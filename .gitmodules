@@ -1,0 +1,3 @@
+[submodule "paperclips"]
+	path = paperclips
+	url = https://github.com/jgmize/paperclips

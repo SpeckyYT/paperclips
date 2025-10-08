@@ -1,0 +1,204 @@
+use std::{collections::VecDeque, time::Duration};
+
+use rand::{random, random_bool, random_range};
+
+use crate::paperclips_core::{Float, PaperClips};
+
+pub const UPDATE_STOCK_SHOP: Duration = Duration::from_millis(1000);
+pub const UPDATE_STOCKS_TIME: Duration = Duration::from_millis(2500);
+
+pub const ALPHABET: [char; 26] = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+];
+
+#[derive(Debug, Clone, Copy)]
+pub enum Riskiness {
+    Low = 7,
+    Medium = 5,
+    High = 1,
+}
+
+pub struct Stock {
+    id: usize,
+    symbol: String,
+    price: Float,
+    amount: u32,
+    total: Float,
+    profit: Float,
+    age: u64,
+}
+
+impl Stock {
+    pub fn update_total(&mut self) {
+        self.total = self.price * self.amount as Float;
+    }
+}
+
+pub struct Investments {
+    stocks: VecDeque<Stock>,
+
+    /// # portfolioSize
+    /// Techincally this is just `stocks.len()`.
+    /// TODO: Maybe can be removed
+    portfolio_size: usize,
+    /// # stockID
+    stock_index: usize,
+
+    // var secTotal = 0;
+    // var sellDelay = 0;
+
+    /// # riskiness
+    riskiness: Riskiness,
+    /// # maxPort
+    max_port: usize,
+
+    // var m = 0;
+    // var investLevel = 0;
+    // var investUpgradeCost = 100;
+
+    /// # stockGainThreshold
+    stock_gain_threshold: Float,
+    /// # bankroll
+    bankroll: Float,
+    /// # ledger
+    ledger: Float,
+    /// # portTotal
+    port_total: Float,
+
+    // var stockReportCounter = 0;
+}
+
+impl Default for Investments {
+    fn default() -> Self {
+        Self {
+            stocks: VecDeque::with_capacity(10),
+            portfolio_size: 0,
+            stock_index: 0,
+            riskiness: Riskiness::Medium,
+            max_port: 5,
+            stock_gain_threshold: 0.5,
+            bankroll: 0.0,
+            ledger: 0.0,
+            port_total: 0.0,
+        }
+    }
+}
+
+impl PaperClips {
+    pub fn invest_upgrade(&mut self) {
+        // TODO: uncomment and add variables
+        let Investments { stock_gain_threshold, .. } = &mut self.investments;
+
+        // yomi -= investUpgradeCost;
+        // invest_level += 1;
+        *stock_gain_threshold += 0.01;
+        // invest_upgrade_cost = ((invest_level + 1.0).powf(f64::consts::E as Float) * 100.0).floor();
+
+        // self.messages.push(format!("Investment engine upgraded, expected profit/loss ratio now {stock_gain_threshold:.2?}"));
+    }
+    pub fn invest_deposit(&mut self) {
+        let Investments { bankroll, ledger, .. } = &mut self.investments;
+
+        *ledger -= self.funds;
+        *bankroll = (*bankroll + self.funds).floor();
+        self.funds = 0.0;
+    }
+    pub fn invest_withdraw(&mut self) {
+        let Investments { bankroll, ledger, .. } = &mut self.investments;
+        
+        *ledger += *bankroll;
+        self.funds += *bankroll;
+        *bankroll = 0.0;
+    }
+    pub fn stock_shop(&mut self) {
+        let Investments { bankroll, port_total, riskiness, portfolio_size, max_port, .. } = &mut self.investments;
+        
+        let budget = (*port_total/ *riskiness as u8 as Float).ceil();
+        let r = (11 - *riskiness as u8) as Float;
+        let reserves = if matches!(riskiness, Riskiness::High) { 0.0 } else { (*port_total/r).ceil() };
+
+        let budget = match (*bankroll - budget < reserves, matches!(riskiness, Riskiness::High), *bankroll > *port_total / 10.0) {
+            (true, true, true) => *bankroll,
+            (true, true, false) => 0.0,
+            (true, _, _) => *bankroll - reserves,
+            (_, _, _) => budget,
+        };
+
+        if portfolio_size < max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves {
+            if random_bool(0.25) {
+                self.create_stock(budget);
+            }
+        }
+    }
+    pub fn create_stock(&mut self, money: Float) {
+        let Investments { stocks, stock_index, portfolio_size, bankroll, .. } = &mut self.investments;
+        *stock_index += 1;
+
+        let roll = random::<Float>();
+        let max_price: Float = match roll {
+            r if r > 0.99 => 3000.0,
+            r if r > 0.85 => 500.0,
+            r if r > 0.60 => 150.0,
+            r if r > 0.20 => 50.0,
+            _ => 15.0,
+        };
+        let price = random_range(1.0..=max_price).ceil();
+        let price = if price > money { money * roll } else { price };
+
+        let amount = (money / price).floor().max(1000000.0);
+
+        stocks.push_back(Stock {
+            id: *stock_index,
+            symbol: generate_symbol(),
+            price,
+            amount: amount as u32,
+            total: price * amount,
+            profit: 0.0,
+            age: 0,
+        });
+
+        *portfolio_size = stocks.len();
+        *bankroll -= price * amount;
+    }
+    pub fn sell_stock(&mut self) {
+        let Investments { stocks, bankroll, portfolio_size, .. } = &mut self.investments;
+        
+        if let Some(stock) = stocks.pop_front() {
+            *bankroll += stock.total;
+            *portfolio_size = stocks.len();
+        }
+    }
+    pub fn update_stocks(&mut self) {
+        let Investments { stocks, stock_gain_threshold, riskiness, .. } = &mut self.investments;
+
+        for stock in stocks {
+            stock.age += 1;
+            if random_bool(0.6) {
+                let gain = random_bool((*stock_gain_threshold).into());
+                
+                let delta = (random::<Float>() * stock.price / (4 * *riskiness as u8) as Float).ceil();
+                stock.price += if gain { delta } else { -delta };
+
+                if stock.price == 0.0 && random_bool(0.76) {
+                    stock.price = 1.0;
+                }
+
+                stock.update_total();
+
+                let profit = delta * stock.amount as Float;
+                stock.profit += if gain { profit } else { -profit }; 
+            }
+        }
+    }
+}
+
+pub fn generate_symbol() -> String {
+    let letters = match random::<Float>() {
+        r if r <= 0.01 => 1,
+        r if r > 0.1 => 2,
+        r if r > 0.4 => 3,
+        _ => 4,
+    };
+    (0..=letters).map(|_| ALPHABET[random_range(0..ALPHABET.len())]).collect()
+}
