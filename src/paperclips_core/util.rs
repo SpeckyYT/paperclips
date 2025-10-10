@@ -2,6 +2,15 @@ use std::time::Duration;
 
 use crate::paperclips_core::Float;
 
+pub fn floor_to(number: Float, power_of_ten: i32) -> Float {
+    let factor = 10f64.powi(power_of_ten) as Float;
+    (number / factor).floor() * factor
+}
+pub fn round_to(number: Float, power_of_ten: i32) -> Float {
+    let factor = 10f64.powi(power_of_ten) as Float;
+    (number / factor).round() * factor
+}
+
 pub fn time_cruncher(t: Duration) -> String {
     let secs = t.as_secs();
     let h = secs / 3600;

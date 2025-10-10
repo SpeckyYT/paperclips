@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use rand::random;
+use rand::random_bool;
 
 use crate::paperclips_core::{Float, PaperClips};
 
@@ -44,7 +44,7 @@ impl Wire {
             self.price_timer = Instant::now();
         }
 
-        if random::<Float>() < 0.015 {
+        if random_bool(0.015) {
             self.price_counter += 1;
             let wire_adjust = 6.0 * (self.price_counter as Float).sin();
             self.cost = self.base_price + wire_adjust;
@@ -57,10 +57,10 @@ impl Wire {
 
 impl PaperClips {
     pub fn buy_wire(&mut self) {
-        if self.funds >= self.wire.cost {
+        if self.business.funds >= self.wire.cost {
             self.wire.price_timer = Instant::now();
             self.wire.count += self.wire.supply;
-            self.funds -= self.wire.cost;
+            self.business.funds -= self.wire.cost;
             self.wire.purchase += 1;
             self.wire.base_price += 0.05;
             // update wire

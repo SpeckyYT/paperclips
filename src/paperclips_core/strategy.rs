@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::paperclips_core::{strategy::strategies::StratFunction, Float};
+use crate::{paperclips_core::{strategy::strategies::StratFunction, Float}, strategy::strategies::A100};
 
 mod strategies;
 mod util;
@@ -110,7 +110,7 @@ pub struct Strategy {
     horizontal_strat: StratFunction,
     vertical_strats: StratFunction,
 
-    yomi: Float,
+    pub yomi: Float,
 
     // var tourneyCost = 1000;
     // var tourneyLvl = 1;
@@ -151,6 +151,18 @@ pub struct Strategy {
     //     valueBB:0,
     // }
 
+}
+
+impl Default for Strategy {
+    fn default() -> Self {
+        Self {
+            board: StrategyBoard::random(),
+            strats: ArrayVec::new(),
+            horizontal_strat: StratFunction::A100(A100 {}),
+            vertical_strats: StratFunction::A100(A100{}),
+            yomi: 0.0,
+        }
+    }
 }
 
 impl Strategy {

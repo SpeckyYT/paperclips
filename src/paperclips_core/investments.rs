@@ -1,3 +1,4 @@
+use core::f64;
 use std::{collections::VecDeque, time::Duration};
 
 use rand::{random, random_bool, random_range};
@@ -54,8 +55,10 @@ pub struct Investments {
     max_port: usize,
 
     // var m = 0;
-    // var investLevel = 0;
-    // var investUpgradeCost = 100;
+    /// # investLevel
+    invest_level: u32,
+    /// # investUpgradeCost
+    invest_upgrade_cost: Float,
 
     /// # stockGainThreshold
     stock_gain_threshold: Float,
@@ -77,6 +80,8 @@ impl Default for Investments {
             stock_index: 0,
             riskiness: Riskiness::Medium,
             max_port: 5,
+            invest_level: 0,
+            invest_upgrade_cost: 100.0,
             stock_gain_threshold: 0.5,
             bankroll: 0.0,
             ledger: 0.0,
@@ -88,27 +93,27 @@ impl Default for Investments {
 impl PaperClips {
     pub fn invest_upgrade(&mut self) {
         // TODO: uncomment and add variables
-        let Investments { stock_gain_threshold, .. } = &mut self.investments;
+        let Investments { invest_level, stock_gain_threshold, invest_upgrade_cost, .. } = &mut self.investments;
 
-        // yomi -= investUpgradeCost;
-        // invest_level += 1;
+        self.strategy.yomi -= *invest_upgrade_cost;
+        *invest_level += 1;
         *stock_gain_threshold += 0.01;
-        // invest_upgrade_cost = ((invest_level + 1.0).powf(f64::consts::E as Float) * 100.0).floor();
+        *invest_upgrade_cost = (((*invest_level + 1) as Float).powf(f64::consts::E as Float) * 100.0).floor();
 
-        // self.messages.push(format!("Investment engine upgraded, expected profit/loss ratio now {stock_gain_threshold:.2?}"));
+        self.messages.push(format!("Investment engine upgraded, expected profit/loss ratio now {stock_gain_threshold:.2?}"));
     }
     pub fn invest_deposit(&mut self) {
         let Investments { bankroll, ledger, .. } = &mut self.investments;
 
-        *ledger -= self.funds;
-        *bankroll = (*bankroll + self.funds).floor();
-        self.funds = 0.0;
+        *ledger -= self.business.funds;
+        *bankroll = (*bankroll + self.business.funds).floor();
+        self.business.funds = 0.0;
     }
     pub fn invest_withdraw(&mut self) {
         let Investments { bankroll, ledger, .. } = &mut self.investments;
         
         *ledger += *bankroll;
-        self.funds += *bankroll;
+        self.business.funds += *bankroll;
         *bankroll = 0.0;
     }
     pub fn stock_shop(&mut self) {
