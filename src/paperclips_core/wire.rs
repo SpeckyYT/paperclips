@@ -21,6 +21,8 @@ pub struct Wire {
     pub supply: Float,
     /// # wirePurchase
     pub purchase: u32,
+    /// # wireBuyerFlag
+    pub buyer_flag: bool,
 }
 
 impl Default for Wire {
@@ -33,6 +35,7 @@ impl Default for Wire {
             count: 1000.0,
             supply: 1000.0,
             purchase: 0,
+            buyer_flag: false,
         }
     }
 }

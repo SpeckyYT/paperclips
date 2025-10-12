@@ -4,6 +4,7 @@ use rand::random_bool;
 
 use crate::{business::Business, paperclips_core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, strategy::Strategy};
 
+// Can easily get changed with f128 in the future
 pub type Float = f32;
 
 pub mod business;
@@ -95,10 +96,10 @@ impl PaperClips {
         //     stock_report_counter = 0;
         // }
 
-        // // WireBuyer
-        // if wire_buyer_flag && wire_buyer_status && self.wire.count <= 1.0 {
-        //     self.buy_wire();
-        // }
+        // WireBuyer
+        if self.wire.buyer_flag && self.wire.count <= 1.0 {
+            self.buy_wire();
+        }
 
         // // First, Explore
         // explore_universe();
