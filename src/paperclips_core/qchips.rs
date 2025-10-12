@@ -3,6 +3,7 @@ use std::time::Instant;
 use crate::paperclips_core::{Float, PaperClips};
 
 pub struct QChips {
+    pub q_flag: bool,
     pub chips: [Float; 10],
     pub activated: u8,
     pub fade: Instant,
@@ -10,7 +11,7 @@ pub struct QChips {
 
 impl Default for QChips {
     fn default() -> Self {
-        Self { chips: [0.0; 10], activated: 0, fade: Instant::now() }
+        Self { q_flag: false, chips: [0.0; 10], activated: 0, fade: Instant::now() }
     }
 }
 

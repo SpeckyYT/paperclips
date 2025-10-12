@@ -55,17 +55,17 @@ impl PaperClips {
         // milestone_check();
         // button_update();
 
-        // if comp_flag {
-        //     calculate_operations();
-        // }
+        if self.computational.comp_flag {
+            self.computational.calculate_operations();
+        }
 
         // if human_flag {
         //     calculate_trust();
         // }
 
-        // if q_flag {
-        //     quantum_compute();
-        // }
+        if self.qchips.q_flag {
+            self.quantum_compute();
+        }
 
         // update_stats();
         // manage_projects();
