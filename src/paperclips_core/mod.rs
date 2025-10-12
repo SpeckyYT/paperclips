@@ -20,6 +20,8 @@ pub struct PaperClips {
     session_start: Instant,
     ticks: u128,
 
+    human_flag: bool,
+
     messages: Messages,
 
     business: Business,
@@ -35,6 +37,8 @@ impl Default for PaperClips {
         Self { 
             session_start: Instant::now(),
             ticks: 0,
+
+            human_flag: true,
 
             business: Business::default(),
             wire: Wire::default(),
@@ -59,9 +63,9 @@ impl PaperClips {
             self.computational.calculate_operations();
         }
 
-        // if human_flag {
+        if self.human_flag {
             self.calculate_trust();
-        // }
+        }
 
         if self.qchips.q_flag {
             self.quantum_compute();
@@ -136,10 +140,10 @@ impl PaperClips {
         // }
 
         // // Demand Curve 
-        // if human_flag {
+        if self.human_flag {
             // put everything into this function
             self.business.update_demand();
-        // }
+        }
 
         // // // Creativity
         // if (creativityOn && operations >= (memory * 1000)) {
@@ -153,24 +157,21 @@ impl PaperClips {
 
     /// Should run once every 1000ms
     pub fn update_stock_shop_tick(&mut self) {
-        // if human_flag {
+        if self.human_flag {
             self.stock_shop();
-        // }
+        }
     }
 
     /// Should run once every 2500ms
     pub fn update_stocks_tick(&mut self) {
-        // sell_delay += 1;
-
-        // if portfolio_size > 0 && sell_delay >= 5 && random_bool(0.3) && human_flag {
-            self.sell_stock();
-        //     sell_delay = 0;
-        // }
-
-        // if portfolio_size > 0 && human_flag {
+        self.investments.sell_delay += 1;
+        if self.human_flag && self.investments.portfolio_size > 0 {
+            if self.investments.sell_delay >= 5 && random_bool(0.3) {
+                self.sell_stock();
+                self.investments.sell_delay = 0;
+            }
             self.update_stocks();
-        // }
-
+        }
     }
 
     /// Should run once every 100ms
@@ -178,15 +179,12 @@ impl PaperClips {
         // Wire Price Fluctuation
         self.wire.adjust_wire_price();
 
-        // if humanflag {
+        if self.human_flag {
             // Sales Calculator
             if random_bool(self.business.demand as f64 / 100.0) {
                 self.sell_clips((0.7 * self.business.demand.powf(1.15)).floor());
             }
-
             // Fire Once a Second
-        // }
-
-
+        }
     }
 }

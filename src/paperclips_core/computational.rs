@@ -1,5 +1,3 @@
-use std::arch::naked_asm;
-
 use crate::{paperclips_core::Float, PaperClips};
 
 pub struct Computational {

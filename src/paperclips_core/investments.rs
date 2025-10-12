@@ -37,37 +37,40 @@ impl Stock {
 }
 
 pub struct Investments {
-    stocks: VecDeque<Stock>,
+    pub stocks: VecDeque<Stock>,
 
     /// # portfolioSize
     /// Techincally this is just `stocks.len()`.
     /// TODO: Maybe can be removed
-    portfolio_size: usize,
+    pub portfolio_size: usize,
     /// # stockID
-    stock_index: usize,
+    pub stock_index: usize,
 
     // var secTotal = 0;
     // var sellDelay = 0;
 
     /// # riskiness
-    riskiness: Riskiness,
+    pub riskiness: Riskiness,
     /// # maxPort
-    max_port: usize,
+    pub max_port: usize,
 
     // var m = 0;
     /// # investLevel
-    invest_level: u32,
+    pub invest_level: u32,
     /// # investUpgradeCost
-    invest_upgrade_cost: Float,
+    pub invest_upgrade_cost: Float,
 
     /// # stockGainThreshold
-    stock_gain_threshold: Float,
+    pub stock_gain_threshold: Float,
     /// # bankroll
-    bankroll: Float,
+    pub bankroll: Float,
     /// # ledger
-    ledger: Float,
+    pub ledger: Float,
     /// # portTotal
-    port_total: Float,
+    pub port_total: Float,
+
+    /// # sellDelay
+    pub sell_delay: u8,
 
     // var stockReportCounter = 0;
 }
@@ -86,6 +89,7 @@ impl Default for Investments {
             bankroll: 0.0,
             ledger: 0.0,
             port_total: 0.0,
+            sell_delay: 0,
         }
     }
 }
