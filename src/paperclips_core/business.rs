@@ -21,6 +21,18 @@ pub struct Business {
     pub demand_boost: Float,
     /// # prestigeU
     pub prestige_u: Float,
+
+    // # clipRateTracker
+    // Used as a "run this code once every 100 cycles"
+    // Removed for the reason above
+    // pub clip_rate_tracker: u8,
+    
+    /// # prevClips
+    pub prev_clips: Float,
+    /// # clipRateTemp
+    pub clip_rate_temp: Float,
+    /// # clipRate
+    pub clip_rate: Float,
 }
 
 impl Default for Business {
@@ -35,6 +47,10 @@ impl Default for Business {
             marketing_effectiveness: 1.0,
             demand_boost: 1.0,
             prestige_u: 0.0,
+
+            prev_clips: 0.0,
+            clip_rate_temp: 0.0,
+            clip_rate: 0.0,
         }
     }
 }

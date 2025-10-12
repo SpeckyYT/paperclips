@@ -1,8 +1,8 @@
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use rand::random_bool;
 
-use crate::{business::Business, paperclips_core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, strategy::Strategy};
+use crate::{business::Business, paperclips_core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f32;
@@ -76,17 +76,16 @@ impl PaperClips {
         // manage_projects();
         // milestone_check();
 
-        // // Clip Rate Tracker
-        // clip_rate_tracker += 1;
-        // if clip_rate_tracker < 100 {
-        //     let cr = clips - prev_clips;
-        //     clip_rate_temp += cr;
-        //     prev_clips = clips;
-        // } else {
-        //     clip_rate_tracker = 0;
-        //     clip_rate = clip_rate_temp;
-        //     clip_rate_temp = 0;
-        // }
+        // Clip Rate Tracker
+        let Business { prev_clips, clip_rate_temp, clip_rate, clips, .. } = &mut self.business;
+        if self.ticks % ticks_10ms(Duration::from_secs(1)) == 0 {
+            let cr = *clips - *prev_clips;
+            *clip_rate_temp += cr;
+            *prev_clips = *clips;
+        } else {
+            *clip_rate = *clip_rate_temp;
+            *clip_rate_temp = 0.0;
+        }
 
         // // Stock Report
         // stock_report_counter += 1;

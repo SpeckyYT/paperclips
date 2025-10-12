@@ -103,3 +103,13 @@ pub fn number_cruncher(number: Float, decimals: Option<u8>) -> String {
         format!("{:.prec$} {}", number, suffix, prec = precision as usize)
     }
 }
+
+#[inline]
+pub const fn ticks(duration: Duration, hertz: Duration) -> u128 {
+    duration.as_nanos().div_ceil(hertz.as_nanos())
+}
+
+#[inline]
+pub const fn ticks_10ms(duration: Duration) -> u128 {
+    ticks(duration, Duration::from_millis(10))
+}
