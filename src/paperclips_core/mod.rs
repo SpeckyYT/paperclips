@@ -165,7 +165,7 @@ impl PaperClips {
     /// Should run once every 2500ms
     pub fn update_stocks_tick(&mut self) {
         self.investments.sell_delay += 1;
-        if self.human_flag && self.investments.portfolio_size > 0 {
+        if self.human_flag && !self.investments.stocks.is_empty() {
             if self.investments.sell_delay >= 5 && random_bool(0.3) {
                 self.sell_stock();
                 self.investments.sell_delay = 0;

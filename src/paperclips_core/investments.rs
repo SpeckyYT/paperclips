@@ -39,10 +39,11 @@ impl Stock {
 pub struct Investments {
     pub stocks: VecDeque<Stock>,
 
-    /// # portfolioSize
-    /// Techincally this is just `stocks.len()`.
-    /// TODO: Maybe can be removed
-    pub portfolio_size: usize,
+    // # portfolioSize
+    // Techincally this is just `stocks.len()`.
+    // REMOVED for the reason above.
+    // pub portfolio_size: usize,
+
     /// # stockID
     pub stock_index: usize,
 
@@ -79,7 +80,6 @@ impl Default for Investments {
     fn default() -> Self {
         Self {
             stocks: VecDeque::with_capacity(10),
-            portfolio_size: 0,
             stock_index: 0,
             riskiness: Riskiness::Medium,
             max_port: 5,
@@ -121,7 +121,7 @@ impl PaperClips {
         *bankroll = 0.0;
     }
     pub fn stock_shop(&mut self) {
-        let Investments { bankroll, port_total, riskiness, portfolio_size, max_port, .. } = &mut self.investments;
+        let Investments { stocks, bankroll, port_total, riskiness, max_port, .. } = &mut self.investments;
         
         let budget = (*port_total/ *riskiness as u8 as Float).ceil();
         let r = (11 - *riskiness as u8) as Float;
@@ -134,14 +134,14 @@ impl PaperClips {
             (_, _, _) => budget,
         };
 
-        if portfolio_size < max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves {
+        if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves {
             if random_bool(0.25) {
                 self.create_stock(budget);
             }
         }
     }
     pub fn create_stock(&mut self, money: Float) {
-        let Investments { stocks, stock_index, portfolio_size, bankroll, .. } = &mut self.investments;
+        let Investments { stocks, stock_index, bankroll, .. } = &mut self.investments;
         *stock_index += 1;
 
         let roll = random::<Float>();
@@ -167,15 +167,13 @@ impl PaperClips {
             age: 0,
         });
 
-        *portfolio_size = stocks.len();
         *bankroll -= price * amount;
     }
     pub fn sell_stock(&mut self) {
-        let Investments { stocks, bankroll, portfolio_size, .. } = &mut self.investments;
+        let Investments { stocks, bankroll, .. } = &mut self.investments;
         
         if let Some(stock) = stocks.pop_front() {
             *bankroll += stock.total;
-            *portfolio_size = stocks.len();
         }
     }
     pub fn update_stocks(&mut self) {
