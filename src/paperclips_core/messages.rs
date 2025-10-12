@@ -17,8 +17,8 @@ impl Default for Messages {
 }
 
 impl Messages {
-    pub fn push(&mut self, msg: String) {
-        self.messages.push_front(msg);
+    pub fn push(&mut self, msg: impl Into<String>) {
+        self.messages.push_front(msg.into());
         if self.messages.len() > self.max_messages {
             self.messages.pop_back();
         }

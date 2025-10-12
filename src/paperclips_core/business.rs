@@ -3,6 +3,9 @@ use crate::{util::{floor_to, round_to}, Float, PaperClips};
 pub struct Business {
     /// # funds
     pub funds: Float,
+    /// # clips
+    /// Total amount of clips produced
+    pub clips: Float,
     /// # unsoldClips
     pub unsold_clips: Float,
     /// # margin
@@ -24,6 +27,7 @@ impl Default for Business {
     fn default() -> Self {
         Self {
             funds: 0.0,
+            clips: 0.0,
             unsold_clips: 0.0,
             margin: 0.25,
             demand: 5.0,

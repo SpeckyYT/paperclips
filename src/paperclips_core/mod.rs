@@ -60,7 +60,7 @@ impl PaperClips {
         }
 
         // if human_flag {
-        //     calculate_trust();
+            self.calculate_trust();
         // }
 
         if self.qchips.q_flag {

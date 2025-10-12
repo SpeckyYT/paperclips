@@ -1,8 +1,12 @@
-use crate::paperclips_core::Float;
+use std::arch::naked_asm;
+
+use crate::{paperclips_core::Float, PaperClips};
 
 pub struct Computational {
     pub comp_flag: bool,
 
+    /// # trust
+    pub trust: u32,
     /// # processors
     pub processors: u32,
     /// # memory
@@ -19,12 +23,18 @@ pub struct Computational {
     pub op_fade_timer: u32,
     /// # opFadeDelay
     pub op_fade_delay: u32,
+    
+    /// # nextTrust
+    pub next_trust: Float,
+    /// # \[fib2, fib1\]
+    pub fib: [Float; 2],
 }
 
 impl Default for Computational {
     fn default() -> Self {
         Self {
             comp_flag: false,
+            trust: 2,
             processors: 1,
             memory: 1,
             operations: 0.0,
@@ -33,6 +43,8 @@ impl Default for Computational {
             op_fade: 0.0,
             op_fade_timer: 0,
             op_fade_delay: 800,
+            next_trust: 3000.0,
+            fib: [2.0, 3.0],
         }
     }
 }
@@ -68,5 +80,17 @@ impl Computational {
         }
 
         self.standard_ops = self.standard_ops.min((self.memory * 1000) as Float);
+    }
+}
+
+impl PaperClips {
+    pub fn calculate_trust(&mut self) {
+        if self.business.clips >= self.computational.next_trust {
+            self.computational.trust += 1;
+            self.messages.push("Production target met: TRUST INCREASED, additional processor/memory capacity granted");
+            let fib_next = self.computational.fib.iter().sum::<Float>();
+            self.computational.next_trust = fib_next * 1000.0;
+            self.computational.fib = [self.computational.fib[1], fib_next];
+        }
     }
 }
