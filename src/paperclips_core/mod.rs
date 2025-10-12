@@ -139,16 +139,17 @@ impl PaperClips {
         //     clip_click(megaClipperBoost * (megaClipperLevel * 5));
         // }
 
-        // // Demand Curve 
+        // Demand Curve 
         if self.human_flag {
             // put everything into this function
             self.business.update_demand();
         }
 
-        // // // Creativity
-        // if (creativityOn && operations >= (memory * 1000)) {
-        //     calculateCreativity();
-        // }
+        // Creativity
+        let Computational { creativity_flag, operations, .. } = &mut self.computational;
+        if *creativity_flag && *operations >= self.computational.max_operations() as Float {
+            self.computational.calculate_creativity();
+        }
 
         // Ending
 

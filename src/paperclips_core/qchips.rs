@@ -35,7 +35,7 @@ impl PaperClips {
 
         let mut qq = (q * 360.0).ceil();
         
-        let buffer = (self.computational.memory as Float * 1000.0) - self.computational.standard_ops;
+        let buffer = self.computational.max_operations() as Float - self.computational.standard_ops;
         let damper = (self.computational.temp_ops / 100.0) + 5.0;
 
         if qq > buffer as Float {
