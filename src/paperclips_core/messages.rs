@@ -4,7 +4,7 @@ const DEFAULT_MESSAGES_SIZE: usize = 5;
 
 pub struct Messages {
     pub max_messages: usize,
-    messages: VecDeque<String>,
+    pub messages: VecDeque<String>,
 }
 
 impl Default for Messages {

@@ -79,21 +79,19 @@ impl PaperClips {
         // Clip Rate Tracker
         let Business { prev_clips, clip_rate_temp, clip_rate, clips, .. } = &mut self.business;
         if self.ticks % ticks_10ms(Duration::from_secs(1)) == 0 {
+            *clip_rate = *clip_rate_temp;
+            *clip_rate_temp = 0.0;
+        } else {
             let cr = *clips - *prev_clips;
             *clip_rate_temp += cr;
             *prev_clips = *clips;
-        } else {
-            *clip_rate = *clip_rate_temp;
-            *clip_rate_temp = 0.0;
         }
 
-        // // Stock Report
-        // stock_report_counter += 1;
-        // if (investment_engine_flag == 1 && stock_report_counter >= 10000) {
-        //     let r = (ledger + portTotal).toLocaleString();
-        //     displayMessage("Lifetime investment revenue report: $" + r);
-        //     stock_report_counter = 0;
-        // }
+        // Stock Report
+        if self.investments.engine_flag && self.ticks % ticks_10ms(Duration::from_secs(100)) == 0 {
+            let r = self.investments.ledger + self.investments.port_total;
+            self.messages.push(format!("Lifetime investment revenue report: ${r}"));
+        }
 
         // WireBuyer
         if self.wire.buyer_flag && self.wire.count <= 1.0 {

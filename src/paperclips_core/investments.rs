@@ -74,6 +74,9 @@ pub struct Investments {
     pub sell_delay: u8,
 
     // var stockReportCounter = 0;
+
+    /// # investmentEngineFlag
+    pub engine_flag: bool,
 }
 
 impl Default for Investments {
@@ -90,6 +93,7 @@ impl Default for Investments {
             ledger: 0.0,
             port_total: 0.0,
             sell_delay: 0,
+            engine_flag: false,
         }
     }
 }
