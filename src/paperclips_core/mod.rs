@@ -18,19 +18,19 @@ pub mod util;
 pub mod investments;
 
 pub struct PaperClips {
-    session_start: Instant,
-    ticks: u128,
+    pub session_start: Instant,
+    pub ticks: u128,
 
-    human_flag: bool,
+    pub human_flag: bool,
 
-    messages: Messages,
+    pub messages: Messages,
 
-    business: Business,
-    wire: Wire,
-    computational: Computational, 
-    qchips: QChips,
-    investments: Investments,
-    strategy: Strategy,
+    pub business: Business,
+    pub wire: Wire,
+    pub computational: Computational, 
+    pub qchips: QChips,
+    pub investments: Investments,
+    pub strategy: Strategy,
 }
 
 impl Default for PaperClips {
