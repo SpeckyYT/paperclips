@@ -31,53 +31,61 @@ impl App for Gui {
         self.update_paperclips(ctx);
 
         CentralPanel::default().show(ctx, |ui| {
-            ui.heading(format!("Paperclips: {}", self.paperclips.business.clips));
-            if ui.button("Make Paperclip").clicked() {
-                self.paperclips.clip_click(1.0);
-            }
+            let paperclips = &mut self.paperclips;
+
+            ui.heading(format!("Paperclips: {}", paperclips.business.clips));
+            ui.add_enabled_ui(paperclips.wire.count >= 1.0, |ui| {
+                if ui.button("Make Paperclip").clicked() {
+                    paperclips.clip_click(1.0);
+                }
+            });
 
             ui.group(|ui| {
                 ui.heading("Business");
                 ui.separator();
 
-                ui.label(format!("Available Funds: ${:.2}", self.paperclips.business.funds));
-                ui.label(format!("Unsold Inventory: {:.0}", self.paperclips.business.unsold_clips));
+                ui.label(format!("Available Funds: ${:.2}", paperclips.business.funds));
+                ui.label(format!("Unsold Inventory: {:.0}", paperclips.business.unsold_clips));
                 ui.horizontal(|ui| {
-                    if ui.button("lower").clicked() { self.paperclips.business.lower_price(); }
-                    if ui.button("raise").clicked() { self.paperclips.business.raise_price(); }
-                    ui.label(format!("Price per Clip: ${:.2}", self.paperclips.business.margin));
+                    if ui.button("lower").clicked() { paperclips.business.lower_price(); }
+                    if ui.button("raise").clicked() { paperclips.business.raise_price(); }
+                    ui.label(format!("Price per Clip: ${:.2}", paperclips.business.margin));
                 });
-                ui.label(format!("Public Demand: {:.0}%", self.paperclips.business.demand * 10.0)); // `* 10.0` is intentional
+                ui.label(format!("Public Demand: {:.0}%", paperclips.business.demand * 10.0)); // `* 10.0` is intentional
 
                 ui.add_space(10.0);
 
                 ui.horizontal(|ui| {
-                    if ui.button("Marketing").clicked() {
-                        self.paperclips.business.buy_ads();
-                    }
-                    ui.label(format!("Level: {}", self.paperclips.business.marketing_lvl));
+                    ui.add_enabled_ui(paperclips.business.funds >= paperclips.business.ad_cost, |ui| {
+                        if ui.button("Marketing").clicked() {
+                            paperclips.business.buy_ads();
+                        }
+                    });
+                    ui.label(format!("Level: {}", paperclips.business.marketing_lvl));
                 });
-                ui.label(format!("Cost: ${}", self.paperclips.business.ad_cost));
+                ui.label(format!("Cost: ${}", paperclips.business.ad_cost));
             });
 
             ui.group(|ui| {
                 ui.heading("Manufacturing");
                 ui.separator();
 
-                ui.label(format!("Clips per Second: {:.0}", self.paperclips.business.clip_rate));
+                ui.label(format!("Clips per Second: {:.0}", paperclips.business.clip_rate));
 
                 ui.add_space(10.0);
 
                 ui.horizontal(|ui| {
-                    if ui.button("Wire").clicked() {
-                        self.paperclips.buy_wire();
-                    }
-                    ui.label(format!("{:.0} inches", self.paperclips.wire.count));
+                    ui.add_enabled_ui(paperclips.business.funds >= paperclips.wire.cost, |ui| {
+                        if ui.button("Wire").clicked() {
+                            paperclips.buy_wire();
+                        }
+                    });
+                    ui.label(format!("{:.0} inches", paperclips.wire.count));
                 });
-                ui.label(format!("Cost: ${:.0}", self.paperclips.wire.cost));
+                ui.label(format!("Cost: ${:.0}", paperclips.wire.cost));
             });
 
-            if self.paperclips.qchips.q_flag {
+            if paperclips.qchips.q_flag {
                 ui.group(|ui | {
                     const SIZE: f32 = 20.0;
                     const SPACING: f32 = 2.0;
