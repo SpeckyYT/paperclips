@@ -1,17 +1,31 @@
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use crate::paperclips_core::{Float, PaperClips};
 
+pub const QOPS_FADE_TIME: Duration = Duration::from_secs(10);
+
 pub struct QChips {
+    /// # qFlag
     pub q_flag: bool,
+    /// # qChips
     pub chips: [Float; 10],
+    /// Doesn't exist in the original code, but it's part of the `qChips`.
     pub activated: u8,
+    /// # qFade
     pub fade: Instant,
+    /// # #qCompDisplay
+    pub qops: Option<Float>,
 }
 
 impl Default for QChips {
     fn default() -> Self {
-        Self { q_flag: false, chips: [0.0; 10], activated: 0, fade: Instant::now() }
+        Self {
+            q_flag: false,
+            chips: [0.0; 10],
+            activated: 0,
+            fade: Instant::now() - QOPS_FADE_TIME,
+            qops: None,
+        }
     }
 }
 
@@ -21,32 +35,35 @@ impl PaperClips {
         for (i, value) in self.qchips.chips.iter_mut().enumerate()  {
             let wave_speed = (i + 1) as Float / 10.0;
             *value = (qclock * wave_speed).sin();
-            // update qchip opacity
         }
     }
 
     pub fn quantum_compute(&mut self) {
         self.qchips.fade = Instant::now();
+        self.qchips.qops = if self.qchips.activated == 0 {
+            None
+        } else {
+            let q: Float = self.qchips.chips.iter()
+                .take(self.qchips.activated as usize)
+                .copied()
+                .sum();
+    
+            let total_qq = (q * 360.0).ceil();
+            let mut qq = total_qq;
 
-        let q: Float = self.qchips.chips.iter()
-            .take(self.qchips.activated as usize)
-            .copied()
-            .sum();
+            let buffer = self.computational.max_operations() as Float - self.computational.standard_ops;
+            let damper = (self.computational.temp_ops / 100.0) + 5.0;
+    
+            if qq > buffer as Float {
+                self.computational.temp_ops += (qq/damper).ceil() - buffer;
+                qq = buffer;
+                self.computational.op_fade = 0.01;
+                self.computational.op_fade_timer = 0;
+            }
+    
+            self.computational.standard_ops += qq;
 
-        let mut qq = (q * 360.0).ceil();
-        
-        let buffer = self.computational.max_operations() as Float - self.computational.standard_ops;
-        let damper = (self.computational.temp_ops / 100.0) + 5.0;
-
-        if qq > buffer as Float {
-            self.computational.temp_ops += (qq/damper).ceil() - buffer;
-            qq = buffer;
-            // opFade = 0.01;
-            // opFadeTimer = 0;
-        }
-
-        self.computational.standard_ops += qq;
-
-        // update "qops: {q * 360}"
+            Some(total_qq)
+        };
     }
 }

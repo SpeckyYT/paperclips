@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
-use eframe::{egui::{CentralPanel, Color32, Context, CornerRadius, Rect, Sense, Vec2}, App, Frame};
-use paperclips::PaperClips;
+use eframe::{egui::{CentralPanel, Color32, Context, CornerRadius, Rect, RichText, Sense, Vec2}, App, Frame};
+use paperclips::{qchips::QOPS_FADE_TIME, PaperClips};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 
@@ -93,16 +93,23 @@ impl App for Gui {
                     for i in 0..activated {
                         let x_off = (SIZE + SPACING) * i as f32;
                         let pos = base + Vec2::new(x_off, 0.0);
-                        let r = Rect::from_min_size(pos, Vec2::splat(SIZE));
+                        let rect = Rect::from_min_size(pos, Vec2::splat(SIZE));
                         let chip = self.paperclips.qchips.chips[i as usize];
-                        let color = Color32::WHITE.gamma_multiply(chip.max(0.0).min(1.0) as f32);
-                        painter.rect_filled(r, CornerRadius::ZERO, color);
+                        let color = Color32::WHITE.gamma_multiply(chip.clamp(0.0, 1.0) as f32);
+                        painter.rect_filled(rect, CornerRadius::ZERO, color);
                     }
                     ui.horizontal(|ui| {
                         if ui.button("Compute").clicked() {
                             self.paperclips.quantum_compute();
                         }
-                        ui.label(format!("qOps: {}", 69420));
+                        let text = match self.paperclips.qchips.qops {
+                            Some(qops) => format!("qOps: {qops:.0}"),
+                            None => "Need Photonic Chips".to_string(),
+                        };
+                        let text_color = ui.style().visuals.text_color();
+                        let transparency = QOPS_FADE_TIME.saturating_sub(self.paperclips.qchips.fade.elapsed()).as_secs_f32() / QOPS_FADE_TIME.as_secs_f32();
+                        let color = text_color.gamma_multiply(transparency);
+                        ui.label(RichText::new(text).color(color));
                     });
                 });
             }
