@@ -16,16 +16,16 @@ impl Default for QChips {
 }
 
 impl PaperClips {
-    pub fn quantum_compute(&mut self) {
-        let qclock = self.session_start.elapsed().as_secs_f64() as Float / 10.0;
+    pub fn quantum_compute_update(&mut self) {
+        let qclock = self.session_start.elapsed().as_secs_f64() as Float;
         for (i, value) in self.qchips.chips.iter_mut().enumerate()  {
-            let wave_speed = (10 - i) as Float / 10.0;
+            let wave_speed = (i + 1) as Float / 10.0;
             *value = (qclock * wave_speed).sin();
             // update qchip opacity
         }
     }
 
-    pub fn quantum_compute_button(&mut self) {
+    pub fn quantum_compute(&mut self) {
         self.qchips.fade = Instant::now();
 
         let q: Float = self.qchips.chips.iter()

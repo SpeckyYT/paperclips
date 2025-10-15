@@ -69,7 +69,7 @@ impl PaperClips {
         }
 
         if self.qchips.q_flag {
-            self.quantum_compute();
+            self.quantum_compute_update();
         }
 
         // update_stats();

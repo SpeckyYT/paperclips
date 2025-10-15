@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use eframe::{egui::{CentralPanel, Context}, App, Frame};
+use eframe::{egui::{CentralPanel, Color32, Context, CornerRadius, Rect, Sense, Vec2}, App, Frame};
 use paperclips::PaperClips;
 
 const TEN_MS: Duration = Duration::from_millis(10);
@@ -75,7 +75,37 @@ impl App for Gui {
                     ui.label(format!("{:.0} inches", self.paperclips.wire.count));
                 });
                 ui.label(format!("Cost: ${:.0}", self.paperclips.wire.cost));
-            })
+            });
+
+            if self.paperclips.qchips.q_flag {
+                ui.group(|ui | {
+                    const SIZE: f32 = 20.0;
+                    const SPACING: f32 = 2.0;
+    
+                    ui.heading("Quantum Computing");
+                    let activated = self.paperclips.qchips.activated;
+                    let size = Vec2::new(
+                        (SIZE + SPACING) * activated as f32,
+                        SIZE,
+                    );
+                    let (resp, painter) = ui.allocate_painter(size, Sense::HOVER);
+                    let base = resp.rect.min;
+                    for i in 0..activated {
+                        let x_off = (SIZE + SPACING) * i as f32;
+                        let pos = base + Vec2::new(x_off, 0.0);
+                        let r = Rect::from_min_size(pos, Vec2::splat(SIZE));
+                        let chip = self.paperclips.qchips.chips[i as usize];
+                        let color = Color32::WHITE.gamma_multiply(chip.max(0.0).min(1.0) as f32);
+                        painter.rect_filled(r, CornerRadius::ZERO, color);
+                    }
+                    ui.horizontal(|ui| {
+                        if ui.button("Compute").clicked() {
+                            self.paperclips.quantum_compute();
+                        }
+                        ui.label(format!("qOps: {}", 69420));
+                    });
+                });
+            }
         });
     }
 }
