@@ -135,8 +135,8 @@ impl PaperClips {
 
         // // Auto-Clipper
         // if (dismantle < 4) {
-        //     clip_click(clipperBoost * (clipmakerLevel / 100));
-        //     clip_click(megaClipperBoost * (megaClipperLevel * 5));
+            self.clip_click(self.business.clipper_boost * (self.business.clipper_level / 100.0));
+            self.clip_click(self.business.mega_clipper_boost * (self.business.mega_clipper_level * 5.0));
         // }
 
         // Demand Curve 

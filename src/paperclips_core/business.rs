@@ -29,6 +29,20 @@ pub struct Business {
     // Removed for the reason above
     // pub clip_rate_tracker: u8,
     
+    // Autoclippers
+    /// # clipmakerLevel
+    pub clipper_level: Float,
+    /// # clipperBoost
+    pub clipper_boost: Float,
+    /// # clipperCost
+    pub clipper_cost: Float,
+    /// # megaClipperLevel
+    pub mega_clipper_level: Float,
+    /// # megaClipperBoost
+    pub mega_clipper_boost: Float,
+    /// # megaClipperCost
+    pub mega_clipper_cost: Float,
+
     /// # prevClips
     pub prev_clips: Float,
     /// # clipRateTemp
@@ -50,6 +64,13 @@ impl Default for Business {
             marketing_effectiveness: 1.0,
             demand_boost: 1.0,
             prestige_u: 0.0,
+
+            clipper_level: 0.0,
+            clipper_boost: 1.0,
+            clipper_cost: 5.0,
+            mega_clipper_level: 0.0,
+            mega_clipper_boost: 1.0,
+            mega_clipper_cost: 500.0,
 
             prev_clips: 0.0,
             clip_rate_temp: 0.0,
@@ -116,5 +137,19 @@ impl Business {
         let marketing = (1.1 as Float).powf((self.marketing_lvl - 1) as Float);
         self.demand = 0.8 / self.margin * marketing * self.marketing_effectiveness * self.demand_boost;
         self.demand += self.demand / 10.0 * self.prestige_u;
+    }
+    pub fn make_clipper(&mut self) {
+        if self.funds >= self.clipper_cost {
+            self.funds -= self.clipper_cost;
+            self.clipper_level += 1.0;
+        }
+        self.clipper_cost = (1.1 as Float).powf(self.clipper_level) + 5.0;
+    }
+    pub fn make_mega_clipper(&mut self) {
+        if self.funds >= self.mega_clipper_cost {
+            self.funds -= self.mega_clipper_cost;
+            self.mega_clipper_level += 1.0;
+        }
+        self.clipper_cost = (1.07 as Float).powf(self.mega_clipper_level) * 1000.0;
     }
 }
