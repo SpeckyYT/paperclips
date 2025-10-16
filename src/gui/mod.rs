@@ -1,9 +1,12 @@
 use std::time::{Duration, Instant};
 
-use eframe::{egui::{CentralPanel, Color32, Context, CornerRadius, Rect, RichText, Sense, Vec2}, App, Frame};
-use paperclips::{qchips::QOPS_FADE_TIME, PaperClips};
+use eframe::{
+    App, Frame,
+    egui::{CentralPanel, Context},
+};
+use paperclips::PaperClips;
 
-use crate::gui::groups::{business_group, manufacturing_group, quantum_computing_group};
+use crate::gui::groups::{business_group, manufacturing_group, projects_group, quantum_computing_group};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 
@@ -49,6 +52,8 @@ impl App for Gui {
             manufacturing_group(ui, paperclips);
 
             quantum_computing_group(ui, paperclips);
+
+            projects_group(ui, paperclips);
         });
     }
 }

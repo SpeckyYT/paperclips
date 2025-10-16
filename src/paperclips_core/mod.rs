@@ -73,7 +73,7 @@ impl PaperClips {
         }
 
         // update_stats();
-        // manage_projects();
+        self.manage_projects();
         // milestone_check();
 
         // Clip Rate Tracker
