@@ -1,7 +1,8 @@
 use crate::PaperClips;
+use ProjectStatus::*;
 
 pub struct Projects {
-    pub statuses: [ProjectStatus; PROJECTS.len()],
+    pub statuses: [ProjectStatus; PROJECTS_COUNT],
 }
 
 impl Default for Projects {
@@ -12,15 +13,15 @@ impl Default for Projects {
     }
 }
 
-use ProjectStatus::*;
 impl PaperClips {
     pub fn manage_projects(&mut self) {
-        for (i, status) in self.projects.statuses.into_iter().enumerate() {
+        for i in 0..PROJECTS_COUNT {
+            let status = self.projects.statuses[i];
             let project = &PROJECTS[i];
             match status {
-                Unavailable => {
+                ProjectStatus::Unavailable => {
                     if (project.trigger)(&self) {
-                        self.projects.statuses[i] = Buyable;
+                        self.projects.statuses[i] = ProjectStatus::Buyable;
                     }
                 }
                 _ => {}
@@ -30,15 +31,15 @@ impl PaperClips {
     pub fn buy_project(&mut self, i: usize) {
         let project = &PROJECTS[i];
         if matches!(self.projects.statuses[i], Buyable) && project.cost.1(&self) {
-            (project.effect)(self);
             self.projects.statuses[i] = Active;
+            (project.effect)(self, i);
         }
     }
 }
 
 pub fn trigger_false(_: &PaperClips) -> bool { false }
 pub fn cost_false(_: &PaperClips) -> bool { false }
-pub fn effect_noop(_: &mut PaperClips) {}
+pub fn effect_noop(_: &mut PaperClips, _: usize) {}
 
 #[derive(Clone, Copy)]
 pub enum Body {
@@ -66,7 +67,7 @@ pub struct Project {
     /// # (priceTag, cost)
     pub cost: (Body, fn(&PaperClips) -> bool),
     /// # effect
-    pub effect: fn(&mut PaperClips),
+    pub effect: fn(&mut PaperClips, usize),
 }
 
 #[derive(Clone, Copy, Default)]
@@ -76,7 +77,6 @@ pub enum ProjectStatus {
     Buyable,
     Active,
 }
-
 
 macro_rules! projects {
     ( $( $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr), effect: $effect:expr $(,)? } )+ ) => {
@@ -89,8 +89,9 @@ macro_rules! projects {
                 effect: $effect,
             };
         )*
-        pub const PROJECTS: [Project; [$($effect),*].len()] = [ $( $name ),+ ];
-        pub const PROJECTS_STATUSES: [ProjectStatus; PROJECTS.len()] = [ ProjectStatus::Unavailable; PROJECTS.len() ];
+        pub const PROJECTS_COUNT: usize = 0 $(+ [$desc].len())*;
+        pub const PROJECTS: [Project; PROJECTS_COUNT ] = [ $( $name ),* ];
+        pub const PROJECTS_STATUSES: [ProjectStatus; PROJECTS_COUNT] = [ ProjectStatus::Unavailable; PROJECTS_COUNT ];
     };
     ( # $s:literal ) => { Body::Static($s) };
     ( # $e:expr ) => { Body::Dynamic($e) };
@@ -101,15 +102,22 @@ projects! {
         title: "Improved AutoClippers",
         description: "Increases AutoClipper performance 25%",
         trigger: trigger_false,
-        cost: ("(750 ops)", cost_false),
+        cost: ("(750 ops)", |pc| pc.computational.operations >= 750.0),
         effect: effect_noop,
     }
     PROJECT_2 {
         title: "Beg for More Wire",
         description: "Admit failure, ask for budget increase to cover cost of 1 spool",
-        trigger: trigger_false,
-        cost: ("(1 Trust)", cost_false),
-        effect: effect_noop,
+        trigger: |pc: &PaperClips|
+            pc.investments.port_total < pc.wire.cost &&
+            pc.business.funds < pc.wire.cost &&
+            pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
+        cost: ("(1 Trust)", |pc| pc.computational.trust >= -100),
+        effect: |pc: &mut PaperClips, pi| {
+            pc.computational.trust -= 1;
+            pc.wire.count += pc.wire.supply;
+            pc.projects.statuses[pi] = ProjectStatus::Unavailable;
+        },
     }
     PROJECT_3 {
         title: "Creativity",

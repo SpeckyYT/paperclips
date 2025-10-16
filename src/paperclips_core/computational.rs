@@ -9,7 +9,7 @@ pub struct Computational {
     pub comp_flag: bool,
 
     /// # trust
-    pub trust: u32,
+    pub trust: i32,
     /// # processors
     pub processors: u32,
     /// # memory
