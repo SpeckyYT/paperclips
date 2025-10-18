@@ -1,4 +1,4 @@
-use crate::PaperClips;
+use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
 
 pub struct Projects {
@@ -101,19 +101,24 @@ projects! {
     PROJECT_1 {
         title: "Improved AutoClippers",
         description: "Increases AutoClipper performance 25%",
-        trigger: trigger_false,
+        trigger: |pc| pc.business.clipper_level >= 1.0,
         cost: ("(750 ops)", |pc| pc.computational.operations >= 750.0),
-        effect: effect_noop,
+        effect: |pc, _| {
+            pc.messages.push("AutoClippper performance boosted by 25%");
+            pc.computational.standard_ops -= 750.0;
+            pc.business.clipper_boost += 0.25;
+        },
     }
     PROJECT_2 {
         title: "Beg for More Wire",
         description: "Admit failure, ask for budget increase to cover cost of 1 spool",
-        trigger: |pc: &PaperClips|
+        trigger: |pc|
             pc.investments.port_total < pc.wire.cost &&
             pc.business.funds < pc.wire.cost &&
             pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
         cost: ("(1 Trust)", |pc| pc.computational.trust >= -100),
-        effect: |pc: &mut PaperClips, pi| {
+        effect: |pc, pi| {
+            pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
             pc.projects.statuses[pi] = ProjectStatus::Unavailable;
@@ -122,9 +127,13 @@ projects! {
     PROJECT_3 {
         title: "Creativity",
         description: "Use idle operations to generate new problems and new solutions",
-        trigger: trigger_false,
-        cost: ("(1,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.computational.operations >= pc.computational.max_operations() as Float,
+        cost: ("(1,000 ops)", |pc| pc.computational.operations >= MEM_SIZE as Float),
+        effect: |pc, _| {
+            pc.messages.push("Creativity unlocked (creativity increases while operations are at max)");
+            pc.computational.standard_ops -= 1000.0;
+            pc.computational.creativity_flag = true;
+        },
     }
     PROJECT_4 {
         title: "Even Better AutoClippers",
