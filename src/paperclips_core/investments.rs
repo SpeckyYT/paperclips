@@ -13,7 +13,7 @@ pub const ALPHABET: [char; 26] = [
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Riskiness {
     Low = 7,
     Medium = 5,

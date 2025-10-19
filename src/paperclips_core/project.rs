@@ -32,14 +32,14 @@ impl PaperClips {
         let project = &PROJECTS[i];
         if self.projects.statuses[i] == Buyable && project.cost.1(&self) {
             self.projects.statuses[i] = Active;
-            (project.effect)(self, i);
+            (project.effect)(self);
         }
     }
 }
 
 pub fn trigger_false(_: &PaperClips) -> bool { false }
 pub fn cost_false(_: &PaperClips) -> bool { false }
-pub fn effect_noop(_: &mut PaperClips, _: usize) {}
+pub fn effect_noop(_: &mut PaperClips) {}
 
 #[derive(Clone, Copy)]
 pub enum Body {
@@ -67,7 +67,7 @@ pub struct Project {
     /// # (priceTag, cost)
     pub cost: (Body, fn(&PaperClips) -> bool),
     /// # effect
-    pub effect: fn(&mut PaperClips, usize),
+    pub effect: fn(&mut PaperClips),
 
     /// Doesn't exist in the original, but is useful
     pub index: usize,
@@ -112,7 +112,7 @@ projects! {
         description: "Increases AutoClipper performance 25%",
         trigger: |pc| pc.business.clipper_level >= 1.0,
         cost: ("(750 ops)", |pc| pc.computational.operations >= 750.0),
-        effect: |pc, _| {
+        effect: |pc| {
             pc.messages.push("AutoClippper performance boosted by 25%");
             pc.computational.standard_ops -= 750.0;
             pc.business.clipper_boost += 0.25;
@@ -126,11 +126,11 @@ projects! {
             pc.business.funds < pc.wire.cost &&
             pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
         cost: ("(1 Trust)", |pc| pc.computational.trust >= -100),
-        effect: |pc, pi| {
+        effect: |pc| {
             pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
-            pc.projects.statuses[pi] = ProjectStatus::Unavailable;
+            pc.projects.statuses[PROJECT_2.index] = ProjectStatus::Unavailable;
         },
     }
     PROJECT_3 {
@@ -138,7 +138,7 @@ projects! {
         description: "Use idle operations to generate new problems and new solutions",
         trigger: |pc| pc.computational.operations >= pc.computational.max_operations() as Float,
         cost: ("(1,000 ops)", |pc| pc.computational.operations >= MEM_SIZE as Float),
-        effect: |pc, _| {
+        effect: |pc| {
             pc.messages.push("Creativity unlocked (creativity increases while operations are at max)");
             pc.computational.standard_ops -= 1000.0;
             pc.computational.creativity_flag = true;
@@ -149,7 +149,7 @@ projects! {
         description: "Increases AutoClipper performance by an additional 50%",
         trigger: |pc| pc.projects.statuses[PROJECT_1.index] == ProjectStatus::Active,
         cost: ("(2,500 ops)", |pc| pc.computational.operations >= 2500.0),
-        effect: |pc, _| {
+        effect: |pc| {
             pc.messages.push("AutoClippper performance boosted by another 50%");
             pc.computational.standard_ops -= 2500.0;
             pc.business.clipper_boost += 0.50;
