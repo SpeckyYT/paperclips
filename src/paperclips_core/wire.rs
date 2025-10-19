@@ -20,7 +20,7 @@ pub struct Wire {
     /// # wireSupply
     pub supply: Float,
     /// # wirePurchase
-    pub purchase: u32,
+    pub purchase: u64,
     /// # wireBuyerFlag
     pub buyer_flag: bool,
 }

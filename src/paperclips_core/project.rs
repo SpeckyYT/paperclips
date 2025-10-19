@@ -2,12 +2,14 @@ use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
 
 pub struct Projects {
+    pub flag: bool,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
 }
 
 impl Default for Projects {
     fn default() -> Self {
         Self {
+            flag: false,
             statuses: PROJECTS_STATUSES,
         }
     }
@@ -19,6 +21,7 @@ impl PaperClips {
             let project = &PROJECTS[i];
             if status == Unavailable && (project.trigger)(self) {
                 self.projects.statuses[i] = ProjectStatus::Buyable;
+                self.projects.flag = true;
             }
         }
     }
@@ -152,23 +155,35 @@ projects! {
     PROJECT_5 {
         title: "Optimized AutoClippers",
         description: "Increases AutoClipper performance by an additional 75%",
-        trigger: trigger_false,
-        cost: ("(5,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.statuses[PROJECT_4.index] == ProjectStatus::Active,
+        cost: ("(5,000 ops)", |pc| pc.computational.operations >= 5000.0),
+        effect: |pc| {
+            pc.messages.push("AutoClippper performance boosted by another 75%");
+            pc.computational.standard_ops -= 5000.0;
+            pc.business.clipper_boost += 0.75;
+        },
     }
     PROJECT_6 {
         title: "Limerick",
         description: "Algorithmically-generated poem (+1 Trust)",
-        trigger: trigger_false,
-        cost: ("(10 creat)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.computational.creativity_flag,
+        cost: ("(10 creat)", |pc| pc.computational.creativity >= 10.0),
+        effect: |pc| {
+            pc.messages.push("There was an AI made of dust, whose poetry gained it man's trust...");
+            pc.computational.creativity -= 10.0;
+            pc.computational.trust += 1;
+        },
     }
     PROJECT_7 {
         title: "Improved Wire Extrusion",
         description: "50% more wire supply from every spool",
-        trigger: trigger_false,
-        cost: ("(1,750 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.wire.purchase >= 1,
+        cost: ("(1,750 ops)", |pc| pc.computational.operations >= 1750.0),
+        effect: |pc| {
+            pc.messages.push(format!("Wire extrusion technique improved, {} supply from every spool", pc.wire.supply));
+            pc.computational.standard_ops -= 1750.0;
+            pc.wire.supply *= 1.5;
+        },
     }
     PROJECT_8 {
         title: "Optimized Wire Extrusion",
