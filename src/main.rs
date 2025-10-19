@@ -7,7 +7,9 @@ mod gui;
 fn main() {
     run_native(
         "paperclips",
-        NativeOptions::default(),
+        NativeOptions {
+            ..Default::default()
+        },
         Box::new(|_cc| {
             let gui = Gui::default();
             Ok(Box::new(gui))

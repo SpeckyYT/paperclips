@@ -1,3 +1,5 @@
+#![allow(clippy::useless_conversion)]
+
 use core::f64;
 use std::{collections::VecDeque, time::Duration};
 

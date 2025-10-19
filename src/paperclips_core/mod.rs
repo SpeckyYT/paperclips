@@ -1,3 +1,5 @@
+#![allow(clippy::unnecessary_cast)]
+
 use std::time::{Duration, Instant};
 
 use rand::random_bool;

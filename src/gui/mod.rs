@@ -38,22 +38,24 @@ impl App for Gui {
         self.update_paperclips(ctx);
 
         CentralPanel::default().show(ctx, |ui| {
-            let paperclips = &mut self.paperclips;
+            let pc = &mut self.paperclips;
 
-            ui.heading(format!("Paperclips: {}", paperclips.business.clips));
-            ui.add_enabled_ui(paperclips.wire.count >= 1.0, |ui| {
+            ui.heading(format!("Paperclips: {}", pc.business.clips));
+            ui.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
                 if ui.button("Make Paperclip").clicked() {
-                    paperclips.clip_click(1.0);
+                    pc.clip_click(1.0);
                 }
             });
 
-            business_group(ui, paperclips);
+            business_group(ui, pc);
 
-            manufacturing_group(ui, paperclips);
+            manufacturing_group(ui, pc);
 
-            quantum_computing_group(ui, paperclips);
+            quantum_computing_group(ui, pc);
 
-            projects_group(ui, paperclips);
+            if pc.projects.flag {
+                projects_group(ui, pc);
+            }
         });
     }
 }
@@ -63,7 +65,7 @@ impl Gui {
         macro_rules! update_time {
             ($($prop:ident($time:expr) $code:block)*) => {
                 $(
-                    if self.$prop.elapsed() >= $time {
+                    while self.$prop.elapsed() >= $time {
                         self.$prop += $time;
                         $code;
                     }
