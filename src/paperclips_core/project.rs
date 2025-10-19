@@ -15,22 +15,16 @@ impl Default for Projects {
 
 impl PaperClips {
     pub fn manage_projects(&mut self) {
-        for i in 0..PROJECTS_COUNT {
-            let status = self.projects.statuses[i];
+        for (i, status) in self.projects.statuses.into_iter().enumerate() {
             let project = &PROJECTS[i];
-            match status {
-                ProjectStatus::Unavailable => {
-                    if (project.trigger)(&self) {
-                        self.projects.statuses[i] = ProjectStatus::Buyable;
-                    }
-                }
-                _ => {}
+            if status == Unavailable && (project.trigger)(self) {
+                self.projects.statuses[i] = ProjectStatus::Buyable;
             }
         }
     }
     pub fn buy_project(&mut self, i: usize) {
         let project = &PROJECTS[i];
-        if self.projects.statuses[i] == Buyable && project.cost.1(&self) {
+        if self.projects.statuses[i] == Buyable && project.cost.1(self) {
             self.projects.statuses[i] = Active;
             (project.effect)(self);
         }

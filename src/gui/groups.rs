@@ -128,7 +128,7 @@ pub fn projects_group(ui: &mut Ui, paperclips: &mut PaperClips) {
                     ui.label(project.description.to_string(paperclips));
                 }).response.interact(Sense::click());
 
-                if (project.cost.1)(&paperclips) {
+                if (project.cost.1)(paperclips) {
                     pj = pj.highlight().on_hover_cursor(CursorIcon::PointingHand);
                     if pj.clicked() {
                         paperclips.buy_project(i);

@@ -138,10 +138,8 @@ impl PaperClips {
             (_, _, _) => budget,
         };
 
-        if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves {
-            if random_bool(0.25) {
-                self.create_stock(budget);
-            }
+        if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves && random_bool(0.25) {
+            self.create_stock(budget);
         }
     }
     pub fn create_stock(&mut self, money: Float) {
