@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use crate::paperclips_core::{Float, PaperClips};
+use crate::core::{Float, PaperClips};
 
 pub const QOPS_FADE_TIME: Duration = Duration::from_secs(10);
 

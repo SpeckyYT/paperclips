@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::{paperclips_core::Float, PaperClips};
+use crate::{core::Float, PaperClips};
 
 pub const CREATIVITY_THRESHOLD: Float = 400.0;
 pub const MEM_SIZE: u32 = 1000;

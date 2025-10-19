@@ -4,10 +4,10 @@ use std::time::{Duration, Instant};
 
 use rand::random_bool;
 
-use crate::{business::Business, paperclips_core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, project::Projects, strategy::Strategy, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, project::Projects, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
-pub type Float = f32;
+pub type Float = f64;
 
 pub mod business;
 pub mod messages;

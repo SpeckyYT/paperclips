@@ -5,7 +5,7 @@ use std::{collections::VecDeque, time::Duration};
 
 use rand::{random, random_bool, random_range};
 
-use crate::paperclips_core::{Float, PaperClips};
+use crate::core::{Float, PaperClips};
 
 pub const UPDATE_STOCK_SHOP: Duration = Duration::from_millis(1000);
 pub const UPDATE_STOCKS_TIME: Duration = Duration::from_millis(2500);

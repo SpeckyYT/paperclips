@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::{paperclips_core::{strategy::strategies::StratFunction, Float}, strategy::strategies::A100};
+use crate::{core::{strategy::strategies::StratFunction, Float}, strategy::strategies::A100};
 
 mod strategies;
 mod util;

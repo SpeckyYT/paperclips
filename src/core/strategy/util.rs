@@ -1,4 +1,4 @@
-use crate::paperclips_core::strategy::{Move, Position, Side::{self, *}, StrategyBoard};
+use crate::core::strategy::{Move, Position, Side::{self, *}, StrategyBoard};
 
 /// Return the `Side` with the largest payoff from a `StrategyBoard`.
 ///

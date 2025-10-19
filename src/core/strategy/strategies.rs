@@ -1,6 +1,6 @@
 use rand::random_bool;
 
-use crate::paperclips_core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StratPickMove, StrategyBoard};
+use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StratPickMove, StrategyBoard};
 
 macro_rules! strats {
     ($(struct $name:ident $impl:tt)*) => {

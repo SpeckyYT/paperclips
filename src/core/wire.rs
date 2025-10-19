@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use rand::random_bool;
 
-use crate::paperclips_core::{Float, PaperClips};
+use crate::core::{Float, PaperClips};
 
 const PRICE_TIMER: Duration = Duration::from_secs(25);
 
