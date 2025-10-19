@@ -119,7 +119,7 @@ projects! {
         title: "Improved AutoClippers",
         description: "Increases AutoClipper performance 25%",
         trigger: |pc| pc.business.clipper_level >= 1.0,
-        cost: ("(750 ops)", |pc| pc.computational.operations >= 750.0),
+        cost: ("(750 ops)", |pc| req_operations(750.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 750.0;
             pc.business.clipper_boost += 0.25;
@@ -133,7 +133,7 @@ projects! {
             pc.investments.port_total < pc.wire.cost &&
             pc.business.funds < pc.wire.cost &&
             pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
-        cost: ("(1 Trust)", |pc| pc.computational.trust >= -100),
+        cost: ("(1 Trust)", |pc| req_trust(-100)(pc)),
         effect: |pc| {
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
@@ -144,8 +144,8 @@ projects! {
     PROJECT_3 {
         title: "Creativity",
         description: "Use idle operations to generate new problems and new solutions",
-        trigger: |pc| pc.computational.operations >= pc.computational.max_operations() as Float,
-        cost: ("(1,000 ops)", |pc| pc.computational.operations >= MEM_SIZE as Float),
+        trigger: |pc| req_operations(pc.computational.max_operations() as Float)(pc),
+        cost: ("(1,000 ops)", |pc| req_operations(MEM_SIZE as Float)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 1000.0;
             pc.computational.creativity_flag = true;
@@ -155,8 +155,8 @@ projects! {
     PROJECT_4 {
         title: "Even Better AutoClippers",
         description: "Increases AutoClipper performance by an additional 50%",
-        trigger: |pc| pc.projects.statuses[PROJECT_1.index] == ProjectStatus::Active,
-        cost: ("(2,500 ops)", |pc| pc.computational.operations >= 2500.0),
+        trigger: |pc| pc.projects.is_active(PROJECT_1),
+        cost: ("(2,500 ops)", |pc| req_operations(2500.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 2500.0;
             pc.business.clipper_boost += 0.50;
@@ -166,8 +166,8 @@ projects! {
     PROJECT_5 {
         title: "Optimized AutoClippers",
         description: "Increases AutoClipper performance by an additional 75%",
-        trigger: |pc| pc.projects.statuses[PROJECT_4.index] == ProjectStatus::Active,
-        cost: ("(5,000 ops)", |pc| pc.computational.operations >= 5000.0),
+        trigger: |pc| pc.projects.is_active(PROJECT_4),
+        cost: ("(5,000 ops)", |pc| req_operations(5000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 5000.0;
             pc.business.clipper_boost += 0.75;
@@ -178,7 +178,7 @@ projects! {
         title: "Limerick",
         description: "Algorithmically-generated poem (+1 Trust)",
         trigger: |pc| pc.computational.creativity_flag,
-        cost: ("(10 creat)", |pc| pc.computational.creativity >= 10.0),
+        cost: ("(10 creat)", |pc| req_creativity(10.0)(pc)),
         effect: |pc| {
             pc.computational.creativity -= 10.0;
             pc.computational.trust += 1;
@@ -189,7 +189,7 @@ projects! {
         title: "Improved Wire Extrusion",
         description: "50% more wire supply from every spool",
         trigger: |pc| pc.wire.purchase >= 1,
-        cost: ("(1,750 ops)", |pc| pc.computational.operations >= 1750.0),
+        cost: ("(1,750 ops)", |pc| req_operations(1750.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 1750.0;
             pc.wire.supply *= 1.5;
@@ -200,7 +200,7 @@ projects! {
         title: "Optimized Wire Extrusion",
         description: "75% more wire supply from every spool",
         trigger: |pc| pc.wire.supply >= 1500.0,
-        cost: ("(3,500 ops)", |pc| pc.computational.operations >= 3500.0),
+        cost: ("(3,500 ops)", |pc| req_operations(3500.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 3500.0;
             pc.wire.supply *= 1.75;
@@ -211,7 +211,7 @@ projects! {
         title: "Microlattice Shapecasting",
         description: "100% more wire supply from every spool",
         trigger: |pc| pc.wire.supply >= 2600.0,
-        cost: ("(7,500 ops)", |pc| pc.computational.operations >= 7500.0),
+        cost: ("(7,500 ops)", |pc| req_operations(7500.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 7500.0;
             pc.wire.supply *= 2.0;
@@ -222,7 +222,7 @@ projects! {
         title: "Spectral Froth Annealment",
         description: "200% more wire supply from every spool",
         trigger: |pc| pc.wire.supply >= 5000.0,
-        cost: ("(12,000 ops)", |pc| pc.computational.operations >= 12000.0),
+        cost: ("(12,000 ops)", |pc| req_operations(12000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 12000.0;
             pc.wire.supply *= 3.0;
@@ -233,7 +233,7 @@ projects! {
         title: "Quantum Foam Annealment",
         description: "1,000% more wire supply from every spool",
         trigger: |pc| pc.wire.cost >= 125.0,
-        cost: ("(15,000 ops)", |pc| pc.computational.operations >= 15000.0),
+        cost: ("(15,000 ops)", |pc| req_operations(15000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 15000.0;
             pc.wire.supply *= 11.0;
@@ -244,7 +244,7 @@ projects! {
         title: "New Slogan",
         description: "Improve marketing effectiveness by 50%",
         trigger: |pc| pc.projects.is_active(PROJECT_13),
-        cost: ("(25 creat, 2,500 ops)", |pc| pc.computational.operations >= 2500.0 && pc.computational.creativity >= 25.0),
+        cost: ("(25 creat, 2,500 ops)", |pc| req_operations(2500.0)(pc) && req_creativity(25.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 2500.0;
             pc.computational.creativity -= 25.0;
@@ -256,7 +256,7 @@ projects! {
         title: "Catchy Jingle",
         description: "Double marketing effectiveness",
         trigger: |pc| pc.projects.is_active(PROJECT_14),
-        cost: ("(45 creat, 4,500 ops)", |pc| pc.computational.operations >= 4500.0 && pc.computational.creativity >= 45.0),
+        cost: ("(45 creat, 4,500 ops)", |pc| req_operations(4500.0)(pc) && req_creativity(45.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 4500.0;
             pc.computational.creativity -= 45.0;
@@ -267,8 +267,8 @@ projects! {
     PROJECT_13 {
         title: "Lexical Processing",
         description: "Gain ability to interpret and understand human language (+1 Trust)",
-        trigger: |pc| pc.computational.creativity >= 50.0,
-        cost: ("(50 creat)", |pc| pc.computational.creativity >= 50.0),
+        trigger: |pc| req_creativity(50.0)(pc),
+        cost: ("(50 creat)", |pc| req_creativity(50.0)(pc)),
         effect: |pc| {
             pc.computational.creativity -= 50.0;
             pc.computational.trust += 1;
@@ -279,8 +279,8 @@ projects! {
     PROJECT_14 {
         title: "Combinatory Harmonics",
         description: "Daisy, Daisy, give me your answer do... (+1 Trust)",
-        trigger: |pc| pc.computational.creativity >= 100.0,
-        cost: ("(100 creat)", |pc| pc.computational.creativity >= 100.0),
+        trigger: |pc| req_creativity(100.0)(pc),
+        cost: ("(100 creat)", |pc| req_creativity(100.0)(pc)),
         effect: |pc| {
             pc.computational.creativity -= 100.0;
             pc.computational.trust += 1;
@@ -291,8 +291,8 @@ projects! {
     PROJECT_15 {
         title: "The Hadwiger Problem",
         description: "Cubes within cubes within cubes... (+1 Trust)",
-        trigger: |pc| pc.computational.creativity >= 150.0,
-        cost: ("(150 creat)", |pc| pc.computational.creativity >= 150.0),
+        trigger: |pc| req_creativity(150.0)(pc),
+        cost: ("(150 creat)", |pc| req_creativity(150.0)(pc)),
         effect: |pc| {
             pc.computational.creativity -= 150.0;
             pc.computational.trust += 1;
@@ -853,4 +853,17 @@ projects! {
         cost: ("(??? )", cost_false),
         effect: effect_noop,
     }
+}
+
+#[inline(always)]
+const fn req_operations(ops: Float) -> impl Fn(&PaperClips) -> bool {
+    move |pc| pc.computational.operations >= ops
+}
+#[inline(always)]
+const fn req_creativity(creativity: Float) -> impl Fn(&PaperClips) -> bool {
+    move |pc| pc.computational.creativity >= creativity
+}
+#[inline(always)]
+const fn req_trust(trust: i32) -> impl Fn(&PaperClips) -> bool {
+    move |pc| pc.computational.trust >= trust
 }
