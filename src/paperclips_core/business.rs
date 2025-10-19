@@ -23,6 +23,8 @@ pub struct Business {
     pub demand_boost: Float,
     /// # prestigeU
     pub prestige_u: Float,
+    /// # revPerSecFlag
+    pub rev_per_sec_flag: bool,
 
     // # clipRateTracker
     // Used as a "run this code once every 100 cycles"
@@ -30,12 +32,16 @@ pub struct Business {
     // pub clip_rate_tracker: u8,
     
     // Autoclippers
+    /// # autoClipperFlag
+    pub clipper_flag: bool,
     /// # clipmakerLevel
     pub clipper_level: Float,
     /// # clipperBoost
     pub clipper_boost: Float,
     /// # clipperCost
     pub clipper_cost: Float,
+    /// # megaClipperFlag
+    pub mega_clipper_flag: bool,
     /// # megaClipperLevel
     pub mega_clipper_level: Float,
     /// # megaClipperBoost
@@ -64,10 +70,13 @@ impl Default for Business {
             marketing_effectiveness: 1.0,
             demand_boost: 1.0,
             prestige_u: 0.0,
+            rev_per_sec_flag: false,
 
+            clipper_flag: false,
             clipper_level: 0.0,
             clipper_boost: 1.0,
             clipper_cost: 5.0,
+            mega_clipper_flag: false,
             mega_clipper_level: 0.0,
             mega_clipper_boost: 1.0,
             mega_clipper_cost: 500.0,

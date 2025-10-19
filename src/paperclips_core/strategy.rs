@@ -103,6 +103,8 @@ struct Strat {
 }
 
 pub struct Strategy {
+    pub engine_flag: bool,
+
     board: StrategyBoard,
 
     strats: ArrayVec<StratFunction, 8>,
@@ -156,6 +158,7 @@ pub struct Strategy {
 impl Default for Strategy {
     fn default() -> Self {
         Self {
+            engine_flag: false,
             board: StrategyBoard::random(),
             strats: ArrayVec::new(),
             horizontal_strat: StratFunction::A100(A100 {}),

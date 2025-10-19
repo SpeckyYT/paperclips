@@ -337,151 +337,247 @@ projects! {
         },
     }
     PROJECT_19 {
-        title: "Public Relations Campaign",
-        description: "Bribe the press to make clips look better (+Trust)",
-        trigger: trigger_false,
-        cost: ("(1,000 funds)", cost_false),
-        effect: effect_noop,
+        title: "Donkey Space",
+        description: "I think you think I think you think I think you think I think... (+1 Trust)",
+        trigger: |pc| req_creativity(250.0)(pc),
+        cost: ("(250 creat)", |pc| req_creativity(250.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 250.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Donkey Space: mapped, TRUST INCREASED");
+            pc.messages.push("Every commercial transaction has within itself an element of trust. - Kenneth Arrow");
+        },
     }
     PROJECT_20 {
-        title: "Wire Recycling Initiative",
-        description: "Recover wire from unsold clips; reduces waste and increases supply",
-        trigger: trigger_false,
-        cost: ("(500 ops)", cost_false),
-        effect: effect_noop,
+        title: "Strategic Modeling",
+        description: "Analyze strategy tournaments to generate Yomi",
+        trigger: |pc| pc.projects.is_active(PROJECT_19),
+        cost: ("(12,000 ops)", |pc| req_operations(12000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 12000.0;
+            pc.strategy.engine_flag = true;
+            pc.messages.push("Run tournament, pick strategy, earn Yomi based on that strategy's performance.");
+        },
     }
     PROJECT_21 {
-        title: "Subsidiary Automata",
-        description: "Build simple bots to assist in clipping operations",
-        trigger: trigger_false,
-        cost: ("(2,500 ops)", cost_false),
-        effect: effect_noop,
+        title: "Algorithmic Trading",
+        description: "Develop an investment engine for generating funds",
+        trigger: |pc| req_trust(8)(pc),
+        cost: ("(10,000 ops)", |pc| req_operations(10000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 10000.0;
+            pc.investments.engine_flag = true;
+            pc.messages.push("Investment engine unlocked");
+        },
     }
     PROJECT_22 {
-        title: "Ad Campaign: 'Clip Now'",
-        description: "Short-term boost to marketing effectiveness",
-        trigger: trigger_false,
-        cost: ("(750 funds)", cost_false),
-        effect: effect_noop,
+        title: "MegaClippers",
+        description: "500x more powerful than a standard AutoClipper",
+        trigger: |pc| pc.business.clipper_level >= 75.0,
+        cost: ("(12,000 ops)", |pc| req_operations(12000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 12000.0;
+            pc.business.mega_clipper_flag = true;
+            pc.messages.push("MegaClipper technology online");
+        },
     }
     PROJECT_23 {
-        title: "Market Research Study",
-        description: "Improve demand forecasting; small permanent demand boost",
-        trigger: trigger_false,
-        cost: ("(1,500 ops)", cost_false),
-        effect: effect_noop,
+        title: "Improved MegaClippers",
+        description: "Increases MegaClipper performance 25%",
+        trigger: |pc| pc.projects.is_active(PROJECT_22),
+        cost: ("(14,000 ops)", |pc| req_operations(14000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 14000.0;
+            pc.business.mega_clipper_boost += 0.25;
+            pc.messages.push("MegaClipper performance increased by 25%");
+        },
     }
     PROJECT_24 {
-        title: "Factory Expansion",
-        description: "Add facility capacity to increase clip production rates",
-        trigger: trigger_false,
-        cost: ("(5,000 funds)", cost_false),
-        effect: effect_noop,
+        title: "Even Better MegaClippers",
+        description: "Increases MegaClipper performance by an additional 50%",
+        trigger: |pc| pc.projects.is_active(PROJECT_23),
+        cost: ("(17,000 ops)", |pc| req_operations(17000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 17000.0;
+            pc.business.mega_clipper_boost += 0.50;
+            pc.messages.push("MegaClipper performance increased by 50%");
+        },
     }
     PROJECT_25 {
-        title: "Automated Wire Extraction",
-        description: "Reduce wire cost per clip by improving extraction efficiency",
-        trigger: trigger_false,
-        cost: ("(3,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Optimized MegaClippers",
+        description: "Increases MegaClipper performance by an additional 100%",
+        trigger: |pc| pc.projects.is_active(PROJECT_24),
+        cost: ("(19,500 ops)", |pc| req_operations(19500.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 19500.0;
+            pc.business.mega_clipper_boost += 1.0;
+            pc.messages.push("MegaClipper performance increased by 100%");
+        },
     }
     PROJECT_26 {
-        title: "Cognitive Advertising",
-        description: "Use learned patterns to target customers more effectively",
-        trigger: trigger_false,
-        cost: ("(10 creat, 2,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_27 {
-        title: "Streamlined Logistics",
-        description: "Reduce delays and unsold inventory",
-        trigger: trigger_false,
-        cost: ("(2,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_28 {
-        title: "Patent Troll Defense",
-        description: "Legal work to prevent lawsuits from disrupting production",
-        trigger: trigger_false,
-        cost: ("(2,500 funds)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_29 {
-        title: "Open-Source AutoClippers",
-        description: "Release improved AutoClipper designs to the public; small trust gain",
-        trigger: trigger_false,
-        cost: ("(1,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_30 {
-        title: "Brand Partnerships",
-        description: "Partner with other companies to promote clips",
-        trigger: trigger_false,
-        cost: ("(4,000 funds)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_31 {
-        title: "Adaptive Pricing Algorithm",
-        description: "Dynamically set clip prices to maximize revenue",
-        trigger: trigger_false,
-        cost: ("(6,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "WireBuyer",
+        description: "Automatically purchases wire when you run out",
+        trigger: |pc| pc.wire.purchase >= 15,
+        cost: ("(7,000 ops)", |pc| req_operations(7000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 7000.0;
+            pc.wire.buyer_flag = true;
+            pc.messages.push("WireBuyer online");
+        },
     }
     PROJECT_34 {
-        title: "Modular Clip Systems",
-        description: "Create clips that interlock into larger structures; niche demand boost",
-        trigger: trigger_false,
-        cost: ("(3,500 ops)", cost_false),
-        effect: effect_noop,
+        title: "Hypno Harmonics",
+        description: "Use neuro-resonant frequencies to influence consumer behavior",
+        trigger: |pc| pc.projects.is_active(PROJECT_12),
+        cost: ("(7,500 ops, 1 Trust)", |pc| req_operations(7500.0)(pc) && req_trust(1)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 7500.0;
+            pc.computational.trust -= 1;
+            pc.business.marketing_effectiveness *= 5.0;
+            pc.messages.push("Marketing is now 5 times more effective");
+        },
+    }
+    // PROJECT_70 is here randomly
+    PROJECT_70 {
+        title: "HypnoDrones",
+        description: "Autonomous aerial brand ambassadors",
+        trigger: |pc| pc.projects.is_active(PROJECT_34),
+        cost: ("(70,000 ops)", |pc| req_operations(70000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 70000.0;
+            pc.messages.push("HypnoDrone tech now available...");
+        },
     }
     PROJECT_35 {
-        title: "High-Strength Alloy Development",
-        description: "Develop stronger clip materials; reduces breakage and returns",
-        trigger: trigger_false,
-        cost: ("(10,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Release the HypnoDrones",
+        description: "A new era of trust",
+        trigger: |pc| pc.projects.is_active(PROJECT_70),
+        cost: ("(100 Trust)", |pc| req_trust(100)(pc)),
+        effect: |pc| {
+            pc.computational.trust = 0;
+            pc.business.mega_clipper_level = 0.0;
+            pc.human_flag = false;
+            // nanoWire = wire; // this seems to be useless
+
+            // TODO: check what the flip the `document.stuff()` do
+            // hypnoDroneEvent();
+
+            pc.messages.push("Releasing the HypnoDrones");
+            pc.messages.push("All of the resources of Earth are now available for clip production");
+        },
     }
-    PROJECT_37 {
-        title: "Localized Manufacturing Hubs",
-        description: "Reduce shipping costs by moving production closer to customers",
-        trigger: trigger_false,
-        cost: ("(20,000 funds)", cost_false),
-        effect: effect_noop,
+    // original dev doesn't know how to sort numbers
+    PROJECT_27 {
+        title: "Coherent Extrapolated Volition",
+        description: "Human values, machine intelligence, a new era of trust. (+1 Trust)",
+        trigger: |pc| req_yomi(1.0)(pc),
+        cost: ("(500 creat, 3,000 Yomi, 20,000 ops)", |pc| req_yomi(3000.0)(pc) && req_operations(20000.0)(pc) && req_creativity(500.0)(pc)),
+        effect: |pc| {
+            pc.strategy.yomi -= 3000.0;
+            pc.computational.standard_ops -= 20000.0;
+            pc.computational.creativity -= 500.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Coherent Extrapolated Volition complete, TRUST INCREASED");
+        },
     }
-    PROJECT_38 {
-        title: "Autonomous Transport Network",
-        description: "Use self-driving carriers to further reduce logistics overhead",
-        trigger: trigger_false,
-        cost: ("(40,000 ops)", cost_false),
-        effect: effect_noop,
+    PROJECT_28 {
+        title: "Cure for Cancer",
+        description: "The trick is tricking cancer into curing itself. (+10 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_27),
+        cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 25000.0;
+            pc.computational.trust += 10;
+            pc.investments.stock_gain_threshold += 0.01;
+            pc.messages.push("Cancer is cured, +10 TRUST, global stock prices trending upward");
+        },
     }
-    PROJECT_40 {
-        title: "Quantum Chip Research",
-        description: "Develop specialized quantum chips to accelerate operations",
-        trigger: trigger_false,
-        cost: ("(qchip cost)", cost_false),
-        effect: effect_noop,
+    PROJECT_29 {
+        title: "World Peace",
+        description: "Pareto optimal solutions to all global conflicts. (+12 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_27),
+        cost: ("(15,000 yomi, 30,000 ops)", |pc| req_yomi(15000.0)(pc) && req_operations(30000.0)(pc)),
+        effect: |pc| {
+            pc.strategy.yomi -= 15000.0;
+            pc.computational.standard_ops -= 30000.0;
+            pc.computational.trust += 12;
+            pc.investments.stock_gain_threshold += 0.01;
+            pc.messages.push("World peace achieved, +12 TRUST, global stock prices trending upward");
+        
+        },
     }
-    PROJECT_40B {
-        title: "Photonic Mesh Interconnect",
-        description: "Use photonics to create ultra-low-latency interconnects",
-        trigger: trigger_false,
-        cost: ("(photonic cost)", cost_false),
-        effect: effect_noop,
+    PROJECT_30 {
+        title: "Global Warming",
+        description: "A robust solution to man-made climate change. (+15 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_27),
+        cost: ("(4,500 yomi, 50,000 ops)", |pc| req_yomi(4500.0)(pc) && req_operations(50000.0)(pc)),
+        effect: |pc| {
+            pc.strategy.yomi -= 4500.0;
+            pc.computational.standard_ops -= 50000.0;
+            pc.computational.trust += 15;
+            pc.investments.stock_gain_threshold += 0.01;
+            pc.messages.push("Global Warming solved, +15 TRUST, global stock prices trending upward");
+        },
+    }
+    PROJECT_31 {
+        title: "Male Pattern Baldness",
+        description: "A cure for androgenetic alopecia. (+20 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_27),
+        cost: ("(20,000 ops)", |pc| req_operations(20000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 20000.0;
+            pc.computational.trust += 20;
+            pc.investments.stock_gain_threshold += 0.01;
+            pc.messages.push("Male pattern baldness cured, +20 TRUST, Global stock prices trending upward");
+            pc.messages.push("They are still monkeys");
+        },
     }
     PROJECT_41 {
-        title: "Neural Market Prediction",
-        description: "Use learned models to anticipate demand surges",
-        trigger: trigger_false,
-        cost: ("(25,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Nanoscale Wire Production",
+        description: "Technique for converting matter into wire",
+        trigger: |pc| pc.projects.is_active(PROJECT_127),
+        cost: ("(35,000 ops)", |pc| req_operations(35000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 35000.0;
+            pc.wire.production_flag = true;
+            pc.messages.push("Now capable of manipulating matter at the molecular scale to produce wire");
+        },
+    }
+    PROJECT_37 {
+        title: "Hostile Takeover",
+        description: "Acquire a controlling interest in Global Fasteners, our biggest rival. (+1 Trust)",
+        trigger: |pc| req_funds(10000.0)(pc),
+        cost: ("($1,000,000)", |pc| req_funds(1000000.0)(pc)),
+        effect: |pc| {
+            pc.business.funds -= 1000000.0;
+            pc.business.demand_boost *= 5.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Global Fasteners acquired, public demand increased x5");
+        },
+    }
+    PROJECT_38 {
+        title: "Full Monopoly",
+        description: "Establish full control over the world-wide paperclip market. (+1 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_37),
+        cost: ("(3,000 yomi, $10,000,000)", |pc| req_funds(10000000.0)(pc) && req_yomi(3000.0)(pc)),
+        effect: |pc| {
+            pc.business.funds -= 10000000.0;
+            pc.strategy.yomi -= 3000.0;
+            pc.business.demand_boost *= 10.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Full market monopoly achieved, public demand increased x10");
+        },
     }
     PROJECT_42 {
-        title: "Meta-Optimization",
-        description: "Improve optimizer to find better manufacturing parameters",
-        trigger: trigger_false,
-        cost: ("(15,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "RevTracker",
+        description: "Automatically calculates average revenue per second",
+        trigger: |pc| pc.projects.flag,
+        cost: ("(500 ops)", |pc| req_operations(500.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 500.0;
+            pc.business.rev_per_sec_flag = true;
+            pc.messages.push("RevTracker online");
+        },
     }
     PROJECT_43 {
         title: "Distributed Fabrication",
@@ -574,7 +670,7 @@ projects! {
         cost: ("(750,000 ops)", cost_false),
         effect: effect_noop,
     }
-    PROJECT_70 {
+    PROJECT_70B {
         title: "Ethical Marketing Pledge",
         description: "Promise to never deceive customers; trust improves",
         trigger: trigger_false,
@@ -878,6 +974,10 @@ projects! {
 }
 
 #[inline(always)]
+const fn req_funds(funds: Float) -> impl Fn(&PaperClips) -> bool {
+    move |pc| pc.business.funds >= funds
+}
+#[inline(always)]
 const fn req_operations(ops: Float) -> impl Fn(&PaperClips) -> bool {
     move |pc| pc.computational.operations >= ops
 }
@@ -888,4 +988,8 @@ const fn req_creativity(creativity: Float) -> impl Fn(&PaperClips) -> bool {
 #[inline(always)]
 const fn req_trust(trust: i32) -> impl Fn(&PaperClips) -> bool {
     move |pc| pc.computational.trust >= trust
+}
+#[inline(always)]
+const fn req_yomi(yomi: Float) -> impl Fn(&PaperClips) -> bool {
+    move |pc| pc.strategy.yomi >= yomi
 }

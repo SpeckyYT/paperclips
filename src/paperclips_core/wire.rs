@@ -23,6 +23,8 @@ pub struct Wire {
     pub purchase: u64,
     /// # wireBuyerFlag
     pub buyer_flag: bool,
+    /// # wireProductionFlag
+    pub production_flag: bool,
 }
 
 impl Default for Wire {
@@ -36,6 +38,7 @@ impl Default for Wire {
             supply: 1000.0,
             purchase: 0,
             buyer_flag: false,
+            production_flag: false,
         }
     }
 }

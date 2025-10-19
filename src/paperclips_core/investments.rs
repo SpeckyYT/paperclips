@@ -71,7 +71,7 @@ pub struct Investments {
     pub port_total: Float,
 
     /// # sellDelay
-    pub sell_delay: u8,
+    pub sell_delay: u32,
 
     // var stockReportCounter = 0;
 
