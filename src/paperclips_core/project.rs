@@ -300,19 +300,41 @@ projects! {
             pc.messages.push("Architecture is the thoughtful making of space. -Louis Kahn");
         },
     }
+    // PROJECT_17 and PROJECT_16 are out of order
+    PROJECT_17 {
+        title: "The Tóth Sausage Conjecture",
+        description: "Tubes within tubes within tubes... (+1 Trust)",
+        trigger: |pc| req_creativity(200.0)(pc),
+        cost: ("(200 creat)", |pc| req_creativity(200.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 200.0;
+            pc.computational.trust += 1;
+            pc.messages.push("The Tóth Sausage Conjecture: proven, TRUST INCREASED");
+            pc.messages.push("You can't invent a design. You recognize it, in the fourth dimension. -D.H. Lawrence");
+        },
+    }
     PROJECT_16 {
         title: "Hadwiger Clip Diagrams",
         description: "Increases AutoClipper performance by an additional 500%",
-        trigger: trigger_false,
-        cost: ("(6,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.is_active(PROJECT_15),
+        cost: ("(6,000 ops)", |pc| req_operations(6000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 6000.0;
+            pc.business.clipper_boost += 5.0;
+            pc.messages.push("AutoClipper performance improved by 500%");
+        },
     }
     PROJECT_18 {
         title: "Tóth Tubule Enfolding",
         description: "Technique for assembling clip-making technology directly out of paperclips",
-        trigger: trigger_false,
-        cost: ("(45,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.is_active(PROJECT_17) && !pc.human_flag,
+        cost: ("(45,000 ops)", |pc| req_operations(45000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 45000.0;
+            // this can be checked with `pc.project.is_active(PROJECT_18)`
+            // toth_flag = true;
+            pc.messages.push("New capability: build machinery out of clips");
+        },
     }
     PROJECT_19 {
         title: "Public Relations Campaign",
