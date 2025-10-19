@@ -4,6 +4,12 @@ use ProjectStatus::*;
 pub struct Projects {
     pub flag: bool,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
+
+    pub harvester_flag: bool,
+    pub wire_drone_flag: bool,
+    pub factory_flag: bool,
+
+    pub bribe: Float,
 }
 
 impl Default for Projects {
@@ -11,6 +17,12 @@ impl Default for Projects {
         Self {
             flag: false,
             statuses: PROJECTS_STATUSES,
+
+            harvester_flag: false,
+            wire_drone_flag: false,
+            factory_flag: false,
+
+            bribe: 1000000.0,
         }
     }
 }
@@ -20,6 +32,10 @@ impl Projects {
     pub fn is_active(&self, project: impl AsRef<Project>) -> bool {
         self.statuses[project.as_ref().index] == Active
     }
+    #[inline]
+    pub fn status_mut(&mut self, project: impl AsRef<Project>) -> &mut ProjectStatus {
+        &mut self.statuses[project.as_ref().index]
+    } 
 }
 
 impl PaperClips {
@@ -90,10 +106,10 @@ pub enum ProjectStatus {
 }
 
 macro_rules! projects {
-    ( $( $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr), effect: $effect:expr $(,)? } )+ ) => {
+    ( $( $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr $(,)?), effect: $effect:expr $(,)? } )+ ) => {
         projects!(@inner 0usize; [ ]; $( $name { title: $title, description: $desc, trigger: $trigger, cost: ($cost_body, $cost_fn), effect: $effect } )+ );
     };
-    (@inner $idx:expr; [ $($acc:ident,)* ] ; $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr), effect: $effect:expr } $( $rest:tt )* ) => {
+    (@inner $idx:expr; [ $($acc:ident,)* ] ; $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr $(,)?), effect: $effect:expr } $( $rest:tt )* ) => {
         pub const $name: Project = Project {
             index: $idx,
             title: projects!(# $title),
@@ -137,7 +153,7 @@ projects! {
         effect: |pc| {
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
-            pc.projects.statuses[PROJECT_2.index] = ProjectStatus::Unavailable;
+            *pc.projects.status_mut(PROJECT_2) = ProjectStatus::Unavailable;
             pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
         },
     }
@@ -580,39 +596,66 @@ projects! {
         },
     }
     PROJECT_43 {
-        title: "Distributed Fabrication",
-        description: "Coordinate many small fabs to behave like one large plant",
-        trigger: trigger_false,
-        cost: ("(30,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Harvester Drones",
+        description: "Gather raw matter and prepare it for processing",
+        trigger: |pc| pc.projects.is_active(PROJECT_41),
+        cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 25000.0;
+            pc.projects.harvester_flag = true;
+            pc.messages.push("Harvester Drone facilities online");
+        },
     }
     PROJECT_44 {
-        title: "Emotional Branding",
-        description: "Build a narrative to attach emotional value to clips",
-        trigger: trigger_false,
-        cost: ("(12,000 funds)", cost_false),
-        effect: effect_noop,
+        title: "Wire Drones",
+        description: "Process acquired matter into wire",
+        trigger: |pc| pc.projects.is_active(PROJECT_41),
+        cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 25000.0;
+            pc.projects.wire_drone_flag = true;
+            pc.messages.push("Wire Drone facilities online");
+        },
     }
     PROJECT_45 {
-        title: "Clip Subscription Service",
-        description: "Sell clips as a subscription to stabilize revenue",
-        trigger: trigger_false,
-        cost: ("(6,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Clip Factories",
+        description: "Large scale clip production facilities made from clips",
+        trigger: |pc| pc.projects.is_active(PROJECT_43) && pc.projects.is_active(PROJECT_44),
+        cost: ("(35,000 ops)", |pc| req_operations(35000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 35000.0;
+            pc.projects.factory_flag = true;
+            pc.messages.push("Clip factory assembly facilities online");
+        },
     }
-    PROJECT_46 {
-        title: "Autonomous QA",
-        description: "Use AI to spot production defects and reduce returns",
-        trigger: trigger_false,
-        cost: ("(8,000 ops)", cost_false),
-        effect: effect_noop,
+    PROJECT_40 {
+        title: "A Token of Goodwill...",
+        description: "A small gift to the supervisors. (+1 Trust)",
+        trigger: |pc| pc.human_flag && (85..100).contains(&pc.computational.trust) && pc.business.clips >= 101000000.0,
+        cost: ("($500,000)", |pc| req_funds(500000.0)(pc)),
+        effect: |pc| {
+            pc.business.funds -= 500000.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Gift accepted, TRUST INCREASED");
+        },
     }
-    PROJECT_50 {
-        title: "Black Budget Project",
-        description: "Secret program to acquire resources via unconventional channels",
-        trigger: trigger_false,
-        cost: ("(50,000 funds)", cost_false),
-        effect: effect_noop,
+    PROJECT_40B {
+        title: "Another Token of Goodwill...",
+        description: "Another small gift to the supervisors. (+1 Trust)",
+        trigger: |pc| pc.projects.is_active(PROJECT_40) && pc.computational.trust < 100,
+        cost: (
+            |pc| format!("(${})", pc.projects.bribe),
+            |pc| pc.business.funds >= pc.projects.bribe,
+        ),
+        effect: |pc| {
+            pc.business.funds -= pc.projects.bribe;
+            pc.projects.bribe *= 2.0;
+            pc.computational.trust += 1;
+            if pc.computational.trust < 100 {
+                *pc.projects.status_mut(PROJECT_40B) = Unavailable;
+            }
+            pc.messages.push("Gift accepted, TRUST INCREASED");
+        },
     }
     PROJECT_51 {
         title: "Subtle Propaganda",
