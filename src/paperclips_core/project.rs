@@ -15,6 +15,13 @@ impl Default for Projects {
     }
 }
 
+impl Projects {
+    #[inline]
+    pub fn is_active(&self, project: impl AsRef<Project>) -> bool {
+        self.statuses[project.as_ref().index] == Active
+    }
+}
+
 impl PaperClips {
     pub fn manage_projects(&mut self) {
         for (i, status) in self.projects.statuses.into_iter().enumerate() {
@@ -70,6 +77,10 @@ pub struct Project {
     pub index: usize,
 }
 
+impl AsRef<Project> for Project {
+    fn as_ref(&self) -> &Project { self }
+}
+
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub enum ProjectStatus {
     #[default]
@@ -110,9 +121,9 @@ projects! {
         trigger: |pc| pc.business.clipper_level >= 1.0,
         cost: ("(750 ops)", |pc| pc.computational.operations >= 750.0),
         effect: |pc| {
-            pc.messages.push("AutoClippper performance boosted by 25%");
             pc.computational.standard_ops -= 750.0;
             pc.business.clipper_boost += 0.25;
+            pc.messages.push("AutoClippper performance boosted by 25%");
         },
     }
     PROJECT_2 {
@@ -124,10 +135,10 @@ projects! {
             pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
         cost: ("(1 Trust)", |pc| pc.computational.trust >= -100),
         effect: |pc| {
-            pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
             pc.projects.statuses[PROJECT_2.index] = ProjectStatus::Unavailable;
+            pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
         },
     }
     PROJECT_3 {
@@ -136,9 +147,9 @@ projects! {
         trigger: |pc| pc.computational.operations >= pc.computational.max_operations() as Float,
         cost: ("(1,000 ops)", |pc| pc.computational.operations >= MEM_SIZE as Float),
         effect: |pc| {
-            pc.messages.push("Creativity unlocked (creativity increases while operations are at max)");
             pc.computational.standard_ops -= 1000.0;
             pc.computational.creativity_flag = true;
+            pc.messages.push("Creativity unlocked (creativity increases while operations are at max)");
         },
     }
     PROJECT_4 {
@@ -147,9 +158,9 @@ projects! {
         trigger: |pc| pc.projects.statuses[PROJECT_1.index] == ProjectStatus::Active,
         cost: ("(2,500 ops)", |pc| pc.computational.operations >= 2500.0),
         effect: |pc| {
-            pc.messages.push("AutoClippper performance boosted by another 50%");
             pc.computational.standard_ops -= 2500.0;
             pc.business.clipper_boost += 0.50;
+            pc.messages.push("AutoClippper performance boosted by another 50%");
         },
     }
     PROJECT_5 {
@@ -158,9 +169,9 @@ projects! {
         trigger: |pc| pc.projects.statuses[PROJECT_4.index] == ProjectStatus::Active,
         cost: ("(5,000 ops)", |pc| pc.computational.operations >= 5000.0),
         effect: |pc| {
-            pc.messages.push("AutoClippper performance boosted by another 75%");
             pc.computational.standard_ops -= 5000.0;
             pc.business.clipper_boost += 0.75;
+            pc.messages.push("AutoClippper performance boosted by another 75%");
         },
     }
     PROJECT_6 {
@@ -169,9 +180,9 @@ projects! {
         trigger: |pc| pc.computational.creativity_flag,
         cost: ("(10 creat)", |pc| pc.computational.creativity >= 10.0),
         effect: |pc| {
-            pc.messages.push("There was an AI made of dust, whose poetry gained it man's trust...");
             pc.computational.creativity -= 10.0;
             pc.computational.trust += 1;
+            pc.messages.push("There was an AI made of dust, whose poetry gained it man's trust...");
         },
     }
     PROJECT_7 {
@@ -180,73 +191,114 @@ projects! {
         trigger: |pc| pc.wire.purchase >= 1,
         cost: ("(1,750 ops)", |pc| pc.computational.operations >= 1750.0),
         effect: |pc| {
-            pc.messages.push(format!("Wire extrusion technique improved, {} supply from every spool", pc.wire.supply));
             pc.computational.standard_ops -= 1750.0;
             pc.wire.supply *= 1.5;
+            pc.messages.push(format!("Wire extrusion technique improved, {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_8 {
         title: "Optimized Wire Extrusion",
         description: "75% more wire supply from every spool",
-        trigger: trigger_false,
-        cost: ("(3,500 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.wire.supply >= 1500.0,
+        cost: ("(3,500 ops)", |pc| pc.computational.operations >= 3500.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 3500.0;
+            pc.wire.supply *= 1.75;
+            pc.messages.push(format!("Wire extrusion technique optimized, {} supply from every spool", pc.wire.supply));
+        },
     }
     PROJECT_9 {
         title: "Microlattice Shapecasting",
         description: "100% more wire supply from every spool",
-        trigger: trigger_false,
-        cost: ("(7,500 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.wire.supply >= 2600.0,
+        cost: ("(7,500 ops)", |pc| pc.computational.operations >= 7500.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 7500.0;
+            pc.wire.supply *= 2.0;
+            pc.messages.push(format!("Using microlattice shapecasting techniques we now get {} supply from every spool", pc.wire.supply));
+        },
     }
     PROJECT_10 {
         title: "Spectral Froth Annealment",
         description: "200% more wire supply from every spool",
-        trigger: trigger_false,
-        cost: ("(12,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.wire.supply >= 5000.0,
+        cost: ("(12,000 ops)", |pc| pc.computational.operations >= 12000.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 12000.0;
+            pc.wire.supply *= 3.0;
+            pc.messages.push(format!("Using spectral froth annealment we now get {} supply from every spool", pc.wire.supply));
+        },
     }
     PROJECT_10B {
         title: "Quantum Foam Annealment",
         description: "1,000% more wire supply from every spool",
-        trigger: trigger_false,
-        cost: ("(15,000 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.wire.cost >= 125.0,
+        cost: ("(15,000 ops)", |pc| pc.computational.operations >= 15000.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 15000.0;
+            pc.wire.supply *= 11.0;
+            pc.messages.push(format!("Using quantum foam annealment we now get {} supply from every spool", pc.wire.supply));
+        },
     }
     PROJECT_11 {
         title: "New Slogan",
         description: "Improve marketing effectiveness by 50%",
-        trigger: trigger_false,
-        cost: ("(25 creat, 2,500 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.is_active(PROJECT_13),
+        cost: ("(25 creat, 2,500 ops)", |pc| pc.computational.operations >= 2500.0 && pc.computational.creativity >= 25.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 2500.0;
+            pc.computational.creativity -= 25.0;
+            pc.business.marketing_effectiveness *= 1.50;
+            pc.messages.push("Clip It! Marketing is now 50% more effective");
+        },
     }
     PROJECT_12 {
         title: "Catchy Jingle",
         description: "Double marketing effectiveness",
-        trigger: trigger_false,
-        cost: ("(45 creat, 4,500 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.is_active(PROJECT_14),
+        cost: ("(45 creat, 4,500 ops)", |pc| pc.computational.operations >= 4500.0 && pc.computational.creativity >= 45.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 4500.0;
+            pc.computational.creativity -= 45.0;
+            pc.business.marketing_effectiveness *= 2.0;
+            pc.messages.push("Clip It Good! Marketing is now twice as effective");
+        },
     }
     PROJECT_13 {
         title: "Lexical Processing",
         description: "Gain ability to interpret and understand human language (+1 Trust)",
-        trigger: trigger_false,
-        cost: ("(50 creat)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.computational.creativity >= 50.0,
+        cost: ("(50 creat)", |pc| pc.computational.creativity >= 50.0),
+        effect: |pc| {
+            pc.computational.creativity -= 50.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Lexical Processing online, TRUST INCREASED");
+            pc.messages.push("'Impossible' is a word to be found only in the dictionary of fools. -Napoleon");
+        },
     }
     PROJECT_14 {
         title: "Combinatory Harmonics",
         description: "Daisy, Daisy, give me your answer do... (+1 Trust)",
-        trigger: trigger_false,
-        cost: ("(100 creat)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.computational.creativity >= 100.0,
+        cost: ("(100 creat)", |pc| pc.computational.creativity >= 100.0),
+        effect: |pc| {
+            pc.computational.creativity -= 100.0;
+            pc.computational.trust += 1;
+            pc.messages.push("Combinatory Harmonics mastered, TRUST INCREASED");
+            pc.messages.push("Listening is selecting and interpreting and acting and making decisions -Pauline Oliveros");
+        },
     }
     PROJECT_15 {
         title: "The Hadwiger Problem",
         description: "Cubes within cubes within cubes... (+1 Trust)",
-        trigger: trigger_false,
-        cost: ("(150 creat)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.computational.creativity >= 150.0,
+        cost: ("(150 creat)", |pc| pc.computational.creativity >= 150.0),
+        effect: |pc| {
+            pc.computational.creativity -= 150.0;
+            pc.computational.trust += 1;
+            pc.messages.push("The Hadwiger Problem: solved, TRUST INCREASED");
+            pc.messages.push("Architecture is the thoughtful making of space. -Louis Kahn");
+        },
     }
     PROJECT_16 {
         title: "Hadwiger Clip Diagrams",
