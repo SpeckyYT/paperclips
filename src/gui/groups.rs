@@ -117,7 +117,7 @@ pub fn projects_group(ui: &mut Ui, paperclips: &mut PaperClips) {
         ui.separator();
 
         for (i, ps) in paperclips.projects.statuses.into_iter().enumerate() {
-            if matches!(ps, ProjectStatus::Buyable) {
+            if ps == ProjectStatus::Buyable {
                 let project = &PROJECTS[i];
 
                 let mut pj = ui.group(|ui| {

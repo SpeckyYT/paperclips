@@ -30,7 +30,7 @@ impl PaperClips {
     }
     pub fn buy_project(&mut self, i: usize) {
         let project = &PROJECTS[i];
-        if matches!(self.projects.statuses[i], Buyable) && project.cost.1(&self) {
+        if self.projects.statuses[i] == Buyable && project.cost.1(&self) {
             self.projects.statuses[i] = Active;
             (project.effect)(self, i);
         }
@@ -68,9 +68,12 @@ pub struct Project {
     pub cost: (Body, fn(&PaperClips) -> bool),
     /// # effect
     pub effect: fn(&mut PaperClips, usize),
+
+    /// Doesn't exist in the original, but is useful
+    pub index: usize,
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub enum ProjectStatus {
     #[default]
     Unavailable,
@@ -80,17 +83,23 @@ pub enum ProjectStatus {
 
 macro_rules! projects {
     ( $( $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr), effect: $effect:expr $(,)? } )+ ) => {
-        $(
-            pub const $name: Project = Project {
-                title: projects!(# $title),
-                description: projects!(# $desc),
-                trigger: $trigger,
-                cost: (projects!(# $cost_body), $cost_fn),
-                effect: $effect,
-            };
-        )*
-        pub const PROJECTS_COUNT: usize = 0 $(+ [$desc].len())*;
-        pub const PROJECTS: [Project; PROJECTS_COUNT ] = [ $( $name ),* ];
+        projects!(@inner 0usize; [ ]; $( $name { title: $title, description: $desc, trigger: $trigger, cost: ($cost_body, $cost_fn), effect: $effect } )+ );
+    };
+    (@inner $idx:expr; [ $($acc:ident,)* ] ; $name:ident { title: $title:expr, description: $desc:expr, trigger: $trigger:expr, cost: ($cost_body:expr, $cost_fn:expr), effect: $effect:expr } $( $rest:tt )* ) => {
+        pub const $name: Project = Project {
+            index: $idx,
+            title: projects!(# $title),
+            description: projects!(# $desc),
+            trigger: $trigger,
+            cost: (projects!(# $cost_body), $cost_fn),
+            effect: $effect,
+        };
+
+        projects!(@inner ($idx + 1usize); [ $($acc,)* $name, ] ; $( $rest )* );
+    };
+    (@inner $idx:expr; [ $($acc:ident,)* ] ; ) => {
+        pub const PROJECTS_COUNT: usize = $idx;
+        pub const PROJECTS: [Project; PROJECTS_COUNT ] = [ $($acc,)* ];
         pub const PROJECTS_STATUSES: [ProjectStatus; PROJECTS_COUNT] = [ ProjectStatus::Unavailable; PROJECTS_COUNT ];
     };
     ( # $s:literal ) => { Body::Static($s) };
@@ -138,9 +147,13 @@ projects! {
     PROJECT_4 {
         title: "Even Better AutoClippers",
         description: "Increases AutoClipper performance by an additional 50%",
-        trigger: trigger_false,
-        cost: ("(2,500 ops)", cost_false),
-        effect: effect_noop,
+        trigger: |pc| pc.projects.statuses[PROJECT_1.index] == ProjectStatus::Active,
+        cost: ("(2,500 ops)", |pc| pc.computational.operations >= 2500.0),
+        effect: |pc, _| {
+            pc.messages.push("AutoClippper performance boosted by another 50%");
+            pc.computational.standard_ops -= 2500.0;
+            pc.business.clipper_boost += 0.50;
+        },
     }
     PROJECT_5 {
         title: "Optimized AutoClippers",
