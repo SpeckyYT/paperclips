@@ -62,7 +62,7 @@ impl PaperClips {
         self.ticks += 1;
         
         // milestone_check();
-        // button_update();
+        self.button_update();
 
         if self.computational.comp_flag {
             self.computational.calculate_operations();
@@ -189,5 +189,30 @@ impl PaperClips {
             }
             // Fire Once a Second
         }
+    }
+
+    pub fn button_update(&mut self) {
+        // if results_flag && auto_tourney_flag && auto_tourney_status && tournamentResultsTableElement.is_empty() {
+        //     results_timer += 1;
+
+        //     if results_timer >= 300 && self.computational.operations >= tourney_cost {
+        //         new_tourney();
+        //         run_tourney();
+        //         results_timer = 0;
+        //     }
+        // }
+        
+        if self.business.funds >= self.business.clipper_cost {
+            self.business.clipper_flag = true;
+        }
+        if self.business.funds >= self.business.mega_clipper_cost {
+            self.business.mega_clipper_flag = true;
+        }
+
+        if self.human_flag {
+            self.investments.engine_flag = false;
+            self.wire.buyer_flag = false;
+        }
+
     }
 }
