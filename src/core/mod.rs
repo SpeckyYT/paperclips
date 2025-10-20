@@ -205,9 +205,6 @@ impl PaperClips {
         if self.business.funds >= self.business.clipper_cost {
             self.business.clipper_flag = true;
         }
-        if self.business.funds >= self.business.mega_clipper_cost {
-            self.business.mega_clipper_flag = true;
-        }
 
         if self.human_flag {
             self.investments.engine_flag = false;

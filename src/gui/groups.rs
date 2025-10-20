@@ -69,6 +69,34 @@ pub fn manufacturing_group(ui: &mut Ui, paperclips: &mut PaperClips) -> InnerRes
             ui.label(format!("{:.0} inches", paperclips.wire.count));
         });
         ui.label(format!("Cost: ${:.0}", paperclips.wire.cost));
+
+        if paperclips.business.clipper_flag {
+            ui.add_space(10.0);
+
+            ui.horizontal(|ui| {
+                ui.add_enabled_ui(paperclips.business.funds >= paperclips.business.clipper_cost, |ui| {
+                    if ui.button("AutoClippers").clicked() {
+                        paperclips.business.make_clipper();
+                    }
+                });
+                ui.label(format!("{:.0}", paperclips.business.clipper_level));
+            });
+            ui.label(format!("Cost: ${:.2}", paperclips.business.clipper_cost));
+        }
+
+        if paperclips.business.mega_clipper_flag {
+            ui.add_space(10.0);
+
+            ui.horizontal(|ui| {
+                ui.add_enabled_ui(paperclips.business.funds >= paperclips.business.mega_clipper_cost, |ui| {
+                    if ui.button("AutoClippers").clicked() {
+                        paperclips.business.make_mega_clipper();
+                    }
+                });
+                ui.label(format!("{:.0}", paperclips.business.mega_clipper_level));
+            });
+            ui.label(format!("Cost: ${:.2}", paperclips.business.mega_clipper_cost));
+        }
     })
 }
 
