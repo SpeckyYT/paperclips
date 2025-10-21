@@ -1,12 +1,11 @@
 use std::time::{Duration, Instant};
 
 use eframe::{
-    App, Frame,
-    egui::{CentralPanel, Context},
+    egui::{CentralPanel, Context, TopBottomPanel}, App, Frame
 };
 use paperclips::PaperClips;
 
-use crate::gui::groups::{business_group, manufacturing_group, projects_group, quantum_computing_group};
+use crate::gui::groups::{business_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 
@@ -37,10 +36,14 @@ impl App for Gui {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         self.update_paperclips(ctx);
 
+        TopBottomPanel::top("console").show(ctx, |ui| {
+            top_console(ui, &mut self.paperclips);
+        });
+
         CentralPanel::default().show(ctx, |ui| {
             let pc = &mut self.paperclips;
 
-            ui.heading(format!("Paperclips: {}", pc.business.clips));
+            ui.heading(format!("Paperclips: {}", pc.business.clips.ceil()));
             ui.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
                 if ui.button("Make Paperclip").clicked() {
                     pc.clip_click(1.0);

@@ -1,3 +1,5 @@
+// TODO: rename everything to "console"
+
 use std::collections::VecDeque;
 
 const DEFAULT_MESSAGES_SIZE: usize = 5;
@@ -18,9 +20,9 @@ impl Default for Messages {
 
 impl Messages {
     pub fn push(&mut self, msg: impl Into<String>) {
-        self.messages.push_front(msg.into());
+        self.messages.push_back(msg.into());
         if self.messages.len() > self.max_messages {
-            self.messages.pop_back();
+            self.messages.pop_front();
         }
     }
 }

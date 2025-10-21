@@ -170,3 +170,20 @@ pub fn projects_group(ui: &mut Ui, paperclips: &mut PaperClips) {
         }
     });
 }
+
+pub fn top_console(ui: &mut Ui, paperclips: &PaperClips) {
+    let to_fill = paperclips.messages.max_messages - paperclips.messages.messages.len();
+    for _ in 0..to_fill {
+        ui.add_enabled_ui(false, |ui| ui.label(RichText::new(".").monospace()));
+    }
+    for (i, string) in paperclips.messages.messages.iter().enumerate() {
+        let is_last = i >= paperclips.messages.messages.len() - 1;
+        ui.add_enabled_ui(is_last, |ui| {
+            let head = match is_last {
+                false => '.',
+                true => '>',
+            };
+            ui.label(RichText::new(format!("{head} {string}")).monospace());
+        });
+    }
+}

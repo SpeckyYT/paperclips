@@ -66,7 +66,7 @@ impl PaperClips {
     pub fn main_loop_tick(&mut self) {
         self.ticks += 1;
         
-        // milestone_check();
+        self.milestone_check();
         self.button_update();
 
         if self.computational.comp_flag {
@@ -83,7 +83,8 @@ impl PaperClips {
 
         // update_stats();
         self.manage_projects();
-        // milestone_check();
+        // why does it happen twice lmao
+        self.milestone_check();
 
         // Clip Rate Tracker
         let Business { prev_clips, clip_rate_temp, clip_rate, clips, .. } = &mut self.business;
@@ -215,7 +216,6 @@ impl PaperClips {
     }
 
     pub fn milestone_check(&mut self) {
-
         if !self.computational.comp_flag && (
             self.business.unsold_clips < 1.0 && self.business.funds < self.wire.cost && self.wire.count < 1.0
             || self.business.clips.ceil() >= 2000.0

@@ -46,7 +46,6 @@ impl PaperClips {
             let project = &PROJECTS[i];
             if status == Unavailable && (project.trigger)(self) {
                 self.projects.statuses[i] = ProjectStatus::Buyable;
-                self.projects.flag = true;
             }
         }
     }
