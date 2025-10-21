@@ -148,21 +148,24 @@ pub fn projects_group(ui: &mut Ui, paperclips: &mut PaperClips) {
             if ps == ProjectStatus::Buyable {
                 let project = &PROJECTS[i];
 
-                let mut pj = ui.group(|ui| {
-                    ui.horizontal(|ui| {
-                        ui.label(project.title.to_string(paperclips));
-                        ui.label(project.cost.0.to_string(paperclips));
-                    });
-                    ui.label(project.description.to_string(paperclips));
-                }).response.interact(Sense::click());
+                let affordable = (project.cost.1)(paperclips);
 
-                if (project.cost.1)(paperclips) {
-                    pj = pj.highlight().on_hover_cursor(CursorIcon::PointingHand);
-                    if pj.clicked() {
-                        paperclips.buy_project(i);
+                ui.add_enabled_ui(affordable, |ui| {
+                    let mut pj = ui.group(|ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(project.title.to_string(paperclips));
+                            ui.label(project.cost.0.to_string(paperclips));
+                        });
+                        ui.label(project.description.to_string(paperclips));
+                    }).response.interact(Sense::click());
+
+                    if affordable {
+                        pj = pj.highlight().on_hover_cursor(CursorIcon::PointingHand);
+                        if pj.clicked() {
+                            paperclips.buy_project(i);
+                        }
                     }
-                }
-
+                });
             }
         }
     });
