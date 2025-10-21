@@ -5,6 +5,7 @@ pub struct Projects {
     pub flag: bool,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
 
+    pub space_flag: bool,
     pub harvester_flag: bool,
     pub wire_drone_flag: bool,
     pub factory_flag: bool,
@@ -18,6 +19,7 @@ impl Default for Projects {
             flag: false,
             statuses: PROJECTS_STATUSES,
 
+            space_flag: false,
             harvester_flag: false,
             wire_drone_flag: false,
             factory_flag: false,

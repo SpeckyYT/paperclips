@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::{fmt::Display, time::Duration};
 
-use crate::core::Float;
+use crate::{core::Float, PaperClips};
 
 pub fn floor_to(number: Float, power_of_ten: i32) -> Float {
     let factor = 10f64.powi(power_of_ten) as Float;
@@ -40,17 +40,30 @@ pub fn time_cruncher(t: Duration) -> String {
 
     string
 }
+pub fn ticks_to_duration(ticks: u128) -> Duration {
+    let seconds = (ticks / 100) as u64;
+    let ms = ((ticks % 100) * 10) as u32;
+    Duration::new(seconds, ms * 1_000_000)
+}
+impl PaperClips {
+    pub fn milestone_string(&mut self, milestone: impl Display) -> String {
+        format!(
+            "{} in {} (REALTIME: {})",
+            milestone,
+            time_cruncher(ticks_to_duration(self.ticks)),
+            time_cruncher(self.session_start.elapsed()),
+        )
+    }
+}
 
-const fn powf(base: Float, exp: u32) -> Float {
+pub const fn powf(mut base: Float, mut exp: u32) -> Float {
     let mut result = 1.0;
-    let mut b = base;
-    let mut e = exp;
-    while e > 0 {
-        if e % 2 == 1 {
-            result *= b;
+    while exp > 0 {
+        if exp % 2 == 1 {
+            result *= base;
         }
-        b *= b;
-        e /= 2;
+        base *= base;
+        exp /= 2;
     }
     result
 }

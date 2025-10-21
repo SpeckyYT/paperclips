@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use rand::random_bool;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, project::Projects, strategy::Strategy, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, project::{Projects, PROJECT_35}, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -18,11 +18,13 @@ pub mod project;
 pub mod strategy;
 pub mod util;
 pub mod investments;
+pub mod space;
 
 pub struct PaperClips {
     pub session_start: Instant,
     pub ticks: u128,
 
+    pub milestone_flag: u8,
     pub human_flag: bool,
 
     pub messages: Messages,
@@ -34,6 +36,7 @@ pub struct PaperClips {
     pub qchips: QChips,
     pub investments: Investments,
     pub strategy: Strategy,
+    pub space: Space,
 }
 
 impl Default for PaperClips {
@@ -42,6 +45,7 @@ impl Default for PaperClips {
             session_start: Instant::now(),
             ticks: 0,
 
+            milestone_flag: 0,
             human_flag: true,
 
             business: Business::default(),
@@ -52,6 +56,7 @@ impl Default for PaperClips {
             messages: Messages::default(),
             investments: Investments::default(),
             strategy: Strategy::default(),
+            space: Space::default(),
         }
     }
 }
@@ -201,15 +206,65 @@ impl PaperClips {
         //         results_timer = 0;
         //     }
         // }
-        
-        if self.business.funds >= self.business.clipper_cost {
-            self.business.clipper_flag = true;
-        }
 
-        if self.human_flag {
+        if !self.human_flag {
             self.investments.engine_flag = false;
             self.wire.buyer_flag = false;
         }
 
+    }
+
+    pub fn milestone_check(&mut self) {
+
+        if !self.computational.comp_flag && (
+            self.business.unsold_clips < 1.0 && self.business.funds < self.wire.cost && self.wire.count < 1.0
+            || self.business.clips.ceil() >= 2000.0
+        ) {
+            self.computational.comp_flag = true;
+            self.projects.flag = true;
+            self.messages.push("Trust-Constrained Self-Modification enabled");
+        }
+
+        macro_rules! milestones {
+            ($([$milestone:literal] $condition:tt => $($code:block)? $($kind:ident $text:expr;)?)*) => {
+                $(
+                    if self.milestone_flag == $milestone && milestones!(@ $condition) {
+                        self.milestone_flag += 1;
+                        $( $code; )?
+                        $( milestones!(@ $kind $text); )?
+                    }
+                )*
+            };
+            (@ time $text:literal) => {
+                let message = self.milestone_string($text);
+                self.messages.push(message);
+            };
+            (@ text $text:literal) => { self.messages.push($text); };
+            (@ (clips($amount:expr))) => { self.business.clips >= $amount as Float };
+            (@ ($condition:expr)) => { $condition };
+        }
+
+        milestones!{
+            [0] (self.business.funds >= self.business.clipper_cost) =>
+                { self.business.clipper_flag = true; }
+                text "AutoClippers available for purchase";
+            [1] (clips(500)) => time "500 clips created";
+            [2] (clips(1000)) => time "1,000 clips created";
+            [3] (clips(10000)) => time "10,000 clips created";
+            [4] (clips(100000)) => time "100,000 clips created";
+            [5] (clips(1000000)) => time "1,000,000 clips created";
+            [6] (self.projects.is_active(PROJECT_35)) => time "Full autonomy attained";
+            [7] (clips(1000000000000.0)) => time "One Trillion Clips Created";
+            [8] (clips(1000000000000000.0)) => time "One Quadrillion Clips Created";
+            [9] (clips(1000000000000000000.0)) => time "One Quintillion Clips Created";
+            [10] (clips(1000000000000000000000.0)) => time "One Sextillion Clips Created";
+            [11] (clips(1000000000000000000000000.0)) => time "One Septillion Clips Created";
+            [12] (clips(1000000000000000000000000000.0)) => time "One Octillion Clips Created";
+            [13] (self.projects.space_flag) => time "Terrestrial resources fully utilized";
+            [14] (
+                (self.business.clips >= TOTAL_MATTER)
+                || (self.space.found_matter >= TOTAL_MATTER && self.space.available_matter < 1.0 && self.wire.count < 1.0)
+            ) => time "Universal Paperclips achieved";
+        }
     }
 }
