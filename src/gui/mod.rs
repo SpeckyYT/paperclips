@@ -44,7 +44,7 @@ impl App for Gui {
             let pc = &mut self.paperclips;
 
             ScrollArea::vertical().show(ui, |ui| {
-                ui.columns_const(|[left, middle, right]| {
+                ui.columns_const(|[left, middle, _right]| {
                     // LEFT COLUMN
                     left.heading(format!("Paperclips: {}", pc.business.clips.round()));
                     left.add_enabled_ui(pc.wire.count >= 1.0, |ui| {

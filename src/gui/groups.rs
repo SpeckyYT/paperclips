@@ -10,6 +10,12 @@ pub fn business_group(ui: &mut Ui, pc: &mut PaperClips) -> InnerResponse<()> {
             "Available Funds: ${:.2}",
             pc.business.funds
         ));
+
+        if pc.business.rev_per_sec_flag {
+            ui.label(format!("Avg. Rev. per sec: ${:.2}", pc.business.avg_rev));
+            ui.label(format!("Avg. Clips Sold per sec: {:.0}", pc.business.avg_sales));
+        }
+
         ui.label(format!(
             "Unsold Inventory: {:.0}",
             pc.business.unsold_clips

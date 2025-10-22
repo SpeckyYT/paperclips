@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::{util::{floor_to, round_to}, Float, PaperClips};
 
 pub struct Business {
@@ -23,8 +25,21 @@ pub struct Business {
     pub demand_boost: Float,
     /// # prestigeU
     pub prestige_u: Float,
+    
     /// # revPerSecFlag
     pub rev_per_sec_flag: bool,
+    /// # avgSales
+    pub avg_sales: Float,
+    /// # avgRev
+    pub avg_rev: Float,
+    /// # income
+    pub income: Float,
+    /// # incomeTracker
+    pub income_tracker: VecDeque<Float>,
+    /// # incomeThen
+    pub income_then: Float,
+    /// # incomeNow
+    pub income_now: Float,
 
     // # clipRateTracker
     // Used as a "run this code once every 100 cycles"
@@ -70,7 +85,14 @@ impl Default for Business {
             marketing_effectiveness: 1.0,
             demand_boost: 1.0,
             prestige_u: 0.0,
+
             rev_per_sec_flag: false,
+            avg_sales: 0.0,
+            avg_rev: 0.0,
+            income: 0.0,
+            income_tracker: VecDeque::with_capacity(10),
+            income_then: 0.0,
+            income_now: 0.0,
 
             clipper_flag: false,
             clipper_level: 0.0,
@@ -94,7 +116,7 @@ impl PaperClips {
 
         let transaction = floor_to(amount * self.business.margin, -3);
         self.business.funds = floor_to(self.business.funds + transaction, -2);
-        // income += transaction;
+        self.business.income += transaction;
         // clipsSold += amount; // UNUSED
         self.business.unsold_clips -= amount;
     }
@@ -160,5 +182,39 @@ impl Business {
             self.mega_clipper_level += 1.0;
         }
         self.clipper_cost = (1.07 as Float).powf(self.mega_clipper_level) * 1000.0;
+    }
+    #[inline]
+    pub fn scaled_demand(&self) -> Float {
+        0.7 * self.demand.powf(1.15)
+    }
+    pub fn calculate_rev(&mut self) {
+        self.income_then = self.income_now;
+        self.income_now = self.income;
+
+        let income_last_second = round_to(self.income_now - self.income_then, -2);
+
+        self.income_tracker.push_back(income_last_second);
+        if self.income_tracker.len() > 10 {
+            self.income_tracker.pop_front();
+        }
+
+        let sum = round_to(self.income_tracker.iter().sum(), -2);
+
+        
+        let chance_of_purchase = match self.unsold_clips {
+            1.0.. => (self.demand / 100.0).min(1.0),
+            _ => 0.0,
+        };
+        
+        let scaled_demand = self.scaled_demand();
+        
+        if self.demand > self.unsold_clips {
+            let true_avg_rev = sum / self.income_tracker.len() as Float;
+            self.avg_rev = true_avg_rev;
+            self.avg_sales = self.avg_rev / self.margin;
+        } else {
+            self.avg_sales = chance_of_purchase * scaled_demand * 10.0;
+            self.avg_rev = chance_of_purchase * scaled_demand * self.margin * 10.0;
+        }
     }
 }

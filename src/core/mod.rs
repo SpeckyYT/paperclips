@@ -168,6 +168,7 @@ impl PaperClips {
     pub fn update_stock_shop_tick(&mut self) {
         if self.human_flag {
             self.stock_shop();
+            self.business.calculate_rev();
         }
     }
 
@@ -191,9 +192,10 @@ impl PaperClips {
         if self.human_flag {
             // Sales Calculator
             if random_bool(self.business.demand as f64 / 100.0) {
-                self.sell_clips((0.7 * self.business.demand.powf(1.15)).floor());
+                self.sell_clips(self.business.scaled_demand().floor());
             }
-            // Fire Once a Second
+
+            // here there was "Fire Once a Second" with `calculateRev()`, but it got moved into the 1000ms loop
         }
     }
 
