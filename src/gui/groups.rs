@@ -1,5 +1,5 @@
 use eframe::egui::{Color32, CornerRadius, CursorIcon, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
-use paperclips::{project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
+use paperclips::{messages::Console, project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
 
 pub fn business_group(ui: &mut Ui, paperclips: &mut PaperClips) -> InnerResponse<()> {
     ui.group(|ui| {
@@ -172,12 +172,13 @@ pub fn projects_group(ui: &mut Ui, paperclips: &mut PaperClips) {
 }
 
 pub fn top_console(ui: &mut Ui, paperclips: &PaperClips) {
-    let to_fill = paperclips.messages.max_messages - paperclips.messages.messages.len();
+    let Console { max_messages, messages } = &paperclips.console;
+    let to_fill = *max_messages - messages.len();
     for _ in 0..to_fill {
         ui.add_enabled_ui(false, |ui| ui.label(RichText::new(".").monospace()));
     }
-    for (i, string) in paperclips.messages.messages.iter().enumerate() {
-        let is_last = i >= paperclips.messages.messages.len() - 1;
+    for (i, string) in messages.iter().enumerate() {
+        let is_last = i >= messages.len() - 1;
         ui.add_enabled_ui(is_last, |ui| {
             let head = match is_last {
                 false => '.',

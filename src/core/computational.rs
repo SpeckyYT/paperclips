@@ -127,7 +127,7 @@ impl PaperClips {
     pub fn calculate_trust(&mut self) {
         if self.business.clips >= self.computational.next_trust {
             self.computational.trust += 1;
-            self.messages.push("Production target met: TRUST INCREASED, additional processor/memory capacity granted");
+            self.console.push("Production target met: TRUST INCREASED, additional processor/memory capacity granted");
             let fib_next = self.computational.fib.iter().sum::<Float>();
             self.computational.next_trust = fib_next * 1000.0;
             self.computational.fib = [self.computational.fib[1], fib_next];

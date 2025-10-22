@@ -110,7 +110,7 @@ impl PaperClips {
         *stock_gain_threshold += 0.01;
         *invest_upgrade_cost = (((*invest_level + 1) as Float).powf(f64::consts::E as Float) * 100.0).floor();
 
-        self.messages.push(format!("Investment engine upgraded, expected profit/loss ratio now {stock_gain_threshold:.2?}"));
+        self.console.push(format!("Investment engine upgraded, expected profit/loss ratio now {stock_gain_threshold:.2?}"));
     }
     pub fn invest_deposit(&mut self) {
         let Investments { bankroll, ledger, .. } = &mut self.investments;

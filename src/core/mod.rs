@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use rand::random_bool;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Messages, qchips::QChips, wire::Wire}, project::{Projects, PROJECT_35}, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, project::{Projects, PROJECT_35}, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -27,7 +27,7 @@ pub struct PaperClips {
     pub milestone_flag: u8,
     pub human_flag: bool,
 
-    pub messages: Messages,
+    pub console: Console,
 
     pub business: Business,
     pub wire: Wire,
@@ -53,7 +53,7 @@ impl Default for PaperClips {
             qchips: QChips::default(),
             computational: Computational::default(),
             projects: Projects::default(),
-            messages: Messages::default(),
+            console: Console::default(),
             investments: Investments::default(),
             strategy: Strategy::default(),
             space: Space::default(),
@@ -100,7 +100,7 @@ impl PaperClips {
         // Stock Report
         if self.investments.engine_flag && self.ticks.is_multiple_of(ticks_10ms(Duration::from_secs(100))) {
             let r = self.investments.ledger + self.investments.port_total;
-            self.messages.push(format!("Lifetime investment revenue report: ${r}"));
+            self.console.push(format!("Lifetime investment revenue report: ${r}"));
         }
 
         // WireBuyer
@@ -222,7 +222,7 @@ impl PaperClips {
         ) {
             self.computational.comp_flag = true;
             self.projects.flag = true;
-            self.messages.push("Trust-Constrained Self-Modification enabled");
+            self.console.push("Trust-Constrained Self-Modification enabled");
         }
 
         macro_rules! milestones {
@@ -237,9 +237,9 @@ impl PaperClips {
             };
             (@ time $text:literal) => {
                 let message = self.milestone_string($text);
-                self.messages.push(message);
+                self.console.push(message);
             };
-            (@ text $text:literal) => { self.messages.push($text); };
+            (@ text $text:literal) => { self.console.push($text); };
             (@ (clips($amount:expr))) => { self.business.clips >= $amount as Float };
             (@ ($condition:expr)) => { $condition };
         }

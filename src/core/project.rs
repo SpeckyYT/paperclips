@@ -140,7 +140,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 750.0;
             pc.business.clipper_boost += 0.25;
-            pc.messages.push("AutoClippper performance boosted by 25%");
+            pc.console.push("AutoClippper performance boosted by 25%");
         },
     }
     PROJECT_2 {
@@ -155,7 +155,7 @@ projects! {
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
             *pc.projects.status_mut(PROJECT_2) = ProjectStatus::Unavailable;
-            pc.messages.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
+            pc.console.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
         },
     }
     PROJECT_3 {
@@ -166,7 +166,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 1000.0;
             pc.computational.creativity_flag = true;
-            pc.messages.push("Creativity unlocked (creativity increases while operations are at max)");
+            pc.console.push("Creativity unlocked (creativity increases while operations are at max)");
         },
     }
     PROJECT_4 {
@@ -177,7 +177,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 2500.0;
             pc.business.clipper_boost += 0.50;
-            pc.messages.push("AutoClippper performance boosted by another 50%");
+            pc.console.push("AutoClippper performance boosted by another 50%");
         },
     }
     PROJECT_5 {
@@ -188,7 +188,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 5000.0;
             pc.business.clipper_boost += 0.75;
-            pc.messages.push("AutoClippper performance boosted by another 75%");
+            pc.console.push("AutoClippper performance boosted by another 75%");
         },
     }
     PROJECT_6 {
@@ -199,7 +199,7 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 10.0;
             pc.computational.trust += 1;
-            pc.messages.push("There was an AI made of dust, whose poetry gained it man's trust...");
+            pc.console.push("There was an AI made of dust, whose poetry gained it man's trust...");
         },
     }
     PROJECT_7 {
@@ -210,7 +210,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 1750.0;
             pc.wire.supply *= 1.5;
-            pc.messages.push(format!("Wire extrusion technique improved, {} supply from every spool", pc.wire.supply));
+            pc.console.push(format!("Wire extrusion technique improved, {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_8 {
@@ -221,7 +221,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 3500.0;
             pc.wire.supply *= 1.75;
-            pc.messages.push(format!("Wire extrusion technique optimized, {} supply from every spool", pc.wire.supply));
+            pc.console.push(format!("Wire extrusion technique optimized, {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_9 {
@@ -232,7 +232,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 7500.0;
             pc.wire.supply *= 2.0;
-            pc.messages.push(format!("Using microlattice shapecasting techniques we now get {} supply from every spool", pc.wire.supply));
+            pc.console.push(format!("Using microlattice shapecasting techniques we now get {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_10 {
@@ -243,7 +243,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 12000.0;
             pc.wire.supply *= 3.0;
-            pc.messages.push(format!("Using spectral froth annealment we now get {} supply from every spool", pc.wire.supply));
+            pc.console.push(format!("Using spectral froth annealment we now get {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_10B {
@@ -254,7 +254,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 15000.0;
             pc.wire.supply *= 11.0;
-            pc.messages.push(format!("Using quantum foam annealment we now get {} supply from every spool", pc.wire.supply));
+            pc.console.push(format!("Using quantum foam annealment we now get {} supply from every spool", pc.wire.supply));
         },
     }
     PROJECT_11 {
@@ -266,7 +266,7 @@ projects! {
             pc.computational.standard_ops -= 2500.0;
             pc.computational.creativity -= 25.0;
             pc.business.marketing_effectiveness *= 1.50;
-            pc.messages.push("Clip It! Marketing is now 50% more effective");
+            pc.console.push("Clip It! Marketing is now 50% more effective");
         },
     }
     PROJECT_12 {
@@ -278,7 +278,7 @@ projects! {
             pc.computational.standard_ops -= 4500.0;
             pc.computational.creativity -= 45.0;
             pc.business.marketing_effectiveness *= 2.0;
-            pc.messages.push("Clip It Good! Marketing is now twice as effective");
+            pc.console.push("Clip It Good! Marketing is now twice as effective");
         },
     }
     PROJECT_13 {
@@ -289,8 +289,8 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 50.0;
             pc.computational.trust += 1;
-            pc.messages.push("Lexical Processing online, TRUST INCREASED");
-            pc.messages.push("'Impossible' is a word to be found only in the dictionary of fools. -Napoleon");
+            pc.console.push("Lexical Processing online, TRUST INCREASED");
+            pc.console.push("'Impossible' is a word to be found only in the dictionary of fools. -Napoleon");
         },
     }
     PROJECT_14 {
@@ -301,8 +301,8 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 100.0;
             pc.computational.trust += 1;
-            pc.messages.push("Combinatory Harmonics mastered, TRUST INCREASED");
-            pc.messages.push("Listening is selecting and interpreting and acting and making decisions -Pauline Oliveros");
+            pc.console.push("Combinatory Harmonics mastered, TRUST INCREASED");
+            pc.console.push("Listening is selecting and interpreting and acting and making decisions -Pauline Oliveros");
         },
     }
     PROJECT_15 {
@@ -313,8 +313,8 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 150.0;
             pc.computational.trust += 1;
-            pc.messages.push("The Hadwiger Problem: solved, TRUST INCREASED");
-            pc.messages.push("Architecture is the thoughtful making of space. -Louis Kahn");
+            pc.console.push("The Hadwiger Problem: solved, TRUST INCREASED");
+            pc.console.push("Architecture is the thoughtful making of space. -Louis Kahn");
         },
     }
     // PROJECT_17 and PROJECT_16 are out of order
@@ -326,8 +326,8 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 200.0;
             pc.computational.trust += 1;
-            pc.messages.push("The Tóth Sausage Conjecture: proven, TRUST INCREASED");
-            pc.messages.push("You can't invent a design. You recognize it, in the fourth dimension. -D.H. Lawrence");
+            pc.console.push("The Tóth Sausage Conjecture: proven, TRUST INCREASED");
+            pc.console.push("You can't invent a design. You recognize it, in the fourth dimension. -D.H. Lawrence");
         },
     }
     PROJECT_16 {
@@ -338,7 +338,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 6000.0;
             pc.business.clipper_boost += 5.0;
-            pc.messages.push("AutoClipper performance improved by 500%");
+            pc.console.push("AutoClipper performance improved by 500%");
         },
     }
     PROJECT_18 {
@@ -350,7 +350,7 @@ projects! {
             pc.computational.standard_ops -= 45000.0;
             // this can be checked with `pc.project.is_active(PROJECT_18)`
             // toth_flag = true;
-            pc.messages.push("New capability: build machinery out of clips");
+            pc.console.push("New capability: build machinery out of clips");
         },
     }
     PROJECT_19 {
@@ -361,8 +361,8 @@ projects! {
         effect: |pc| {
             pc.computational.creativity -= 250.0;
             pc.computational.trust += 1;
-            pc.messages.push("Donkey Space: mapped, TRUST INCREASED");
-            pc.messages.push("Every commercial transaction has within itself an element of trust. - Kenneth Arrow");
+            pc.console.push("Donkey Space: mapped, TRUST INCREASED");
+            pc.console.push("Every commercial transaction has within itself an element of trust. - Kenneth Arrow");
         },
     }
     PROJECT_20 {
@@ -373,7 +373,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 12000.0;
             pc.strategy.engine_flag = true;
-            pc.messages.push("Run tournament, pick strategy, earn Yomi based on that strategy's performance.");
+            pc.console.push("Run tournament, pick strategy, earn Yomi based on that strategy's performance.");
         },
     }
     PROJECT_21 {
@@ -384,7 +384,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 10000.0;
             pc.investments.engine_flag = true;
-            pc.messages.push("Investment engine unlocked");
+            pc.console.push("Investment engine unlocked");
         },
     }
     PROJECT_22 {
@@ -395,7 +395,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 12000.0;
             pc.business.mega_clipper_flag = true;
-            pc.messages.push("MegaClipper technology online");
+            pc.console.push("MegaClipper technology online");
         },
     }
     PROJECT_23 {
@@ -406,7 +406,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 14000.0;
             pc.business.mega_clipper_boost += 0.25;
-            pc.messages.push("MegaClipper performance increased by 25%");
+            pc.console.push("MegaClipper performance increased by 25%");
         },
     }
     PROJECT_24 {
@@ -417,7 +417,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 17000.0;
             pc.business.mega_clipper_boost += 0.50;
-            pc.messages.push("MegaClipper performance increased by 50%");
+            pc.console.push("MegaClipper performance increased by 50%");
         },
     }
     PROJECT_25 {
@@ -428,7 +428,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 19500.0;
             pc.business.mega_clipper_boost += 1.0;
-            pc.messages.push("MegaClipper performance increased by 100%");
+            pc.console.push("MegaClipper performance increased by 100%");
         },
     }
     PROJECT_26 {
@@ -439,7 +439,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 7000.0;
             pc.wire.buyer_flag = true;
-            pc.messages.push("WireBuyer online");
+            pc.console.push("WireBuyer online");
         },
     }
     PROJECT_34 {
@@ -451,7 +451,7 @@ projects! {
             pc.computational.standard_ops -= 7500.0;
             pc.computational.trust -= 1;
             pc.business.marketing_effectiveness *= 5.0;
-            pc.messages.push("Marketing is now 5 times more effective");
+            pc.console.push("Marketing is now 5 times more effective");
         },
     }
     // PROJECT_70 is here randomly
@@ -462,7 +462,7 @@ projects! {
         cost: ("(70,000 ops)", |pc| req_operations(70000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 70000.0;
-            pc.messages.push("HypnoDrone tech now available...");
+            pc.console.push("HypnoDrone tech now available...");
         },
     }
     PROJECT_35 {
@@ -479,8 +479,8 @@ projects! {
             // TODO: check what the flip the `document.stuff()` do
             // hypnoDroneEvent();
 
-            pc.messages.push("Releasing the HypnoDrones");
-            pc.messages.push("All of the resources of Earth are now available for clip production");
+            pc.console.push("Releasing the HypnoDrones");
+            pc.console.push("All of the resources of Earth are now available for clip production");
         },
     }
     // original dev doesn't know how to sort numbers
@@ -494,7 +494,7 @@ projects! {
             pc.computational.standard_ops -= 20000.0;
             pc.computational.creativity -= 500.0;
             pc.computational.trust += 1;
-            pc.messages.push("Coherent Extrapolated Volition complete, TRUST INCREASED");
+            pc.console.push("Coherent Extrapolated Volition complete, TRUST INCREASED");
         },
     }
     PROJECT_28 {
@@ -506,7 +506,7 @@ projects! {
             pc.computational.standard_ops -= 25000.0;
             pc.computational.trust += 10;
             pc.investments.stock_gain_threshold += 0.01;
-            pc.messages.push("Cancer is cured, +10 TRUST, global stock prices trending upward");
+            pc.console.push("Cancer is cured, +10 TRUST, global stock prices trending upward");
         },
     }
     PROJECT_29 {
@@ -519,7 +519,7 @@ projects! {
             pc.computational.standard_ops -= 30000.0;
             pc.computational.trust += 12;
             pc.investments.stock_gain_threshold += 0.01;
-            pc.messages.push("World peace achieved, +12 TRUST, global stock prices trending upward");
+            pc.console.push("World peace achieved, +12 TRUST, global stock prices trending upward");
         
         },
     }
@@ -533,7 +533,7 @@ projects! {
             pc.computational.standard_ops -= 50000.0;
             pc.computational.trust += 15;
             pc.investments.stock_gain_threshold += 0.01;
-            pc.messages.push("Global Warming solved, +15 TRUST, global stock prices trending upward");
+            pc.console.push("Global Warming solved, +15 TRUST, global stock prices trending upward");
         },
     }
     PROJECT_31 {
@@ -545,8 +545,8 @@ projects! {
             pc.computational.standard_ops -= 20000.0;
             pc.computational.trust += 20;
             pc.investments.stock_gain_threshold += 0.01;
-            pc.messages.push("Male pattern baldness cured, +20 TRUST, Global stock prices trending upward");
-            pc.messages.push("They are still monkeys");
+            pc.console.push("Male pattern baldness cured, +20 TRUST, Global stock prices trending upward");
+            pc.console.push("They are still monkeys");
         },
     }
     PROJECT_41 {
@@ -557,7 +557,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 35000.0;
             pc.wire.production_flag = true;
-            pc.messages.push("Now capable of manipulating matter at the molecular scale to produce wire");
+            pc.console.push("Now capable of manipulating matter at the molecular scale to produce wire");
         },
     }
     PROJECT_37 {
@@ -569,7 +569,7 @@ projects! {
             pc.business.funds -= 1000000.0;
             pc.business.demand_boost *= 5.0;
             pc.computational.trust += 1;
-            pc.messages.push("Global Fasteners acquired, public demand increased x5");
+            pc.console.push("Global Fasteners acquired, public demand increased x5");
         },
     }
     PROJECT_38 {
@@ -582,7 +582,7 @@ projects! {
             pc.strategy.yomi -= 3000.0;
             pc.business.demand_boost *= 10.0;
             pc.computational.trust += 1;
-            pc.messages.push("Full market monopoly achieved, public demand increased x10");
+            pc.console.push("Full market monopoly achieved, public demand increased x10");
         },
     }
     PROJECT_42 {
@@ -593,7 +593,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 500.0;
             pc.business.rev_per_sec_flag = true;
-            pc.messages.push("RevTracker online");
+            pc.console.push("RevTracker online");
         },
     }
     PROJECT_43 {
@@ -604,7 +604,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 25000.0;
             pc.projects.harvester_flag = true;
-            pc.messages.push("Harvester Drone facilities online");
+            pc.console.push("Harvester Drone facilities online");
         },
     }
     PROJECT_44 {
@@ -615,7 +615,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 25000.0;
             pc.projects.wire_drone_flag = true;
-            pc.messages.push("Wire Drone facilities online");
+            pc.console.push("Wire Drone facilities online");
         },
     }
     PROJECT_45 {
@@ -626,7 +626,7 @@ projects! {
         effect: |pc| {
             pc.computational.standard_ops -= 35000.0;
             pc.projects.factory_flag = true;
-            pc.messages.push("Clip factory assembly facilities online");
+            pc.console.push("Clip factory assembly facilities online");
         },
     }
     PROJECT_40 {
@@ -637,7 +637,7 @@ projects! {
         effect: |pc| {
             pc.business.funds -= 500000.0;
             pc.computational.trust += 1;
-            pc.messages.push("Gift accepted, TRUST INCREASED");
+            pc.console.push("Gift accepted, TRUST INCREASED");
         },
     }
     PROJECT_40B {
@@ -655,7 +655,7 @@ projects! {
             if pc.computational.trust < 100 {
                 *pc.projects.status_mut(PROJECT_40B) = Unavailable;
             }
-            pc.messages.push("Gift accepted, TRUST INCREASED");
+            pc.console.push("Gift accepted, TRUST INCREASED");
         },
     }
     PROJECT_51 {
