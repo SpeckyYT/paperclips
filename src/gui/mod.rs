@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use eframe::{
-    egui::{CentralPanel, Context, TopBottomPanel}, App, Frame
+    egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}, App, Frame
 };
 use paperclips::PaperClips;
 
@@ -43,24 +43,28 @@ impl App for Gui {
         CentralPanel::default().show(ctx, |ui| {
             let pc = &mut self.paperclips;
 
-            ui.heading(format!("Paperclips: {}", pc.business.clips.round()));
-            ui.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
-                if ui.button("Make Paperclip").clicked() {
-                    pc.clip_click(1.0);
-                }
+            ScrollArea::vertical().show(ui, |ui| {
+                ui.columns_const(|[left, middle, right]| {
+                    // LEFT COLUMN
+                    left.heading(format!("Paperclips: {}", pc.business.clips.round()));
+                    left.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
+                        if ui.button("Make Paperclip").clicked() {
+                            pc.clip_click(1.0);
+                        }
+                    });
+                    business_group(left, pc);
+                    manufacturing_group(left, pc);
+
+                    // MIDDLE COLUMN
+                    computational_group(middle, pc);
+                    quantum_computing_group(middle, pc);
+                    if pc.projects.flag {
+                        projects_group(middle, pc);
+                    }
+
+                    // RIGHT COLUMN
+                });
             });
-
-            business_group(ui, pc);
-
-            manufacturing_group(ui, pc);
-
-            computational_group(ui, pc);
-
-            quantum_computing_group(ui, pc);
-
-            if pc.projects.flag {
-                projects_group(ui, pc);
-            }
         });
     }
 }
