@@ -5,7 +5,7 @@ use eframe::{
 };
 use paperclips::PaperClips;
 
-use crate::gui::groups::{business_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
+use crate::gui::groups::{business_group, computational_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 
@@ -43,7 +43,7 @@ impl App for Gui {
         CentralPanel::default().show(ctx, |ui| {
             let pc = &mut self.paperclips;
 
-            ui.heading(format!("Paperclips: {}", pc.business.clips.ceil()));
+            ui.heading(format!("Paperclips: {}", pc.business.clips.round()));
             ui.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
                 if ui.button("Make Paperclip").clicked() {
                     pc.clip_click(1.0);
@@ -53,6 +53,8 @@ impl App for Gui {
             business_group(ui, pc);
 
             manufacturing_group(ui, pc);
+
+            computational_group(ui, pc);
 
             quantum_computing_group(ui, pc);
 

@@ -100,6 +100,46 @@ pub fn manufacturing_group(ui: &mut Ui, pc: &mut PaperClips) -> InnerResponse<()
     })
 }
 
+pub fn computational_group(ui: &mut Ui, pc: &mut PaperClips) {
+    if pc.computational.comp_flag {
+        ui.group(|ui| {
+            let c = &pc.computational;
+
+            ui.heading("Computational Resources");
+            ui.separator();
+
+            ui.label(format!("Trust: {}", c.trust));
+            ui.label(format!("+1 Trust at: {} clips", c.next_trust));
+
+            ui.add_space(10.0);
+
+            let enable_buttons = c.trust > c.processors as i32 + c.memory as i32 /* && swarmGifts > 0 */;
+            ui.horizontal(|ui| {
+                ui.add_enabled_ui(enable_buttons, |ui| {
+                    if ui.button("Processors").clicked() {
+                        pc.add_processors();
+                    }
+                });
+                ui.label(pc.computational.processors.to_string());
+            });
+            ui.horizontal(|ui| {
+                ui.add_enabled_ui(enable_buttons, |ui| {
+                    if ui.button("Memory").clicked() {
+                        pc.add_memory();
+                    }
+                });
+                ui.label(pc.computational.memory.to_string());
+            });
+            let c = &pc.computational;
+
+            ui.add_space(10.0);
+
+            ui.label(format!("Operations: {}/{}", c.operations, c.max_operations()));
+            ui.label(format!("Creativity: {}", c.creativity));
+        });
+    }
+}
+
 pub fn quantum_computing_group(ui: &mut Ui, pc: &mut PaperClips) {
     if pc.qchips.q_flag {
         ui.group(|ui| {

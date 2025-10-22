@@ -133,4 +133,30 @@ impl PaperClips {
             self.computational.fib = [self.computational.fib[1], fib_next];
         }
     }
+    /// # addProc()
+    pub fn add_processors(&mut self) {
+        if self.computational.trust > 0 /* || swarmGifts > 0 */ {
+            let processors = &mut self.computational.processors;
+            *processors += 1;
+            let proc_float = *processors as Float;
+            self.computational.creativity_speed = proc_float.log10() * proc_float.powf(1.1) + proc_float - 1.0;
+            if self.human_flag {
+                // swarmGifts -= 1;
+            }
+            self.console.push(match self.computational.creativity_flag {
+                false => "Processor added, operations per sec increased",
+                true => "Processor added, operations (or creativity) per sec increased",
+            });
+        } 
+    }
+    /// # addMem()
+    pub fn add_memory(&mut self) {
+        if self.computational.trust > 0 /* || swarmGifts > 0 */ {
+            self.computational.memory += 1;
+            if self.human_flag {
+                // swarmGifts -= 1;
+            }
+            self.console.push("Memory added, max operations increased");
+        }
+    }
 }
