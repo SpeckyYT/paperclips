@@ -69,10 +69,10 @@ pub enum Body {
 }
 
 impl Body {
-    pub fn to_string(&self, paperclips: &PaperClips) -> String {
+    pub fn to_string(&self, pc: &PaperClips) -> String {
         match self {
             Body::Static(s) => s.to_string(),
-            Body::Dynamic(f) => (f)(paperclips),
+            Body::Dynamic(f) => (f)(pc),
         }
     }
 }
