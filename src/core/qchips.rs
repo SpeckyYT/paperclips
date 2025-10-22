@@ -40,11 +40,11 @@ impl PaperClips {
 
     pub fn quantum_compute(&mut self) {
         self.qchips.fade = Instant::now();
-        self.qchips.qops = if self.qchips.activated == 0 {
+        self.qchips.qops = if self.qchips.activated() == 0 {
             None
         } else {
             let q: Float = self.qchips.chips.iter()
-                .take(self.qchips.activated as usize)
+                .take(self.qchips.activated() as usize)
                 .copied()
                 .sum();
     
@@ -65,5 +65,12 @@ impl PaperClips {
 
             Some(total_qq)
         };
+    }
+}
+
+impl QChips {
+    #[inline]
+    pub fn activated(&self) -> u8 {
+        self.activated.min(self.chips.len() as u8)
     }
 }

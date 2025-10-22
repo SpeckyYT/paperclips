@@ -107,7 +107,7 @@ pub fn quantum_computing_group(ui: &mut Ui, pc: &mut PaperClips) {
             const SPACING: f32 = 2.0;
 
             ui.heading("Quantum Computing");
-            let activated = pc.qchips.activated;
+            let activated = pc.qchips.activated();
             let size = Vec2::new((SIZE + SPACING) * activated as f32, SIZE);
             let (resp, painter) = ui.allocate_painter(size, Sense::HOVER);
             let base = resp.rect.min;
