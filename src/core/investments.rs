@@ -186,7 +186,7 @@ impl PaperClips {
         for stock in stocks {
             stock.age += 1;
             if random_bool(0.6) {
-                let gain = random_bool((*stock_gain_threshold).into());
+                let gain = random_bool((*stock_gain_threshold).clamp(0.0, 1.0).into());
                 
                 let delta = (random::<Float>() * stock.price / (4 * *riskiness as u8) as Float).ceil();
                 stock.price += if gain { delta } else { -delta };

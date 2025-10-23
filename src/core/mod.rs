@@ -191,7 +191,7 @@ impl PaperClips {
 
         if self.human_flag {
             // Sales Calculator
-            if random_bool(self.business.demand as f64 / 100.0) {
+            if random_bool((self.business.demand as f64 / 100.0).clamp(0.0, 1.0)) {
                 self.sell_clips(self.business.scaled_demand().floor());
             }
 
