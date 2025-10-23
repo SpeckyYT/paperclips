@@ -8,6 +8,7 @@ use paperclips::PaperClips;
 use crate::gui::groups::{business_group, computational_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
 
 const TEN_MS: Duration = Duration::from_millis(10);
+const FRAME_60FPS: Duration = Duration::from_millis(16);
 
 mod groups;
 
@@ -73,10 +74,16 @@ impl Gui {
     pub fn update_paperclips(&mut self, ctx: &Context) {
         macro_rules! update_time {
             ($($prop:ident($time:expr) $code:block)*) => {
+                const TOTAL_LOOPS: usize = [$(stringify!($prop)),*].len();
                 $(
-                    while self.$prop.elapsed() >= $time {
-                        self.$prop += $time;
-                        $code;
+                    let start = Instant::now();
+                    while start.elapsed() < FRAME_60FPS / TOTAL_LOOPS as u32 {
+                        if self.$prop.elapsed() >= $time {
+                            self.$prop += $time;
+                            $code;
+                        } else {
+                            break
+                        }
                     }
                 )*
             };
