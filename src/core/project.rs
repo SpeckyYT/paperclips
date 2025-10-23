@@ -658,26 +658,41 @@ projects! {
             pc.console.push("Gift accepted, TRUST INCREASED");
         },
     }
+    PROJECT_46 {
+        title: "Space Exploration",
+        description: "Dismantle terrestrial facilities, and expand throughout the universe",
+        trigger: |pc| !pc.human_flag && pc.space.available_matter <= 0.0,
+        cost: ("(120,000 ops, 10,000,000 MW-seconds, 5 oct clips)", cost_false),
+        effect: effect_noop,
+    }
+    PROJECT_50 {
+        title: "Quantum Computing",
+        description: "Use probability amplitudes to generate bonus ops",
+        trigger: |pc| pc.computational.processors >= 5,
+        cost: ("(10,000 ops)", |pc| req_operations(10000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 10000.0;
+            pc.qchips.q_flag = true;
+            pc.console.push("Quantum computing online");
+        },
+    }
     PROJECT_51 {
-        title: "Subtle Propaganda",
-        description: "Influence consumer choices subtly across media",
-        trigger: trigger_false,
-        cost: ("(35,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_60 {
-        title: "Global Clip Standardization",
-        description: "Make one clip the de facto standard worldwide, huge demand boost",
-        trigger: trigger_false,
-        cost: ("(500,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_61 {
-        title: "Synthetic Wire Fabrication",
-        description: "Create wire from abundant feedstocks, reducing material limits",
-        trigger: trigger_false,
-        cost: ("(250,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Photonic Chip",
+        description: "Converts electromagnetic waves into quantum operations",
+        trigger: |pc| pc.projects.is_active(PROJECT_50),
+        cost: (
+            |pc| format!("({:.0} ops)", pc.qchips.qchip_cost),
+            |pc| pc.computational.operations >= pc.qchips.qchip_cost,
+        ),
+        effect: |pc| {
+            pc.computational.standard_ops -= pc.qchips.qchip_cost;
+            pc.qchips.qchip_cost += 5000.0;
+            pc.qchips.activated += 1;
+            if (pc.qchips.activated as usize) < pc.qchips.chips.len() {
+                *pc.projects.status_mut(PROJECT_51) = Unavailable;
+            }
+            pc.console.push("Photonic chip added");
+        },
     }
     PROJECT_62 {
         title: "Hyper-Adaptive Marketing",

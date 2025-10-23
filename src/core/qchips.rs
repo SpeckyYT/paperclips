@@ -15,6 +15,8 @@ pub struct QChips {
     pub fade: Instant,
     /// # #qCompDisplay
     pub qops: Option<Float>,
+    /// # qChipCost
+    pub qchip_cost: Float,
 }
 
 impl Default for QChips {
@@ -25,6 +27,7 @@ impl Default for QChips {
             activated: 0,
             fade: Instant::now() - QOPS_FADE_TIME,
             qops: None,
+            qchip_cost: 10000.0,
         }
     }
 }
