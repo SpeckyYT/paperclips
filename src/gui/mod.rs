@@ -38,7 +38,7 @@ impl App for Gui {
         self.update_paperclips(ctx);
 
         TopBottomPanel::top("console").show(ctx, |ui| {
-            top_console(ui, &mut self.paperclips);
+            top_console(ui, &self.paperclips);
         });
 
         CentralPanel::default().show(ctx, |ui| {

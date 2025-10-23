@@ -23,13 +23,13 @@ pub enum Riskiness {
 }
 
 pub struct Stock {
-    id: usize,
-    symbol: String,
-    price: Float,
-    amount: u32,
-    total: Float,
-    profit: Float,
-    age: u64,
+    pub id: usize,
+    pub symbol: String,
+    pub price: Float,
+    pub amount: u32,
+    pub total: Float,
+    pub profit: Float,
+    pub age: u64,
 }
 
 impl Stock {
