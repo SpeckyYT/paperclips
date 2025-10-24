@@ -21,9 +21,11 @@ pub fn business_group(ui: &mut Ui, pc: &mut PaperClips) -> InnerResponse<()> {
             pc.business.unsold_clips
         ));
         ui.horizontal(|ui| {
-            if ui.button("lower").clicked() {
-                pc.business.lower_price();
-            }
+            ui.add_enabled_ui(pc.business.margin > 0.01, |ui| {
+                if ui.button("lower").clicked() {
+                    pc.business.lower_price();
+                }
+            });
             if ui.button("raise").clicked() {
                 pc.business.raise_price();
             }

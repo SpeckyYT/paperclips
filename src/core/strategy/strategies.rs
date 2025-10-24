@@ -1,83 +1,79 @@
 use rand::random_bool;
 
-use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StratPickMove, StrategyBoard};
+use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StrategyBoard};
+
+#[derive(Clone, Copy)]
+pub struct Strat {
+    name: &'static str,
+    pick_move: fn(board: StrategyBoard, position: Position) -> Move,
+}
 
 macro_rules! strats {
-    ($(struct $name:ident $impl:tt)*) => {
+    ($($name:ident { $(# $str:literal)? $($prop:ident: $val:expr),* $(,)? })*) => {
         $(
-            #[derive(Debug, Clone, Copy)]
-            pub struct $name {}
-            impl StratPickMove for $name $impl
+            pub const $name: Strat = Strat {
+                name: [$($str,)? stringify!($name)][0],
+                $(
+                    $prop: $val,
+                )*
+            };
         )*
-        #[derive(Debug, Clone, Copy)]
-        pub enum StratFunction {
-            $(
-                $name($name),
-            )*
-        }
-        impl StratFunction {
-            fn pick_move(&mut self, board: StrategyBoard, position: Position) -> Move {
-                match self {
-                    $(
-                        Self::$name(strat) => strat.pick_move(board, position),
-                    )*
-                }
-            }
-        }
+        pub const ALL_STRATS: [Strat; [$(stringify!($name),)*].len()] = [$($name,)*];
     };
 }
 
 strats!{
-    struct Random {
-        fn pick_move(&mut self, _: StrategyBoard, _: Position) -> Move {
+    RANDOM {
+        pick_move: |_, _| {
             match random_bool(0.5) {
                 true => A,
                 false => B,
             }
-        }
+        },
     }
-    struct A100 {
-        fn pick_move(&mut self, _: StrategyBoard, _: Position) -> Move { A }
+    A100 {
+        pick_move: |_, _| A,
     }
-    struct B100 {
-        fn pick_move(&mut self, _: StrategyBoard, _: Position) -> Move { B }
+    B100 {
+        pick_move: |_, _| B,
     }
-    struct Greedy {
-        fn pick_move(&mut self, board: StrategyBoard, _: Position) -> Move {
+    GREEDY {
+        pick_move: |board, _| {
             match find_biggest_payoff(board) {
                 AA|AB => A,
                 BA|BB => B,
             }
         }
     }
-    struct Generous {
-        fn pick_move(&mut self, board: StrategyBoard, _: Position) -> Move {
+    GENEROUS {
+        pick_move: |board, _| {
             match find_biggest_payoff(board) {
                 AA|BA => A,
                 AB|BB => B,
             }
         }
     }
-    struct MiniMax {
-        fn pick_move(&mut self, board: StrategyBoard, _: Position) -> Move {
+    MINIMAX {
+        pick_move: |board, _| {
             match find_biggest_payoff(board) {
                 AA|BA => B,
                 AB|BB => A,
             }
         }
     }
-    struct TitForTat {
-        fn pick_move(&mut self, board: StrategyBoard, position: Position) -> Move {
+    TIT_FOR_TAT {
+        # "TIT FOR TAT"
+        pick_move: |board, position| {
             match position {
                 Position::H => board.previous_vertical_move,
                 Position::V => board.previous_horizontal_move,
             }
         }
     }
-    struct BeatLast {
-        fn pick_move(&mut self, board: StrategyBoard, position: Position) -> Move {
+    BEAT_LAST {
+        # "BEAT LAST"
+        pick_move: |board, position| {
             what_beats_last(position, &board)
         }
     }
-
 }

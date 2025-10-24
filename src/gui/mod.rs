@@ -43,11 +43,11 @@ impl App for Gui {
 
         CentralPanel::default().show(ctx, |ui| {
             let pc = &mut self.paperclips;
+            ui.heading(format!("Paperclips: {}", pc.business.clips.round()));
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, _right]| {
                     // LEFT COLUMN
-                    left.heading(format!("Paperclips: {}", pc.business.clips.round()));
                     left.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
                         if ui.button("Make Paperclip").clicked() {
                             pc.clip_click(1.0);
