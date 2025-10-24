@@ -3,10 +3,13 @@
 use core::f64;
 use std::{collections::VecDeque, time::Duration};
 
+use arrayvec::ArrayString;
 use rand::{random, random_bool, random_range};
+use strum::EnumIter;
 
 use crate::core::{Float, PaperClips};
 
+pub const MAX_STOCKS: usize = 5;
 pub const UPDATE_STOCK_SHOP: Duration = Duration::from_millis(1000);
 pub const UPDATE_STOCKS_TIME: Duration = Duration::from_millis(2500);
 
@@ -15,16 +18,36 @@ pub const ALPHABET: [char; 26] = [
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
 pub enum Riskiness {
     Low = 7,
     Medium = 5,
     High = 1,
 }
 
+impl Riskiness {
+    #[inline]
+    pub const fn name(&self) -> &str {
+        match self {
+            Riskiness::Low => "Low Risk",
+            Riskiness::Medium => "Med Risk",
+            Riskiness::High => "High Risk",
+        }
+    }
+    #[inline]
+    pub const fn value(&self) -> u8 {
+        match self {
+            Riskiness::Low => 7,
+            Riskiness::Medium => 5,
+            Riskiness::High => 1,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 pub struct Stock {
     pub id: usize,
-    pub symbol: String,
+    pub symbol: ArrayString<5>,
     pub price: Float,
     pub amount: u32,
     pub total: Float,
@@ -69,6 +92,8 @@ pub struct Investments {
     pub bankroll: Float,
     /// # ledger
     pub ledger: Float,
+    /// # secTotal
+    pub sec_total: Float,
     /// # portTotal
     pub port_total: Float,
 
@@ -84,25 +109,25 @@ pub struct Investments {
 impl Default for Investments {
     fn default() -> Self {
         Self {
-            stocks: VecDeque::with_capacity(10),
+            stocks: VecDeque::with_capacity(5),
             stock_index: 0,
             riskiness: Riskiness::Medium,
-            max_port: 5,
+            max_port: MAX_STOCKS,
             invest_level: 0,
             invest_upgrade_cost: 100.0,
             stock_gain_threshold: 0.5,
             bankroll: 0.0,
             ledger: 0.0,
+            sec_total: 0.0,
             port_total: 0.0,
             sell_delay: 0,
-            engine_flag: false,
+            engine_flag: true,
         }
     }
 }
 
 impl PaperClips {
     pub fn invest_upgrade(&mut self) {
-        // TODO: uncomment and add variables
         let Investments { invest_level, stock_gain_threshold, invest_upgrade_cost, .. } = &mut self.investments;
 
         self.strategy.yomi -= *invest_upgrade_cost;
@@ -116,7 +141,7 @@ impl PaperClips {
         let Investments { bankroll, ledger, .. } = &mut self.investments;
 
         *ledger -= self.business.funds;
-        *bankroll = (*bankroll + self.business.funds).floor();
+        *bankroll += self.business.funds; // there was a `.floor()` here, but you lose money that way
         self.business.funds = 0.0;
     }
     pub fn invest_withdraw(&mut self) {
@@ -129,17 +154,25 @@ impl PaperClips {
     pub fn stock_shop(&mut self) {
         let Investments { stocks, bankroll, port_total, riskiness, max_port, .. } = &mut self.investments;
         
-        let budget = (*port_total/ *riskiness as u8 as Float).ceil();
-        let r = (11 - *riskiness as u8) as Float;
+        let budget = (*port_total/ riskiness.value() as Float).ceil();
+        let r = (11 - riskiness.value()) as Float;
         let reserves = if matches!(riskiness, Riskiness::High) { 0.0 } else { (*port_total/r).ceil() };
 
         let budget = match (*bankroll - budget < reserves, matches!(riskiness, Riskiness::High), *bankroll > *port_total / 10.0) {
-            (true, true, true) => *bankroll,
-            (true, true, false) => 0.0,
-            (true, _, _) => *bankroll - reserves,
-            (_, _, _) => budget,
+            (true, true, true) => dbg!(*bankroll),
+            (true, true, false) => dbg!(0.0),
+            (true, _, _) => dbg!(*bankroll - reserves),
+            (false, _, _) => dbg!(budget),
         };
 
+        println!("budget: {budget}");
+        println!(
+            "{} {} {} {}",
+            stocks.len() < *max_port,
+            *bankroll >= 5.0,
+            budget >= 1.0,
+            *bankroll - budget >= reserves
+        );
         if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves && random_bool(0.25) {
             self.create_stock(budget);
         }
@@ -180,6 +213,11 @@ impl PaperClips {
             *bankroll += stock.total;
         }
     }
+    pub fn stock_list_display_routine(&mut self) {
+        // Stock List Display Routine
+        self.investments.sec_total = self.investments.stocks.iter().map(|s| s.total).sum();
+        self.investments.port_total = self.investments.bankroll + self.investments.sec_total;
+    }
     pub fn update_stocks(&mut self) {
         let Investments { stocks, stock_gain_threshold, riskiness, .. } = &mut self.investments;
 
@@ -188,7 +226,7 @@ impl PaperClips {
             if random_bool(0.6) {
                 let gain = random_bool((*stock_gain_threshold).clamp(0.0, 1.0).into());
                 
-                let delta = (random::<Float>() * stock.price / (4 * *riskiness as u8) as Float).ceil();
+                let delta = (random::<Float>() * stock.price / (4 * riskiness.value()) as Float).ceil();
                 stock.price += if gain { delta } else { -delta };
 
                 if stock.price == 0.0 && random_bool(0.76) {
@@ -201,15 +239,19 @@ impl PaperClips {
                 stock.profit += if gain { profit } else { -profit }; 
             }
         }
+
+        self.investments.port_total = self.investments.sec_total + self.investments.bankroll;
     }
 }
 
-pub fn generate_symbol() -> String {
+pub fn generate_symbol() -> ArrayString<5> {
     let letters = match random::<Float>() {
         r if r <= 0.01 => 1,
         r if r > 0.1 => 2,
         r if r > 0.4 => 3,
         _ => 4,
     };
-    (0..=letters).map(|_| ALPHABET[random_range(0..ALPHABET.len())]).collect()
+    let mut symbol = ArrayString::new_const();
+    (0..=letters).for_each(|_| symbol.push(ALPHABET[random_range(0..ALPHABET.len())]));
+    symbol
 }

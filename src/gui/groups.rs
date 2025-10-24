@@ -1,5 +1,7 @@
-use eframe::egui::{Color32, CornerRadius, CursorIcon, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
-use paperclips::{messages::Console, project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
+use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
+use egui_extras::{Column, TableBuilder};
+use paperclips::{investments::Riskiness, messages::Console, project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
+use strum::IntoEnumIterator;
 
 pub fn business_group(ui: &mut Ui, pc: &mut PaperClips) -> InnerResponse<()> {
     ui.group(|ui| {
@@ -216,6 +218,66 @@ pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
                 });
             }
         }
+    });
+}
+
+pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
+    ui.group(|ui| {
+        ui.heading("Investments");
+        ui.separator();
+
+        let riskiness = &mut pc.investments.riskiness;
+    
+        ComboBox::from_label("Riskiness")
+            .selected_text(riskiness.name())
+            .show_ui(ui, |ui| {
+                for risk in Riskiness::iter() {
+                    ui.selectable_value(riskiness, risk, risk.name());
+                }
+            });
+
+        ui.columns_const(|[left, right]| {
+            if left.button("Deposit").clicked() {
+                pc.invest_deposit();
+            }
+            if left.button("Withdraw").clicked() {
+                pc.invest_withdraw();
+            }
+            
+            right.label(format!("Cash: ${:.2}", pc.investments.bankroll));
+            right.label(format!("Stocks: ${:.2}", pc.investments.sec_total));
+            right.label(format!("Total: ${:.2}", pc.investments.port_total));
+        });
+
+        const TABLE_HEADINGS: &[&str] = &["Stock", "Amt.", "Price", "Total", "P/L"];
+
+        ui.group(|ui| {
+            TableBuilder::new(ui)
+                .columns(Column::remainder(), TABLE_HEADINGS.len())
+                .header(10.0, |mut row| {
+                    for col in TABLE_HEADINGS {
+                        row.col(|ui| { ui.label(*col); });
+                    }
+                })
+                .body(|mut body| {
+                    let to_fill = pc.investments.max_port - pc.investments.stocks.len();
+                    for stock in &pc.investments.stocks {
+                        println!("{stock:?}");
+                        body.row(10.0, |mut row| {
+                            row.col(|ui| { ui.label(&*stock.symbol); });
+                            row.col(|ui| { ui.label(format!("{:.2}", &stock.amount)); });
+                            row.col(|ui| { ui.label(format!("{:.2}", &stock.price)); });
+                            row.col(|ui| { ui.label(format!("{:.2}", &stock.total)); });
+                            row.col(|ui| { ui.label(format!("{:.2}", &stock.profit)); });
+                        });
+                    }
+                    body.rows(10.0, to_fill, |mut row| {
+                        for _ in 0..pc.investments.max_port {
+                            row.col(|_| {});
+                        }
+                    });
+                });
+        });
     });
 }
 

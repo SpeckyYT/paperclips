@@ -100,7 +100,7 @@ impl PaperClips {
         // Stock Report
         if self.investments.engine_flag && self.ticks.is_multiple_of(ticks_10ms(Duration::from_secs(100))) {
             let r = self.investments.ledger + self.investments.port_total;
-            self.console.push(format!("Lifetime investment revenue report: ${r}"));
+            self.console.push(format!("Lifetime investment revenue report: ${r:.2}"));
         }
 
         // WireBuyer

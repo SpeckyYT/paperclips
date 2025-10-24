@@ -5,7 +5,7 @@ use eframe::{
 };
 use paperclips::PaperClips;
 
-use crate::gui::groups::{business_group, computational_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
+use crate::gui::groups::{business_group, computational_group, investments_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 const FRAME_60FPS: Duration = Duration::from_millis(16);
@@ -46,7 +46,7 @@ impl App for Gui {
             ui.heading(format!("Paperclips: {}", pc.business.clips.round()));
 
             ScrollArea::vertical().show(ui, |ui| {
-                ui.columns_const(|[left, middle, _right]| {
+                ui.columns_const(|[left, middle, right]| {
                     // LEFT COLUMN
                     left.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
                         if ui.button("Make Paperclip").clicked() {
@@ -64,6 +64,9 @@ impl App for Gui {
                     }
 
                     // RIGHT COLUMN
+                    if pc.investments.engine_flag {
+                        investments_group(right, pc);
+                    }
                 });
             });
         });
@@ -99,6 +102,7 @@ impl Gui {
                 self.paperclips.update_stocks_tick();
             }
             last_wire_price_and_demand_update(Duration::from_millis(100)) {
+                self.paperclips.stock_list_display_routine();
                 self.paperclips.update_wire_price_and_demand_tick();
             }
         }
