@@ -245,8 +245,8 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
             }
             
             right.label(format!("Cash: ${:.2}", pc.investments.bankroll));
-            right.label(format!("Stocks: ${:.2}", pc.investments.sec_total));
-            right.label(format!("Total: ${:.2}", pc.investments.port_total));
+            right.label(format!("Stocks: ${:.2}", pc.investments.sec_total()));
+            right.label(format!("Total: ${:.2}", pc.investments.port_total()));
         });
 
         const TABLE_HEADINGS: &[&str] = &["Stock", "Amt.", "Price", "Total", "P/L"];
@@ -262,13 +262,12 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
                 .body(|mut body| {
                     let to_fill = pc.investments.max_port - pc.investments.stocks.len();
                     for stock in &pc.investments.stocks {
-                        println!("{stock:?}");
                         body.row(10.0, |mut row| {
                             row.col(|ui| { ui.label(&*stock.symbol); });
-                            row.col(|ui| { ui.label(format!("{:.2}", &stock.amount)); });
-                            row.col(|ui| { ui.label(format!("{:.2}", &stock.price)); });
-                            row.col(|ui| { ui.label(format!("{:.2}", &stock.total)); });
-                            row.col(|ui| { ui.label(format!("{:.2}", &stock.profit)); });
+                            row.col(|ui| { ui.label(format!("{}", &stock.amount)); });
+                            row.col(|ui| { ui.label(format!("{:.0}", &stock.price)); });
+                            row.col(|ui| { ui.label(format!("{:.0}", &stock.total())); });
+                            row.col(|ui| { ui.label(format!("{:.0}", &stock.profit)); });
                         });
                     }
                     body.rows(10.0, to_fill, |mut row| {

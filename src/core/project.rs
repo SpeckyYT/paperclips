@@ -147,7 +147,7 @@ projects! {
         title: "Beg for More Wire",
         description: "Admit failure, ask for budget increase to cover cost of 1 spool",
         trigger: |pc|
-            pc.investments.port_total < pc.wire.cost &&
+            pc.investments.port_total() < pc.wire.cost &&
             pc.business.funds < pc.wire.cost &&
             pc.wire.count < 1.0 && pc.business.unsold_clips < 1.0,
         cost: ("(1 Trust)", |pc| req_trust(-100)(pc)),

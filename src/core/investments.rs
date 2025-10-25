@@ -46,18 +46,19 @@ impl Riskiness {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Stock {
-    pub id: usize,
+    // these two aren't used
+    // pub id: usize,
+    // pub age: u64,
     pub symbol: ArrayString<5>,
     pub price: Float,
     pub amount: u32,
-    pub total: Float,
     pub profit: Float,
-    pub age: u64,
 }
 
 impl Stock {
-    pub fn update_total(&mut self) {
-        self.total = self.price * self.amount as Float;
+    #[inline]
+    pub fn total(&self) -> Float {
+        self.price * self.amount as Float
     }
 }
 
@@ -93,9 +94,11 @@ pub struct Investments {
     /// # ledger
     pub ledger: Float,
     /// # secTotal
-    pub sec_total: Float,
+    /// Removed because it's calculated
+    // pub sec_total: Float,
     /// # portTotal
-    pub port_total: Float,
+    /// Removed because it's calculated
+    // pub port_total: Float,
 
     /// # sellDelay
     pub sell_delay: u32,
@@ -118,12 +121,21 @@ impl Default for Investments {
             stock_gain_threshold: 0.5,
             bankroll: 0.0,
             ledger: 0.0,
-            sec_total: 0.0,
-            port_total: 0.0,
             sell_delay: 0,
             engine_flag: true,
         }
     }
+}
+
+impl Investments {
+    #[inline]
+    pub fn sec_total(&self) -> Float {
+        self.stocks.iter().map(|s| s.total()).sum()
+    }
+    #[inline]
+    pub fn port_total(&self) -> Float {
+        self.bankroll + self.sec_total()
+    } 
 }
 
 impl PaperClips {
@@ -140,9 +152,11 @@ impl PaperClips {
     pub fn invest_deposit(&mut self) {
         let Investments { bankroll, ledger, .. } = &mut self.investments;
 
-        *ledger -= self.business.funds;
-        *bankroll += self.business.funds; // there was a `.floor()` here, but you lose money that way
-        self.business.funds = 0.0;
+        let amount = self.business.funds.floor();
+
+        *ledger -= amount;
+        *bankroll += amount;
+        self.business.funds -= amount; // this used to be `= 0.0`, but that makes you waste money each time you click this button
     }
     pub fn invest_withdraw(&mut self) {
         let Investments { bankroll, ledger, .. } = &mut self.investments;
@@ -152,27 +166,20 @@ impl PaperClips {
         *bankroll = 0.0;
     }
     pub fn stock_shop(&mut self) {
-        let Investments { stocks, bankroll, port_total, riskiness, max_port, .. } = &mut self.investments;
+        let port_total = self.investments.port_total();
+        let Investments { stocks, bankroll, riskiness, max_port, .. } = &mut self.investments;
         
-        let budget = (*port_total/ riskiness.value() as Float).ceil();
+        let budget = (port_total / riskiness.value() as Float).ceil();
         let r = (11 - riskiness.value()) as Float;
-        let reserves = if matches!(riskiness, Riskiness::High) { 0.0 } else { (*port_total/r).ceil() };
+        let reserves = if *riskiness == Riskiness::High { 0.0 } else { (port_total/r).ceil() };
 
-        let budget = match (*bankroll - budget < reserves, matches!(riskiness, Riskiness::High), *bankroll > *port_total / 10.0) {
-            (true, true, true) => dbg!(*bankroll),
-            (true, true, false) => dbg!(0.0),
-            (true, _, _) => dbg!(*bankroll - reserves),
-            (false, _, _) => dbg!(budget),
+        let budget = match (*bankroll - budget < reserves, *riskiness == Riskiness::High, *bankroll > port_total / 10.0) {
+            (true, true, true) => *bankroll,
+            (true, true, false) => 0.0,
+            (true, _, _) => *bankroll - reserves,
+            (false, _, _) => budget,
         };
 
-        println!("budget: {budget}");
-        println!(
-            "{} {} {} {}",
-            stocks.len() < *max_port,
-            *bankroll >= 5.0,
-            budget >= 1.0,
-            *bankroll - budget >= reserves
-        );
         if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves && random_bool(0.25) {
             self.create_stock(budget);
         }
@@ -189,40 +196,32 @@ impl PaperClips {
             r if r > 0.20 => 50.0,
             _ => 15.0,
         };
-        let price = random_range(1.0..=max_price).ceil();
+        let price = random_range(0.0..=max_price).ceil();
         let price = if price > money { money * roll } else { price };
 
-        let amount = (money / price).floor().max(1000000.0);
+        let amount = (money / price).floor().min(1000000.0);
+        let total = price * amount;
 
         stocks.push_back(Stock {
-            id: *stock_index,
             symbol: generate_symbol(),
             price,
             amount: amount as u32,
-            total: price * amount,
             profit: 0.0,
-            age: 0,
         });
 
-        *bankroll -= price * amount;
+        *bankroll -= total;
     }
     pub fn sell_stock(&mut self) {
         let Investments { stocks, bankroll, .. } = &mut self.investments;
         
         if let Some(stock) = stocks.pop_front() {
-            *bankroll += stock.total;
+            *bankroll += stock.total();
         }
-    }
-    pub fn stock_list_display_routine(&mut self) {
-        // Stock List Display Routine
-        self.investments.sec_total = self.investments.stocks.iter().map(|s| s.total).sum();
-        self.investments.port_total = self.investments.bankroll + self.investments.sec_total;
     }
     pub fn update_stocks(&mut self) {
         let Investments { stocks, stock_gain_threshold, riskiness, .. } = &mut self.investments;
 
         for stock in stocks {
-            stock.age += 1;
             if random_bool(0.6) {
                 let gain = random_bool((*stock_gain_threshold).clamp(0.0, 1.0).into());
                 
@@ -233,14 +232,10 @@ impl PaperClips {
                     stock.price = 1.0;
                 }
 
-                stock.update_total();
-
                 let profit = delta * stock.amount as Float;
                 stock.profit += if gain { profit } else { -profit }; 
             }
         }
-
-        self.investments.port_total = self.investments.sec_total + self.investments.bankroll;
     }
 }
 

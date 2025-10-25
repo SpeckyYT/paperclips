@@ -102,7 +102,6 @@ impl Gui {
                 self.paperclips.update_stocks_tick();
             }
             last_wire_price_and_demand_update(Duration::from_millis(100)) {
-                self.paperclips.stock_list_display_routine();
                 self.paperclips.update_wire_price_and_demand_tick();
             }
         }
