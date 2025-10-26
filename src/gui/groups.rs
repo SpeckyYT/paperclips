@@ -254,7 +254,8 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
         ui.group(|ui| {
             TableBuilder::new(ui)
                 .columns(Column::remainder(), TABLE_HEADINGS.len())
-                .header(10.0, |mut row| {
+                .striped(true)
+                .header(15.0, |mut row| {
                     for col in TABLE_HEADINGS {
                         row.col(|ui| { ui.label(*col); });
                     }
@@ -262,7 +263,7 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
                 .body(|mut body| {
                     let to_fill = pc.investments.max_port - pc.investments.stocks.len();
                     for stock in &pc.investments.stocks {
-                        body.row(10.0, |mut row| {
+                        body.row(15.0, |mut row| {
                             row.col(|ui| { ui.label(&*stock.symbol); });
                             row.col(|ui| { ui.label(format!("{}", &stock.amount)); });
                             row.col(|ui| { ui.label(format!("{:.0}", &stock.price)); });
@@ -270,7 +271,7 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
                             row.col(|ui| { ui.label(format!("{:.0}", &stock.profit)); });
                         });
                     }
-                    body.rows(10.0, to_fill, |mut row| {
+                    body.rows(15.0, to_fill, |mut row| {
                         for _ in 0..pc.investments.max_port {
                             row.col(|_| {});
                         }
