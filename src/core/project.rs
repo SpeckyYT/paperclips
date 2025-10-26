@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
 
@@ -69,10 +71,10 @@ pub enum Body {
 }
 
 impl Body {
-    pub fn to_string(&self, pc: &PaperClips) -> String {
-        match self {
-            Body::Static(s) => s.to_string(),
-            Body::Dynamic(f) => (f)(pc),
+    pub fn to_string(&self, pc: &PaperClips) -> Cow<'static, str> {
+        match *self {
+            Body::Static(s) => Cow::Borrowed(s),
+            Body::Dynamic(f) => Cow::Owned((f)(pc)),
         }
     }
 }
