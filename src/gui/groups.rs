@@ -287,6 +287,15 @@ pub fn investments_group(ui: &mut Ui, pc: &mut PaperClips) {
                     });
                 });
         });
+        ui.horizontal(|ui| {
+            ui.add_enabled_ui(pc.strategy.yomi >= pc.investments.invest_upgrade_cost, |ui| {
+                if ui.button("Upgrade Investment Engine").clicked() {
+                    pc.invest_upgrade();
+                }
+            });
+            ui.label(format!("Level: {}", pc.investments.invest_level));
+        });
+        ui.label(format!("Cost: {:.0} Yomi", pc.investments.invest_upgrade_cost));
     });
 }
 
