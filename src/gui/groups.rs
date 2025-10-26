@@ -1,4 +1,4 @@
-use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
+use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
 use paperclips::{investments::Riskiness, messages::Console, project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
 use strum::IntoEnumIterator;
@@ -201,16 +201,25 @@ pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
                 let affordable = (project.cost.1)(pc);
 
                 ui.add_enabled_ui(affordable, |ui| {
-                    let mut pj = ui.group(|ui| {
+                    let mut frame = Frame::group(ui.style()).begin(ui);
+
+                    {
+                        let ui = &mut frame.content_ui;
                         ui.horizontal(|ui| {
                             ui.label(project.title.to_string(pc));
                             ui.label(project.cost.0.to_string(pc));
                         });
                         ui.label(project.description.to_string(pc));
-                    }).response.interact(Sense::click());
+                    }
+
+                    let pj = frame.allocate_space(ui);
+                    if pj.hovered() && affordable && pj.enabled() {
+                        frame.frame.stroke.color = Color32::GRAY;
+                    }
+                    frame.paint(ui);
 
                     if affordable {
-                        pj = pj.highlight().on_hover_cursor(CursorIcon::PointingHand);
+                        let pj = pj.interact(Sense::CLICK).on_hover_cursor(CursorIcon::PointingHand);
                         if pj.clicked() {
                             pc.buy_project(i);
                         }
