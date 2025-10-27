@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 const DEFAULT_MESSAGES_SIZE: usize = 5;
 
+#[derive(Debug, Clone)]
 pub struct Console {
     pub max_messages: usize,
     pub messages: VecDeque<String>,

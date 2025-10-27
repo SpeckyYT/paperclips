@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::{strategy::strategies::{Strat, A100}, Float};
+use crate::{Float, strategy::strategies::{A100, ALL_STRATS, STRAT_COUNT, Strat}};
 
 mod strategies;
 mod util;
@@ -97,12 +97,13 @@ pub trait StratPickMove {
     fn pick_move(&mut self, board: StrategyBoard, current_position: Position) -> Move;
 }
 
+#[derive(Debug, Clone)]
 pub struct Strategy {
     pub engine_flag: bool,
 
     board: StrategyBoard,
 
-    strats: ArrayVec<Strat, 8>,
+    strats: [Option<Strat>; STRAT_COUNT],
 
     horizontal_strat: Strat,
     vertical_strats: Strat,
@@ -155,7 +156,7 @@ impl Default for Strategy {
         Self {
             engine_flag: false,
             board: StrategyBoard::random(),
-            strats: ArrayVec::new(),
+            strats: [None; STRAT_COUNT],
             horizontal_strat: A100,
             vertical_strats: A100,
             yomi: 0.0,

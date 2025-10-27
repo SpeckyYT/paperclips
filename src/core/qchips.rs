@@ -4,6 +4,7 @@ use crate::core::{Float, PaperClips};
 
 pub const QOPS_FADE_TIME: Duration = Duration::from_secs(10);
 
+#[derive(Debug, Clone, Copy)]
 pub struct QChips {
     /// # qFlag
     pub q_flag: bool,

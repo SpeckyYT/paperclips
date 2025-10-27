@@ -20,6 +20,7 @@ pub mod util;
 pub mod investments;
 pub mod space;
 
+#[derive(Debug, Clone)]
 pub struct PaperClips {
     pub session_start: Instant,
     pub ticks: u128,

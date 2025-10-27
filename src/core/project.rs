@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
 
+#[derive(Debug, Clone)]
 pub struct Projects {
     pub flag: bool,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
@@ -64,7 +65,7 @@ pub fn trigger_false(_: &PaperClips) -> bool { false }
 pub fn cost_false(_: &PaperClips) -> bool { false }
 pub fn effect_noop(_: &mut PaperClips) {}
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Body {
     Static(&'static str),
     Dynamic(fn(&PaperClips) -> String),
@@ -79,7 +80,7 @@ impl Body {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Project {
     /// # title
     pub title: Body,
@@ -100,7 +101,7 @@ impl AsRef<Project> for Project {
     fn as_ref(&self) -> &Project { self }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum ProjectStatus {
     #[default]
     Unavailable,

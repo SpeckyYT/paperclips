@@ -64,6 +64,7 @@ impl Stock {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Investments {
     pub stocks: VecDeque<Stock>,
 

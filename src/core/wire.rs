@@ -6,6 +6,7 @@ use crate::{core::{Float, PaperClips}};
 
 const PRICE_TIMER: Duration = Duration::from_secs(25);
 
+#[derive(Debug, Clone, Copy)]
 pub struct Wire {
     /// # wirePriceTimer
     pub price_timer: Instant,

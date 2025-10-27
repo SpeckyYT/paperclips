@@ -3,6 +3,7 @@ use crate::{util::powf, Float};
 pub const TOTAL_MATTER: Float = powf(10.0, 54);
 pub const STARTING_AVAILABLE_MATTER: Float = powf(10.0, 24) * 6000.0;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Space {
     /// # availableMatter
     pub available_matter: Float,

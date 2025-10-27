@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use crate::{util::{floor_to, round_to}, Float, PaperClips};
 
+#[derive(Debug, Clone)]
 pub struct Business {
     /// # funds
     pub funds: Float,

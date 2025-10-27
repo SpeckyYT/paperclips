@@ -2,7 +2,7 @@ use rand::random_bool;
 
 use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StrategyBoard};
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Strat {
     name: &'static str,
     pick_move: fn(board: StrategyBoard, position: Position) -> Move,
@@ -18,7 +18,8 @@ macro_rules! strats {
                 )*
             };
         )*
-        pub const ALL_STRATS: [Strat; [$(stringify!($name),)*].len()] = [$($name,)*];
+        pub const STRAT_COUNT: usize = [$(stringify!($name),)*].len();
+        pub const ALL_STRATS: [Strat; STRAT_COUNT] = [$($name,)*];
     };
 }
 
