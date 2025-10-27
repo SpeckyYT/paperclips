@@ -44,12 +44,14 @@ impl Riskiness {
     }
 }
 
+pub type Symbol = ArrayString<4>;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Stock {
     // these two aren't used
     // pub id: usize,
     // pub age: u64,
-    pub symbol: ArrayString<5>,
+    pub symbol: Symbol,
     pub price: Float,
     pub amount: u32,
     pub profit: Float,
@@ -122,7 +124,7 @@ impl Default for Investments {
             bankroll: 0.0,
             ledger: 0.0,
             sell_delay: 0,
-            engine_flag: true,
+            engine_flag: false,
         }
     }
 }
@@ -239,14 +241,14 @@ impl PaperClips {
     }
 }
 
-pub fn generate_symbol() -> ArrayString<5> {
+pub fn generate_symbol() -> Symbol {
     let letters = match random::<Float>() {
-        r if r <= 0.01 => 1,
-        r if r > 0.1 => 2,
-        r if r > 0.4 => 3,
+        0.0..=0.01 => 1,
+        0.01..=0.1 => 2,
+        0.1..=0.4 => 3,
         _ => 4,
     };
-    let mut symbol = ArrayString::new_const();
-    (0..=letters).for_each(|_| symbol.push(ALPHABET[random_range(0..ALPHABET.len())]));
+    let mut symbol = Symbol::new_const();
+    (0..letters).for_each(|_| symbol.push(ALPHABET[random_range(0..ALPHABET.len())]));
     symbol
 }
