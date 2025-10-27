@@ -1,11 +1,11 @@
-use std::collections::VecDeque;
+use std::{borrow::Cow, collections::VecDeque};
 
 const DEFAULT_MESSAGES_SIZE: usize = 5;
 
 #[derive(Debug, Clone)]
 pub struct Console {
     pub max_messages: usize,
-    pub messages: VecDeque<String>,
+    pub messages: VecDeque<Cow<'static, str>>,
 }
 
 impl Default for Console {
@@ -18,7 +18,7 @@ impl Default for Console {
 }
 
 impl Console {
-    pub fn push(&mut self, msg: impl Into<String>) {
+    pub fn push(&mut self, msg: impl Into<Cow<'static, str>>) {
         self.messages.push_back(msg.into());
         if self.messages.len() > self.max_messages {
             self.messages.pop_front();
