@@ -5,6 +5,8 @@ use eframe::egui::{Color32, RichText, Ui};
 use crate::gui::Gui;
 
 const TEXT_SIZE: f32 = 80.0;
+const SPACE_SIZE: f32 = TEXT_SIZE * 1.6;
+
 const LONG_BLINK_INTERVAL: u128 = 32;
 
 impl Gui {
@@ -29,10 +31,10 @@ impl Gui {
                 huge_text(0.0, "Release");
             }
             30..40 => {
-                huge_text(TEXT_SIZE * 4.0, "Release");
+                huge_text(SPACE_SIZE * 2.0, "Release");
             }
             45..55 => {
-                huge_text(TEXT_SIZE * 2.0, "Release");
+                huge_text(SPACE_SIZE, "Release");
             }
             55..120 => {
                 huge_text(0.0, "Release\nthe\nHypno\nDrones");

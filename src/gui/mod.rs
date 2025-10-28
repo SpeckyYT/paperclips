@@ -5,8 +5,6 @@ use eframe::{
 };
 use paperclips::PaperClips;
 
-use crate::gui::{groups::{business_group, computational_group, investments_group, manufacturing_group, projects_group, quantum_computing_group, top_console}};
-
 const TEN_MS: Duration = Duration::from_millis(10);
 const FRAME_60FPS: Duration = Duration::from_millis(16);
 
@@ -48,36 +46,35 @@ impl App for Gui {
         self.update_paperclips(ctx);
 
         TopBottomPanel::top("console").show(ctx, |ui| {
-            top_console(ui, &self.paperclips);
+            self.draw_top_console(ui);
         });
 
         CentralPanel::default().show(ctx, |ui| {
-            let pc = &mut self.paperclips;
-            ui.heading(format!("Paperclips: {}", pc.business.clips.round()));
+            ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()));
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, right]| {
                     // LEFT COLUMN
-                    left.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
+                    left.add_enabled_ui(self.paperclips.wire.count >= 1.0, |ui| {
                         if ui.button("Make Paperclip").clicked() {
-                            pc.clip_click(1.0);
+                            self.paperclips.clip_click(1.0);
                         }
                     });
-                    business_group(left, pc);
-                    manufacturing_group(left, pc);
+                    self.draw_business_group(left);
+                    self.draw_manufacturing_group(left);
 
                     // MIDDLE COLUMN
-                    computational_group(middle, pc);
-                    if pc.qchips.q_flag {
-                        quantum_computing_group(middle, pc);
+                    self.draw_computational_group(middle);
+                    if self.paperclips.qchips.q_flag {
+                        self.draw_quantum_computing_group(middle);
                     }
-                    if pc.projects.flag {
-                        projects_group(middle, pc);
+                    if self.paperclips.projects.flag {
+                        self.draw_projects_group(middle);
                     }
 
                     // RIGHT COLUMN
-                    if pc.investments.engine_flag {
-                        investments_group(right, pc);
+                    if self.paperclips.investments.engine_flag {
+                        self.draw_investments_group(right);
                     }
                 });
             });
