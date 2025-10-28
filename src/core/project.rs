@@ -2,10 +2,13 @@ use std::borrow::Cow;
 
 use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
+use arrayvec::ArrayVec;
 
 #[derive(Debug, Clone)]
 pub struct Projects {
     pub flag: bool,
+
+    pub buyable_projects: ArrayVec<&'static Project, PROJECTS_COUNT>,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
 
     pub space_flag: bool,
@@ -20,6 +23,8 @@ impl Default for Projects {
     fn default() -> Self {
         Self {
             flag: false,
+
+            buyable_projects: ArrayVec::new(),
             statuses: PROJECTS_STATUSES,
 
             space_flag: false,
@@ -35,7 +40,7 @@ impl Default for Projects {
 impl Projects {
     #[inline]
     pub fn is_active(&self, project: impl AsRef<Project>) -> bool {
-        self.statuses[project.as_ref().index] == Active
+        self.statuses[project.as_ref().index] == Bought
     }
     #[inline]
     pub fn status_mut(&mut self, project: impl AsRef<Project>) -> &mut ProjectStatus {
@@ -47,15 +52,18 @@ impl PaperClips {
     pub fn manage_projects(&mut self) {
         for (i, status) in self.projects.statuses.into_iter().enumerate() {
             let project = &PROJECTS[i];
-            if status == Unavailable && (project.trigger)(self) {
+            if status == Locked && (project.trigger)(self) {
+                self.projects.buyable_projects.push(project);
                 self.projects.statuses[i] = ProjectStatus::Buyable;
             }
         }
     }
-    pub fn buy_project(&mut self, i: usize) {
-        let project = &PROJECTS[i];
-        if self.projects.statuses[i] == Buyable && project.cost.1(self) {
-            self.projects.statuses[i] = Active;
+    pub fn buy_project(&mut self, bpi: usize) {
+        let project = self.projects.buyable_projects[bpi];
+        let pi = project.index;
+        if self.projects.statuses[pi] == Buyable && project.cost.1(self) {
+            self.projects.buyable_projects.remove(bpi);
+            self.projects.statuses[pi] = Bought;
             (project.effect)(self);
         }
     }
@@ -103,10 +111,13 @@ impl AsRef<Project> for Project {
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum ProjectStatus {
+    /// Needs `.trigger()` to be true to get unlocked.
     #[default]
-    Unavailable,
+    Locked,
+    /// Needs `.cost.1()` to be true and clicking on the project to buy it
     Buyable,
-    Active,
+    /// Cannot be used anymore
+    Bought,
 }
 
 macro_rules! projects {
@@ -128,7 +139,7 @@ macro_rules! projects {
     (@inner $idx:expr; [ $($acc:ident,)* ] ; ) => {
         pub const PROJECTS_COUNT: usize = $idx;
         pub const PROJECTS: [Project; PROJECTS_COUNT ] = [ $($acc,)* ];
-        pub const PROJECTS_STATUSES: [ProjectStatus; PROJECTS_COUNT] = [ ProjectStatus::Unavailable; PROJECTS_COUNT ];
+        pub const PROJECTS_STATUSES: [ProjectStatus; PROJECTS_COUNT] = [ ProjectStatus::Locked; PROJECTS_COUNT ];
     };
     ( # $s:literal ) => { Body::Static($s) };
     ( # $e:expr ) => { Body::Dynamic($e) };
@@ -157,7 +168,7 @@ projects! {
         effect: |pc| {
             pc.computational.trust -= 1;
             pc.wire.count += pc.wire.supply;
-            *pc.projects.status_mut(PROJECT_2) = ProjectStatus::Unavailable;
+            *pc.projects.status_mut(PROJECT_2) = ProjectStatus::Locked;
             pc.console.push("Budget overage approved, 1 spool of wire requisitioned from HQ");
         },
     }
@@ -656,7 +667,7 @@ projects! {
             pc.projects.bribe *= 2.0;
             pc.computational.trust += 1;
             if pc.computational.trust < 100 {
-                *pc.projects.status_mut(PROJECT_40B) = Unavailable;
+                *pc.projects.status_mut(PROJECT_40B) = Locked;
             }
             pc.console.push("Gift accepted, TRUST INCREASED");
         },
@@ -692,7 +703,7 @@ projects! {
             pc.qchips.qchip_cost += 5000.0;
             pc.qchips.activated += 1;
             if (pc.qchips.activated as usize) < pc.qchips.chips.len() {
-                *pc.projects.status_mut(PROJECT_51) = Unavailable;
+                *pc.projects.status_mut(PROJECT_51) = Locked;
             }
             pc.console.push("Photonic chip added");
         },

@@ -194,38 +194,35 @@ pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
         ui.heading("Projects");
         ui.separator();
 
-        for (i, ps) in pc.projects.statuses.into_iter().enumerate() {
-            if ps == ProjectStatus::Buyable {
-                let project = &PROJECTS[i];
+        let buyable_projects = pc.projects.buyable_projects.clone().into_iter().enumerate();
+        for (bpi, project) in buyable_projects {
+            let affordable = (project.cost.1)(pc);
 
-                let affordable = (project.cost.1)(pc);
+            ui.add_enabled_ui(affordable, |ui| {
+                let mut frame = Frame::group(ui.style()).begin(ui);
 
-                ui.add_enabled_ui(affordable, |ui| {
-                    let mut frame = Frame::group(ui.style()).begin(ui);
+                {
+                    let ui = &mut frame.content_ui;
+                    ui.horizontal(|ui| {
+                        ui.label(project.title.to_string(pc));
+                        ui.label(project.cost.0.to_string(pc));
+                    });
+                    ui.label(project.description.to_string(pc));
+                }
 
-                    {
-                        let ui = &mut frame.content_ui;
-                        ui.horizontal(|ui| {
-                            ui.label(project.title.to_string(pc));
-                            ui.label(project.cost.0.to_string(pc));
-                        });
-                        ui.label(project.description.to_string(pc));
+                let pj = frame.allocate_space(ui);
+                if pj.hovered() && affordable && pj.enabled() {
+                    frame.frame.stroke.color = Color32::GRAY;
+                }
+                frame.paint(ui);
+
+                if affordable {
+                    let pj = pj.interact(Sense::CLICK).on_hover_cursor(CursorIcon::PointingHand);
+                    if pj.clicked() {
+                        pc.buy_project(bpi);
                     }
-
-                    let pj = frame.allocate_space(ui);
-                    if pj.hovered() && affordable && pj.enabled() {
-                        frame.frame.stroke.color = Color32::GRAY;
-                    }
-                    frame.paint(ui);
-
-                    if affordable {
-                        let pj = pj.interact(Sense::CLICK).on_hover_cursor(CursorIcon::PointingHand);
-                        if pj.clicked() {
-                            pc.buy_project(i);
-                        }
-                    }
-                });
-            }
+                }
+            });
         }
     });
 }
