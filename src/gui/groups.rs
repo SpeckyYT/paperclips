@@ -1,6 +1,6 @@
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{investments::Riskiness, messages::Console, project::{ProjectStatus, PROJECTS}, qchips::QOPS_FADE_TIME, PaperClips};
+use paperclips::{PaperClips, investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, util::blink};
 use strum::IntoEnumIterator;
 
 pub fn business_group(ui: &mut Ui, pc: &mut PaperClips) -> InnerResponse<()> {
@@ -195,7 +195,7 @@ pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
         ui.separator();
 
         let buyable_projects = pc.projects.buyable_projects.clone().into_iter().enumerate();
-        for (bpi, project) in buyable_projects {
+        for (bpi, (instant, project)) in buyable_projects {
             let affordable = (project.cost.1)(pc);
 
             ui.add_enabled_ui(affordable, |ui| {
@@ -213,6 +213,9 @@ pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
                 let pj = frame.allocate_space(ui);
                 if pj.hovered() && affordable && pj.enabled() {
                     frame.frame.stroke.color = Color32::GRAY;
+                }
+                if !blink(instant) {
+                    frame.frame.stroke.color = Color32::WHITE;
                 }
                 frame.paint(ui);
 

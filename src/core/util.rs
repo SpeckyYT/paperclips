@@ -1,4 +1,4 @@
-use std::{fmt::Display, time::Duration};
+use std::{fmt::Display, time::{Duration, Instant}};
 
 use crate::{core::Float, PaperClips};
 
@@ -125,4 +125,16 @@ pub const fn ticks(duration: Duration, hertz: Duration) -> u128 {
 #[inline]
 pub const fn ticks_10ms(duration: Duration) -> u128 {
     ticks(duration, Duration::from_millis(10))
+}
+
+const BLINK_INTERVAL: u128 = 30;
+const MAX_BLINK_DURATION: u128 = BLINK_INTERVAL * 12;
+
+/// Returns if the element should be enabled/normal
+pub fn blink(instant: Instant) -> bool {
+    let millis = instant.elapsed().as_millis();
+    if millis > MAX_BLINK_DURATION {
+        return true
+    }
+    millis / BLINK_INTERVAL % 2 == 1
 }

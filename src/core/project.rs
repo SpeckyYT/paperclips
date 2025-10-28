@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, time::Instant};
 
 use crate::{computational::MEM_SIZE, Float, PaperClips};
 use ProjectStatus::*;
@@ -8,7 +8,7 @@ use arrayvec::ArrayVec;
 pub struct Projects {
     pub flag: bool,
 
-    pub buyable_projects: ArrayVec<&'static Project, PROJECTS_COUNT>,
+    pub buyable_projects: ArrayVec<(Instant, &'static Project), PROJECTS_COUNT>,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
 
     pub space_flag: bool,
@@ -53,13 +53,13 @@ impl PaperClips {
         for (i, status) in self.projects.statuses.into_iter().enumerate() {
             let project = &PROJECTS[i];
             if status == Locked && (project.trigger)(self) {
-                self.projects.buyable_projects.push(project);
+                self.projects.buyable_projects.push((Instant::now(), project));
                 self.projects.statuses[i] = ProjectStatus::Buyable;
             }
         }
     }
     pub fn buy_project(&mut self, bpi: usize) {
-        let project = self.projects.buyable_projects[bpi];
+        let (_, project) = self.projects.buyable_projects[bpi];
         let pi = project.index;
         if self.projects.statuses[pi] == Buyable && project.cost.1(self) {
             self.projects.buyable_projects.remove(bpi);
