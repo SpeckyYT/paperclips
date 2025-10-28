@@ -40,10 +40,10 @@ pub fn time_cruncher(t: Duration) -> String {
 
     string
 }
-pub fn ticks_to_duration(ticks: u128) -> Duration {
+pub const fn ticks_to_duration(ticks: u128) -> Duration {
     let seconds = (ticks / 100) as u64;
-    let ms = ((ticks % 100) * 10) as u32;
-    Duration::new(seconds, ms * 1_000_000)
+    let nanos = ((ticks % 100) * 10_000_000) as u32;
+    Duration::new(seconds, nanos)
 }
 impl PaperClips {
     pub fn milestone_string(&mut self, milestone: impl Display) -> String {

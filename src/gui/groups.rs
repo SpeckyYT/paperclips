@@ -333,7 +333,11 @@ impl Gui {
                     false => '.',
                     true => '>',
                 };
-                ui.label(RichText::new(format!("{head} {string}")).monospace());
+                let tail = match is_last && pc.ticks / 25 % 2 == 0 {
+                    true => '|',
+                    false => ' ',
+                };
+                ui.label(RichText::new(format!("{head} {string}{tail}")).monospace());
             });
         }
     }
