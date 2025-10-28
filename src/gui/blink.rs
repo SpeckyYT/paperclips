@@ -4,7 +4,7 @@ use eframe::egui::{Color32, RichText, Ui};
 
 use crate::gui::Gui;
 
-const TEXT_SIZE: f32 = 80.0;
+const TEXT_SIZE: f32 = 115.0;
 const SPACE_SIZE: f32 = TEXT_SIZE * 1.6;
 
 const LONG_BLINK_INTERVAL: u128 = 32;

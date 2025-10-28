@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
 use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, util::blink};
@@ -333,6 +335,48 @@ impl Gui {
                 };
                 ui.label(RichText::new(format!("{head} {string}")).monospace());
             });
+        }
+    }
+
+    pub fn draw_cheat_group(&mut self, ui: &mut Ui) {
+        if ui.button("Free Clips").clicked() {
+            self.paperclips.cheat_clips();
+        }
+        if ui.button("Free Money").clicked() {
+            self.paperclips.cheat_money();
+        }
+        if ui.button("Free Trust").clicked() {
+            self.paperclips.cheat_trust();
+        }
+        if ui.button("Free Ops").clicked() {
+            self.paperclips.cheat_ops();
+        }
+        if ui.button("Free Creativity").clicked() {
+            self.paperclips.cheat_creat();
+        }
+        if ui.button("Free Yomi").clicked() {
+            self.paperclips.cheat_yomi();
+        }
+        if ui.button("Reset Prestige").clicked() {
+            self.paperclips.reset_prestige();
+        }
+
+        if ui.button("Destroy all Humans").clicked() {
+            self.gui_draw_state = GuiDrawState::LongBlink(Instant::now());
+        }
+        if ui.button("Free Prestige U").clicked() {
+            // TODO:
+            // self.paperclips.cheat_prestige_u();
+        }
+        if ui.button("Free Prestige S").clicked() {
+            self.paperclips.cheat_prestige_s();
+        }
+        if ui.button("Set Battle Number 1 to 7").clicked() {
+            // TODO:
+            // self.set_b()
+        }
+        if ui.button("Set Avail Matter to 0").clicked() {
+            self.paperclips.zero_matter();
         }
     }
 }

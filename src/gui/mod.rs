@@ -63,6 +63,12 @@ impl App for Gui {
                     self.draw_business_group(left);
                     self.draw_manufacturing_group(left);
 
+                    #[cfg(debug_assertions)]
+                    {
+                        left.add_space(30.0);
+                        self.draw_cheat_group(left);
+                    }
+
                     // MIDDLE COLUMN
                     self.draw_computational_group(middle);
                     if self.paperclips.qchips.q_flag {

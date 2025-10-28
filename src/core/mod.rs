@@ -19,6 +19,7 @@ pub mod strategy;
 pub mod util;
 pub mod investments;
 pub mod space;
+pub mod cheat;
 
 #[derive(Debug, Clone)]
 pub struct PaperClips {
