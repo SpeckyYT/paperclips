@@ -5,15 +5,17 @@ use eframe::{
 };
 use paperclips::PaperClips;
 
-use crate::gui::groups::{business_group, computational_group, investments_group, manufacturing_group, projects_group, quantum_computing_group, top_console};
+use crate::gui::{groups::{business_group, computational_group, investments_group, manufacturing_group, projects_group, quantum_computing_group, top_console}};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 const FRAME_60FPS: Duration = Duration::from_millis(16);
 
 mod groups;
+mod blink;
 
 pub struct Gui {
     pub paperclips: PaperClips,
+    gui_draw_state: GuiDrawState,
 
     last_main_update: Instant,
     last_stock_shop_update: Instant,
@@ -25,12 +27,20 @@ impl Default for Gui {
     fn default() -> Self {
         Self {
             paperclips: PaperClips::default(),
+            gui_draw_state: GuiDrawState::Normal,
+
             last_main_update: Instant::now(),
             last_stock_shop_update: Instant::now(),
             last_stocks_update: Instant::now(),
             last_wire_price_and_demand_update: Instant::now(),
         }
     }
+}
+
+enum GuiDrawState {
+    Normal,
+    /// "Release the Hypno Drones" animation
+    LongBlink(Instant),
 }
 
 impl App for Gui {
@@ -58,7 +68,9 @@ impl App for Gui {
 
                     // MIDDLE COLUMN
                     computational_group(middle, pc);
-                    quantum_computing_group(middle, pc);
+                    if pc.qchips.q_flag {
+                        quantum_computing_group(middle, pc);
+                    }
                     if pc.projects.flag {
                         projects_group(middle, pc);
                     }

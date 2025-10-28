@@ -151,42 +151,40 @@ pub fn computational_group(ui: &mut Ui, pc: &mut PaperClips) {
 }
 
 pub fn quantum_computing_group(ui: &mut Ui, pc: &mut PaperClips) {
-    if pc.qchips.q_flag {
-        ui.group(|ui| {
-            const SIZE: f32 = 20.0;
-            const SPACING: f32 = 2.0;
+    ui.group(|ui| {
+        const SIZE: f32 = 20.0;
+        const SPACING: f32 = 2.0;
 
-            ui.heading("Quantum Computing");
-            let activated = pc.qchips.activated();
-            let size = Vec2::new((SIZE + SPACING) * activated as f32, SIZE);
-            let (resp, painter) = ui.allocate_painter(size, Sense::HOVER);
-            let base = resp.rect.min;
-            for i in 0..activated {
-                let x_off = (SIZE + SPACING) * i as f32;
-                let pos = base + Vec2::new(x_off, 0.0);
-                let rect = Rect::from_min_size(pos, Vec2::splat(SIZE));
-                let chip = pc.qchips.chips[i as usize];
-                let color = Color32::WHITE.gamma_multiply(chip.clamp(0.0, 1.0) as f32);
-                painter.rect_filled(rect, CornerRadius::ZERO, color);
+        ui.heading("Quantum Computing");
+        let activated = pc.qchips.activated();
+        let size = Vec2::new((SIZE + SPACING) * activated as f32, SIZE);
+        let (resp, painter) = ui.allocate_painter(size, Sense::HOVER);
+        let base = resp.rect.min;
+        for i in 0..activated {
+            let x_off = (SIZE + SPACING) * i as f32;
+            let pos = base + Vec2::new(x_off, 0.0);
+            let rect = Rect::from_min_size(pos, Vec2::splat(SIZE));
+            let chip = pc.qchips.chips[i as usize];
+            let color = Color32::WHITE.gamma_multiply(chip.clamp(0.0, 1.0) as f32);
+            painter.rect_filled(rect, CornerRadius::ZERO, color);
+        }
+        ui.horizontal(|ui| {
+            if ui.button("Compute").clicked() {
+                pc.quantum_compute();
             }
-            ui.horizontal(|ui| {
-                if ui.button("Compute").clicked() {
-                    pc.quantum_compute();
-                }
-                let text = match pc.qchips.qops {
-                    Some(qops) => format!("qOps: {qops:.0}"),
-                    None => "Need Photonic Chips".to_string(),
-                };
-                let text_color = ui.style().visuals.text_color();
-                let transparency = QOPS_FADE_TIME
-                    .saturating_sub(pc.qchips.fade.elapsed())
-                    .as_secs_f32()
-                    / QOPS_FADE_TIME.as_secs_f32();
-                let color = text_color.gamma_multiply(transparency);
-                ui.label(RichText::new(text).color(color));
-            });
+            let text = match pc.qchips.qops {
+                Some(qops) => format!("qOps: {qops:.0}"),
+                None => "Need Photonic Chips".to_string(),
+            };
+            let text_color = ui.style().visuals.text_color();
+            let transparency = QOPS_FADE_TIME
+                .saturating_sub(pc.qchips.fade.elapsed())
+                .as_secs_f32()
+                / QOPS_FADE_TIME.as_secs_f32();
+            let color = text_color.gamma_multiply(transparency);
+            ui.label(RichText::new(text).color(color));
         });
-    }
+    });
 }
 
 pub fn projects_group(ui: &mut Ui, pc: &mut PaperClips) {
