@@ -79,6 +79,17 @@ impl Gui {
     
             ui.add_space(10.0);
     
+            if pc.wire.buyer_flag {
+                ui.horizontal(|ui| {
+                    if ui.button("WireBuyer").clicked() {
+                        pc.wire.buyer_status ^= true;
+                    }
+                    ui.label(match pc.wire.buyer_status {
+                        true => "ON",
+                        false => "OFF",
+                    });
+                });
+            }
             ui.horizontal(|ui| {
                 ui.add_enabled_ui(pc.business.funds >= pc.wire.cost, |ui| {
                     if ui.button("Wire").clicked() {

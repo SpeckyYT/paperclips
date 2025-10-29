@@ -61,7 +61,7 @@ impl PaperClips {
     pub fn buy_project(&mut self, bpi: usize) {
         let (_, project) = self.projects.buyable_projects[bpi];
         let pi = project.index;
-        if self.projects.statuses[pi] == Buyable && project.cost.1(self) {
+        if project.cost.1(self) {
             self.projects.buyable_projects.remove(bpi);
             self.projects.statuses[pi] = Bought;
             (project.effect)(self);

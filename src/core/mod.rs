@@ -106,7 +106,7 @@ impl PaperClips {
         }
 
         // WireBuyer
-        if self.wire.buyer_flag && self.wire.count <= 1.0 {
+        if self.human_flag && self.wire.buyer_flag && self.wire.buyer_status && self.wire.count <= 1.0 {
             self.buy_wire();
         }
 

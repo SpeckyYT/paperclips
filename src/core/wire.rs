@@ -23,7 +23,11 @@ pub struct Wire {
     /// # wirePurchase
     pub purchase: u64,
     /// # wireBuyerFlag
+    /// If the wire buyer is usable
     pub buyer_flag: bool,
+    /// # wireBuyerStatus
+    /// If the wire buyers is active
+    pub buyer_status: bool,
     /// # wireProductionFlag
     pub production_flag: bool,
 }
@@ -39,6 +43,7 @@ impl Default for Wire {
             supply: 1000.0,
             purchase: 0,
             buyer_flag: false,
+            buyer_status: true,
             production_flag: false,
         }
     }
