@@ -119,7 +119,7 @@ impl Gui {
     
                 ui.horizontal(|ui| {
                     ui.add_enabled_ui(pc.business.funds >= pc.business.mega_clipper_cost, |ui| {
-                        if ui.button("AutoClippers").clicked() {
+                        if ui.button("MegaClippers").clicked() {
                             pc.business.make_mega_clipper();
                         }
                     });
@@ -166,8 +166,8 @@ impl Gui {
     
                 ui.add_space(10.0);
     
-                ui.label(format!("Operations: {}/{}", c.operations, c.max_operations()));
-                ui.label(format!("Creativity: {}", c.creativity));
+                ui.label(format!("Operations: {:.0}/{}", c.operations, c.max_operations()));
+                ui.label(format!("Creativity: {:.0}", c.creativity));
             });
         }
     }

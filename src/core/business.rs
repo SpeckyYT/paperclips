@@ -182,7 +182,7 @@ impl Business {
             self.funds -= self.mega_clipper_cost;
             self.mega_clipper_level += 1.0;
         }
-        self.clipper_cost = (1.07 as Float).powf(self.mega_clipper_level) * 1000.0;
+        self.mega_clipper_cost = (1.07 as Float).powf(self.mega_clipper_level) * 1000.0;
     }
     #[inline]
     pub fn scaled_demand(&self) -> Float {
