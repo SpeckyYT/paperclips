@@ -17,7 +17,7 @@ impl Gui {
 
         let step = time / LONG_BLINK_INTERVAL;
 
-        let enabled = step % 2 == 0;
+        let enabled = step.is_multiple_of(2);
         if enabled { return false }
 
         let mut huge_text = |space: f32, text: &str| {

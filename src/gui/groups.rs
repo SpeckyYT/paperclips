@@ -344,7 +344,7 @@ impl Gui {
                     false => '.',
                     true => '>',
                 };
-                let tail = match is_last && pc.ticks / 25 % 2 == 0 {
+                let tail = match is_last && (pc.ticks / 25).is_multiple_of(2) {
                     true => '|',
                     false => ' ',
                 };
