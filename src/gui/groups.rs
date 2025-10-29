@@ -5,7 +5,7 @@ use egui_extras::{Column, TableBuilder};
 use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, util::blink};
 use strum::IntoEnumIterator;
 
-use crate::gui::{Gui, GuiDrawState};
+use crate::gui::Gui;
 
 impl Gui {
     pub fn draw_business_group(&mut self, ui: &mut Ui) -> InnerResponse<()> {
@@ -326,14 +326,18 @@ impl Gui {
     }
     
     pub fn draw_top_console(&mut self, ui: &mut Ui) {
-        if let GuiDrawState::LongBlink(start) = self.gui_draw_state {
-            self.long_blink(ui, start);
+        if let Some(start) = self.paperclips.space.hypno_drone_event {
+            if self.long_blink(ui, start) {
+                self.paperclips.space.hypno_drone_event = None;
+            }
         }
 
         let pc = &mut self.paperclips;
 
         let Console { max_messages, messages } = &pc.console;
         let to_fill = *max_messages - messages.len();
+
+        // TODO: make this into a black background
         for _ in 0..to_fill {
             ui.add_enabled_ui(false, |ui| ui.label(RichText::new(".").monospace()));
         }
@@ -377,7 +381,7 @@ impl Gui {
         }
 
         if ui.button("Destroy all Humans").clicked() {
-            self.gui_draw_state = GuiDrawState::LongBlink(Instant::now());
+            self.paperclips.space.hypno_drone_event = Some(Instant::now());
         }
         if ui.button("Free Prestige U").clicked() {
             // TODO:

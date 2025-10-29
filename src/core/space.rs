@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use crate::{util::powf, Float};
 
 pub const TOTAL_MATTER: Float = powf(10.0, 54);
@@ -5,6 +7,8 @@ pub const STARTING_AVAILABLE_MATTER: Float = powf(10.0, 24) * 6000.0;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Space {
+    pub hypno_drone_event: Option<Instant>,
+
     /// # availableMatter
     pub available_matter: Float,
     /// # foundMatter
@@ -18,6 +22,8 @@ pub struct Space {
 impl Default for Space {
     fn default() -> Self {
         Self {
+            hypno_drone_event: None,
+
             available_matter: STARTING_AVAILABLE_MATTER,
             found_matter: STARTING_AVAILABLE_MATTER,
             acquired_matter: 0.0,

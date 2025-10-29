@@ -11,6 +11,7 @@ const SPACE_SIZE: f32 = TEXT_SIZE * 1.6;
 const LONG_BLINK_INTERVAL: Ticks = 32;
 
 impl Gui {
+    /// # hypnoDroneEvent
     /// Returns if the long blink finished
     pub fn long_blink(&mut self, ui: &mut Ui, start: Instant) -> bool {
         let time = start.elapsed().as_millis();
@@ -28,7 +29,7 @@ impl Gui {
         };
 
         match step {
-            5..10 => {
+            0..10 => {
                 huge_text(0.0, "Release");
             }
             30..40 => {

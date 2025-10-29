@@ -491,7 +491,7 @@ projects! {
             // nanoWire = wire; // this seems to be useless
 
             // TODO: check what the flip the `document.stuff()` do
-            // hypnoDroneEvent();
+            pc.space.hypno_drone_event = Some(Instant::now());
 
             pc.console.push("Releasing the HypnoDrones");
             pc.console.push("All of the resources of Earth are now available for clip production");

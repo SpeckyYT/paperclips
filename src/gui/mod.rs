@@ -13,7 +13,6 @@ mod blink;
 
 pub struct Gui {
     pub paperclips: PaperClips,
-    gui_draw_state: GuiDrawState,
 
     last_main_update: Instant,
     last_stock_shop_update: Instant,
@@ -25,7 +24,6 @@ impl Default for Gui {
     fn default() -> Self {
         Self {
             paperclips: PaperClips::default(),
-            gui_draw_state: GuiDrawState::Normal,
 
             last_main_update: Instant::now(),
             last_stock_shop_update: Instant::now(),
@@ -33,12 +31,6 @@ impl Default for Gui {
             last_wire_price_and_demand_update: Instant::now(),
         }
     }
-}
-
-enum GuiDrawState {
-    Normal,
-    /// "Release the Hypno Drones" animation
-    LongBlink(Instant),
 }
 
 impl App for Gui {
