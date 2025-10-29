@@ -1,6 +1,6 @@
 #![allow(clippy::unnecessary_cast)]
 
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use rand::random_bool;
 
@@ -8,6 +8,7 @@ use crate::{business::Business, core::{computational::Computational, investments
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
+pub type Ticks = u128;
 
 pub mod business;
 pub mod messages;
@@ -23,7 +24,6 @@ pub mod cheat;
 
 #[derive(Debug, Clone)]
 pub struct PaperClips {
-    pub session_start: Instant,
     pub ticks: u128,
 
     pub milestone_flag: u8,
@@ -43,8 +43,7 @@ pub struct PaperClips {
 
 impl Default for PaperClips {
     fn default() -> Self {
-        Self { 
-            session_start: Instant::now(),
+        Self {
             ticks: 0,
 
             milestone_flag: 0,

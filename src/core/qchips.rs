@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use crate::core::{Float, PaperClips};
+use crate::{core::{Float, PaperClips}, util::ticks_to_secs_float};
 
 pub const QOPS_FADE_TIME: Duration = Duration::from_secs(10);
 
@@ -35,7 +35,7 @@ impl Default for QChips {
 
 impl PaperClips {
     pub fn quantum_compute_update(&mut self) {
-        let qclock = self.session_start.elapsed().as_secs_f64() as Float;
+        let qclock = ticks_to_secs_float(self.ticks);
         for (i, value) in self.qchips.chips.iter_mut().enumerate()  {
             let wave_speed = (i + 1) as Float / 10.0;
             *value = (qclock * wave_speed).sin();

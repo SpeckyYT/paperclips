@@ -1,13 +1,14 @@
 use std::time::Instant;
 
 use eframe::egui::{Color32, RichText, Ui};
+use paperclips::Ticks;
 
 use crate::gui::Gui;
 
 const TEXT_SIZE: f32 = 115.0;
 const SPACE_SIZE: f32 = TEXT_SIZE * 1.6;
 
-const LONG_BLINK_INTERVAL: u128 = 32;
+const LONG_BLINK_INTERVAL: Ticks = 32;
 
 impl Gui {
     /// Returns if the long blink finished

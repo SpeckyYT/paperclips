@@ -1,15 +1,11 @@
-use std::time::{Duration, Instant};
-
 use rand::random_bool;
 
-use crate::{core::{Float, PaperClips}};
-
-const PRICE_TIMER: Duration = Duration::from_secs(25);
+use crate::{Ticks, core::{Float, PaperClips}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Wire {
     /// # wirePriceTimer
-    pub price_timer: Instant,
+    pub price_timer: Ticks,
     /// # wireBasePrice
     pub base_price: Float,
     /// # wirePriceCounter
@@ -35,7 +31,7 @@ pub struct Wire {
 impl Default for Wire {
     fn default() -> Self {
         Self {
-            price_timer: Instant::now(),
+            price_timer: 0,
             base_price: 20.0,
             price_counter: 0,
             cost: 20.0,
@@ -51,16 +47,15 @@ impl Default for Wire {
 
 impl Wire {
     pub fn adjust_wire_price(&mut self) {
-        if self.price_timer.elapsed() >= PRICE_TIMER && self.base_price > 15.0 {
+        if self.price_timer >= 250 && self.base_price > 15.0 {
             self.base_price *= 0.999; 
-            self.price_timer = Instant::now();
+            self.price_timer = 0;
         }
 
         if random_bool(0.015) {
             self.price_counter += 1;
             let wire_adjust = 6.0 * (self.price_counter as Float).sin();
             self.cost = self.base_price + wire_adjust;
-            // update wire cost
         }
     }
 
@@ -70,7 +65,7 @@ impl Wire {
 impl PaperClips {
     pub fn buy_wire(&mut self) {
         if self.business.funds >= self.wire.cost {
-            self.wire.price_timer = Instant::now();
+            self.wire.price_timer = 0;
             self.wire.count += self.wire.supply;
             self.business.funds -= self.wire.cost;
             self.wire.purchase += 1;

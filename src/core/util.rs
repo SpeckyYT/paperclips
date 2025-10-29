@@ -1,6 +1,6 @@
 use std::{fmt::Display, time::{Duration, Instant}};
 
-use crate::{core::Float, PaperClips};
+use crate::{PaperClips, Ticks, core::Float};
 
 pub fn floor_to(number: Float, power_of_ten: i32) -> Float {
     let factor = 10f64.powi(power_of_ten) as Float;
@@ -40,18 +40,20 @@ pub fn time_cruncher(t: Duration) -> String {
 
     string
 }
-pub const fn ticks_to_duration(ticks: u128) -> Duration {
+pub const fn ticks_to_duration(ticks: Ticks) -> Duration {
     let seconds = (ticks / 100) as u64;
     let nanos = ((ticks % 100) * 10_000_000) as u32;
     Duration::new(seconds, nanos)
 }
+pub const fn ticks_to_secs_float(ticks: Ticks) -> Float {
+    ticks as Float / 100.0
+}
 impl PaperClips {
     pub fn milestone_string(&mut self, milestone: impl Display) -> String {
         format!(
-            "{} in {} (REALTIME: {})",
+            "{} in {}",
             milestone,
             time_cruncher(ticks_to_duration(self.ticks)),
-            time_cruncher(self.session_start.elapsed()),
         )
     }
 }
@@ -118,17 +120,17 @@ pub fn number_cruncher(number: Float, decimals: Option<u8>) -> String {
 }
 
 #[inline]
-pub const fn ticks(duration: Duration, hertz: Duration) -> u128 {
+pub const fn ticks(duration: Duration, hertz: Duration) -> Ticks {
     duration.as_nanos().div_ceil(hertz.as_nanos())
 }
 
 #[inline]
-pub const fn ticks_10ms(duration: Duration) -> u128 {
+pub const fn ticks_10ms(duration: Duration) -> Ticks {
     ticks(duration, Duration::from_millis(10))
 }
 
-const BLINK_INTERVAL: u128 = 30;
-const MAX_BLINK_DURATION: u128 = BLINK_INTERVAL * 12;
+const BLINK_INTERVAL: Ticks = 30;
+const MAX_BLINK_DURATION: Ticks = BLINK_INTERVAL * 12;
 
 /// Returns if the element should be enabled/normal
 pub fn blink(instant: Instant) -> bool {
