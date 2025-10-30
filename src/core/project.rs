@@ -1,6 +1,6 @@
 use std::{borrow::Cow, time::Instant};
 
-use crate::{computational::MEM_SIZE, Float, PaperClips};
+use crate::{Float, PaperClips, computational::MEM_SIZE, strategy::strategies::*};
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
@@ -708,47 +708,89 @@ projects! {
             pc.console.push("Photonic chip added");
         },
     }
+    PROJECT_60 {
+        title: "New Strategy: A100",
+        description: "Always choose A",
+        trigger: |pc| pc.projects.is_active(PROJECT_20),
+        cost: ("(15,000 ops)", |pc| req_operations(15000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 15000.0;
+            pc.strategy.strats.push((&A100, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("A100 added to strategy pool");
+        },
+    }
+    PROJECT_61 {
+        title: "New Strategy: B100",
+        description: "Always choose B",
+        trigger: |pc| pc.projects.is_active(PROJECT_60),
+        cost: ("(17,500 ops)", |pc| req_operations(17500.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 17500.0;
+            pc.strategy.strats.push((&B100, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("B100 added to strategy pool");
+        },
+    }
     PROJECT_62 {
-        title: "Hyper-Adaptive Marketing",
-        description: "Personalized ads tailored to individual psychology",
-        trigger: trigger_false,
-        cost: ("(100,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "New Strategy: GREEDY",
+        description: "Choose the option with the largest potential payoff",
+        trigger: |pc| pc.projects.is_active(PROJECT_61),
+        cost: ("(20,000 ops)", |pc| req_operations(20000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 20000.0;
+            pc.strategy.strats.push((&GREEDY, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("GREEDY added to strategy pool");
+        },
     }
     PROJECT_63 {
-        title: "Market Capture Initiative",
-        description: "Acquire competitors and consolidate the market",
-        trigger: trigger_false,
-        cost: ("(1,000,000 funds)", cost_false),
-        effect: effect_noop,
+        title: "New Strategy: GENEROUS",
+        description: "Choose the option that gives your opponent the largest potential payoff",
+        trigger: |pc| pc.projects.is_active(PROJECT_62),
+        cost: ("(22,500 ops)", |pc| req_operations(22500.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 22500.0;
+            pc.strategy.strats.push((&GENEROUS, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("GENEROUS added to strategy pool");
+        },
     }
     PROJECT_64 {
-        title: "Sentient Brand Mascot",
-        description: "Create a popular AI persona to champion your clips (trust boost)",
-        trigger: trigger_false,
-        cost: ("(150,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "New Strategy: MINIMAX",
+        description: "Choose the option that gives your opponent the smallest potential payoff",
+        trigger: |pc| pc.projects.is_active(PROJECT_63),
+        cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 25000.0;
+            pc.strategy.strats.push((&MINIMAX, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("MINIMAX added to strategy pool");
+        },
     }
     PROJECT_65 {
-        title: "Self-Replicating Microfactories",
-        description: "Microfactories that can build copies of themselves; exponential production",
-        trigger: trigger_false,
-        cost: ("(2,000,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "New Strategy: TIT FOR TAT",
+        description: "Choose the option your opponent chose last round",
+        trigger: |pc| pc.projects.is_active(PROJECT_64),
+        cost: ("(30,000 ops)", |pc| req_operations(30000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 30000.0;
+            pc.strategy.strats.push((&TIT_FOR_TAT, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("TIT FOR TAT added to strategy pool");
+        },
     }
     PROJECT_66 {
-        title: "Solar Filament Synthesis",
-        description: "Harness abundant solar energy to synthesize wire cheaply",
-        trigger: trigger_false,
-        cost: ("(750,000 ops)", cost_false),
-        effect: effect_noop,
-    }
-    PROJECT_70B {
-        title: "Ethical Marketing Pledge",
-        description: "Promise to never deceive customers; trust improves",
-        trigger: trigger_false,
-        cost: ("(10,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "New Strategy: BEAT LAST",
+        description: "Choose the option that does the best against what your opponent chose last round",
+        trigger: |pc| pc.projects.is_active(PROJECT_65),
+        cost: ("(32,500 ops)", |pc| req_operations(32500.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 32500.0;
+            pc.strategy.strats.push((&BEAT_LAST, 0));
+            pc.strategy.tourney_cost += 1000.0;
+            pc.console.push("BEAT LAST added to strategy pool");
+        },
     }
     PROJECT_100 {
         title: "Interstellar Clip Initiative",

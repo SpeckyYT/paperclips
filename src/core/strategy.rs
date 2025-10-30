@@ -5,8 +5,8 @@ use rand::random_range;
 
 use crate::{Float, PaperClips, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}};
 
-mod strategies;
-mod util;
+pub mod strategies;
+pub mod util;
 
 #[derive(Debug, Clone, Copy)]
 pub enum TourneyDisplay {
