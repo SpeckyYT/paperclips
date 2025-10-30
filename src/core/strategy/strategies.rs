@@ -1,23 +1,26 @@
 use rand::random_bool;
 
-use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StrategyBoard};
+use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StrategyGrid};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Strat {
-    name: &'static str,
-    pick_move: fn(board: StrategyBoard, position: Position) -> Move,
+    pub name: &'static str,
+    pub index: usize,
+    pub pick_move: fn(board: StrategyGrid, position: Position) -> Move,
 }
 
 macro_rules! strats {
+    (@gen $i:expr; ) => {};
+    (@gen $i:expr; $name:ident { $(# $str:literal)? $($prop:ident: $val:expr),* $(,)? } $($rest:tt)*) => {
+        pub const $name: Strat = Strat {
+            name: [$($str,)? stringify!($name)][0],
+            index: $i,
+            $($prop: $val,)*
+        };
+        strats!(@gen ($i + 1usize); $($rest)*);
+    };
     ($($name:ident { $(# $str:literal)? $($prop:ident: $val:expr),* $(,)? })*) => {
-        $(
-            pub const $name: Strat = Strat {
-                name: [$($str,)? stringify!($name)][0],
-                $(
-                    $prop: $val,
-                )*
-            };
-        )*
+        strats!(@gen 0usize; $($name { $(# $str)? $($prop: $val),* })*);
         pub const STRAT_COUNT: usize = [$(stringify!($name),)*].len();
         pub const ALL_STRATS: [Strat; STRAT_COUNT] = [$($name,)*];
     };
