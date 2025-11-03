@@ -1,9 +1,9 @@
-use std::borrow::Cow;
+use std::time::Duration;
 
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::{Float, PaperClips, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}};
+use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
 
 pub mod strategies;
 pub mod util;
@@ -29,14 +29,14 @@ pub struct StrategyGrid {
 
 fn random_value() -> u8 { random_range(1..=10) }
 impl StrategyGrid {
-    fn random_self(&mut self) {
+    pub fn random_self(&mut self) {
         self.aa = random_value();
         self.ab = random_value();
         self.ba = random_value();
         self.bb = random_value();
         self.update_choice_names();
     }
-    fn random() -> StrategyGrid {
+    pub fn random() -> StrategyGrid {
         Self {
             aa: random_value(),
             ab: random_value(),
@@ -47,11 +47,20 @@ impl StrategyGrid {
             choice_names: Self::random_choice_names(),
         }
     }
-    fn update_choice_names(&mut self) {
+    pub fn update_choice_names(&mut self) {
         self.choice_names = Self::random_choice_names();
     }
     fn random_choice_names() -> (&'static str, &'static str) {
         CHOICE_NAMES[random_range(0..CHOICE_NAMES.len())]
+    }
+    pub fn get_values(&self, h: Move, v: Move) -> (u8, u8) {
+        use Move::*;
+        match (h, v) {
+            (A, A) => (self.aa, self.aa),
+            (A, B) => (self.ab, self.ba),
+            (B, A) => (self.ba, self.ab),
+            (B, B) => (self.bb, self.bb),
+        }
     }
 }
 
@@ -116,31 +125,39 @@ pub struct Strategy {
     pub tourney_cost: Float,
     pub tourney_report_display: TourneyDisplay,
 
-    /// # (vStrat, hStrat)
+    /// # (hStrat, vStrat)
     pub fight: (&'static Strat, &'static Strat),
     // var stratCounter = 0;
     // var roundNum = 0;
-    // var hMove = 1;
-    // var vMove = 1;
-    // var hMovePrev = 1;
-    // var vMovePrev = 1;
+    h_move: Move,
+    v_move: Move,
+    h_move_prev: Move,
+    v_move_prev: Move,
     // var rounds = 0;
-    current_round: u8,
-    // var rCounter = 0;
-    tourney_in_prog: bool,
+    pub current_round: u8,
+    /// # rCounter
+    round_counter: u8,
+    pub tourney_in_prog: bool,
     // var winnerPtr = 0;
     // var placeScore = 0;
     // var showScore = 0;
-    pick: usize,
+    pub pick: &'static Strat,
     // var yomi = 0;
     yomi_boost: Float,
+
+    pub auto_tourney_flag: bool,
+    pub auto_tourney_status: bool,
+
+    round_timer: Ticks,
+
+    clear_grid: bool,
 
     // var allStrats = [];
     // var strats = [];
 
-    // var resultsTimer = 0;
+    pub results_timer: u64,
     // var results = [];
-    results_flag: bool,
+    pub results_flag: bool,
 
 
     // var payoffGrid = {
@@ -150,6 +167,7 @@ pub struct Strategy {
     //     valueBB:0,
     // }
 
+    pub disable_run_button: bool,
 }
 
 impl Default for Strategy {
@@ -163,18 +181,31 @@ impl Default for Strategy {
             tourney_cost: 1000.0,
             tourney_report_display: TourneyDisplay::RunTournament,
             fight: (&RANDOM, &RANDOM),
+            h_move: Move::A,
+            v_move: Move::A,
+            h_move_prev: Move::A,
+            v_move_prev: Move::A,
             current_round: 0,
+            round_counter: 0,
             tourney_in_prog: false,
-            pick: 0,
+            pick: &RANDOM,
             yomi_boost: 1.0,
+            auto_tourney_flag: false,
+            auto_tourney_status: false,
+            round_timer: Ticks::MAX,
+            clear_grid: false,
+            results_timer: 0,
             results_flag: false,
+
+            disable_run_button: true,
         }
     }
 }
 
 impl Strategy {
     #[inline]
-    pub fn pick_strats(&mut self, round_num: usize) {
+    pub fn pick_strats(&mut self) {
+        let round_num = self.current_round as usize;
         let h = round_num / self.strats.len();
         let v = round_num % self.strats.len();
 
@@ -193,21 +224,22 @@ impl Strategy {
     pub fn generate_grid(&mut self) {
         self.grid.random_self();
     }
-    pub fn round(&mut self, current_round: u8) {
-        // TODO implement round
-    }
     #[inline]
     pub fn pick_winner(&mut self) {
         self.strats.sort_by(|a, b| a.1.cmp(&b.1));
     }
     #[inline]
     pub fn picked_strat(&mut self) -> (&'static Strat, u16) {
-        self.strats.iter().copied().find(|s| s.0.index == self.pick).unwrap_or((&RANDOM, 0))
+        self.strats.iter().copied().find(|s| s.0.index == self.pick.index).unwrap_or((&RANDOM, 0))
+    }
+    #[inline]
+    pub fn get_strat(&mut self, i: usize) -> &mut (&'static Strat, u16) {
+        self.strats.iter_mut().find(|s| s.0.index == i).unwrap()
     }
     /// Requires the strats to be sorted by score
     #[inline]
     pub fn calculate_strats_beat(&self) -> usize {
-        self.strats.len() - self.strats.iter().position(|s| s.0.index == self.pick).unwrap_or(0)
+        self.strats.len() - self.strats.iter().position(|s| s.0.index == self.pick.index).unwrap_or(0)
     }
     #[inline]
     pub fn display_tourney_report(&mut self) {
@@ -216,6 +248,31 @@ impl Strategy {
     #[inline]
     pub fn tourney_report(&mut self, display: TourneyDisplay) {
         self.tourney_report_display = display;
+    }
+
+    pub fn round_setup(&mut self) {
+        self.round_counter = 0;
+        self.pick_strats();
+        self.tourney_report_display = TourneyDisplay::Round;
+    }
+
+    pub fn run_round(&mut self) {
+        self.round_counter += 1;
+
+        (self.h_move_prev, self.h_move) = (self.h_move, (self.fight.0.pick_move)(self.grid, Position::H));
+        (self.v_move_prev, self.v_move) = (self.v_move, (self.fight.1.pick_move)(self.grid, Position::V));
+
+        self.calc_payoff(self.h_move, self.v_move);
+    }
+
+    pub fn calc_payoff(&mut self, hm: Move, vm: Move) {
+        let (hv, vv) = self.grid.get_values(hm, vm);
+
+        // TODO: optimize this stuff
+        let h = self.get_strat(self.fight.0.index);
+        h.1 += hv as u16;
+        let v = self.get_strat(self.fight.1.index);
+        v.1 += vv as u16;
     }
 }
 
@@ -228,10 +285,13 @@ impl PaperClips {
         self.strategy.reset_strats();
         self.computational.standard_ops -= self.strategy.tourney_cost;
         self.strategy.grid.random_self();
+        self.strategy.disable_run_button = false;
+        self.strategy.tourney_report_display = TourneyDisplay::RunTournament;
     }
     pub fn run_tourney(&mut self) {
+        self.strategy.disable_run_button = true;
         if self.strategy.current_round < self.strategy.rounds() {
-            self.strategy.round(self.strategy.current_round);
+            self.tourney_round();
         } else {
             self.strategy.tourney_in_prog = false;
             self.strategy.pick_winner();
@@ -240,6 +300,38 @@ impl PaperClips {
             self.declare_winner();
         }
     }
+
+    /// # round()
+    pub fn tourney_round(&mut self) {
+        self.strategy.round_setup();
+        self.round_loop();
+    }
+    pub fn round_loop(&mut self) {
+        if self.strategy.round_counter < 10 {
+            self.strategy.run_round();
+            self.strategy.round_timer = self.ticks;
+        } else {
+            self.strategy.current_round += 1;
+            self.run_tourney();
+        }
+    }
+    /// Can run at any frequency (preferrably 10ms) 
+    pub fn round_tick(&mut self) {
+        if self.strategy.round_counter <= 10 && self.ticks > self.strategy.round_timer  {
+            let time_passed = self.ticks - self.strategy.round_timer;
+            
+            const FIFTY_MS: Duration = Duration::from_millis(50);
+            if time_passed >= ticks_10ms(FIFTY_MS) {
+                self.strategy.clear_grid = true;
+            }
+            if time_passed >= ticks_10ms(2 * FIFTY_MS) {
+                self.strategy.clear_grid = false;
+                self.strategy.round_timer = Ticks::MAX;
+                self.round_loop();
+            }
+        }
+    }
+
     pub fn declare_winner(&mut self) {
         // if pick < 10 {} // this is assumed to be valid by default
 

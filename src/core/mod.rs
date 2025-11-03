@@ -160,6 +160,11 @@ impl PaperClips {
             self.computational.calculate_creativity();
         }
 
+        // Stuff that has to be global because the original code uses `setTimeout` and other stuff
+        if self.strategy.engine_flag {
+            self.round_tick();
+        }
+
         // Ending
 
         // lots of code
@@ -201,15 +206,15 @@ impl PaperClips {
     }
 
     pub fn button_update(&mut self) {
-        // if results_flag && auto_tourney_flag && auto_tourney_status && tournamentResultsTableElement.is_empty() {
-        //     results_timer += 1;
+        if self.strategy.results_flag && self.strategy.auto_tourney_flag && self.strategy.auto_tourney_status {
+            self.strategy.results_timer += 1;
 
-        //     if results_timer >= 300 && self.computational.operations >= tourney_cost {
-        //         new_tourney();
-        //         run_tourney();
-        //         results_timer = 0;
-        //     }
-        // }
+            if self.strategy.results_timer >= 300 && self.computational.operations >= self.strategy.tourney_cost {
+                self.new_tourney();
+                self.run_tourney();
+                self.strategy.results_timer = 0;
+            }
+        }
 
         if !self.human_flag {
             self.investments.engine_flag = false;

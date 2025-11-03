@@ -74,6 +74,9 @@ impl App for Gui {
                     if self.paperclips.investments.engine_flag {
                         self.draw_investments_group(right);
                     }
+                    if self.paperclips.strategy.engine_flag {
+                        self.draw_strategy_group(right);
+                    }
                 });
             });
         });

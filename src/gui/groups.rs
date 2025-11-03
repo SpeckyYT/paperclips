@@ -1,8 +1,8 @@
-use std::time::Instant;
+use std::{borrow::Cow, time::Instant};
 
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, util::blink};
+use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::blink};
 use strum::IntoEnumIterator;
 
 use crate::gui::Gui;
@@ -325,6 +325,46 @@ impl Gui {
         });
     }
     
+    pub fn draw_strategy_group(&mut self, ui: &mut Ui) {
+        ui.group(|ui| {
+            ui.heading("Strategic Modeling");
+            ui.separator();
+            
+            ComboBox::from_label("Pick a Strat")
+                .selected_text(self.paperclips.strategy.pick.name)
+                .show_ui(ui, |ui| {
+                    for (strat, _) in &self.paperclips.strategy.strats {
+                        ui.selectable_value(&mut self.paperclips.strategy.pick, strat, strat.name);
+                    }
+                });
+
+            ui.add_enabled_ui(self.paperclips.strategy.tourney_in_prog && !self.paperclips.strategy.disable_run_button, |ui| {
+                if ui.button("Run").clicked() {
+                    self.paperclips.run_tourney();
+                }
+            });
+
+            let display_text: Cow<'static, str> = match self.paperclips.strategy.tourney_report_display {
+                TourneyDisplay::RunTournament => "Pick strategy, run tournament, gain yomi".into(),
+                TourneyDisplay::Round => format!("Round: {}", self.paperclips.strategy.current_round + 1).into(),
+                TourneyDisplay::Results(false) => "TOURNAMENT RESULTS (roll over for grid)".into(),
+                TourneyDisplay::Results(true) => "TOURNAMENT RESULTS (roll over for payoff grid)".into(),
+            };
+            ui.label(display_text);
+
+            // tournamentStuff
+            
+            ui.label(format!("Yomi: {}", self.paperclips.strategy.yomi));
+            
+            ui.add_enabled_ui(!self.paperclips.strategy.tourney_in_prog && self.paperclips.computational.operations >= self.paperclips.strategy.tourney_cost, |ui| {
+                if ui.button("New Tournament").clicked() {
+                    self.paperclips.new_tourney();
+                }
+            });
+            ui.label(format!("Cost: {:.0} ops", self.paperclips.strategy.tourney_cost));
+        });
+    }
+
     pub fn draw_top_console(&mut self, ui: &mut Ui) {
         if let Some(start) = self.paperclips.space.hypno_drone_event {
             if self.long_blink(ui, start) {

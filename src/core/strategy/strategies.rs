@@ -9,6 +9,12 @@ pub struct Strat {
     pub pick_move: fn(board: StrategyGrid, position: Position) -> Move,
 }
 
+impl PartialEq for Strat {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+    }
+}
+
 macro_rules! strats {
     (@gen $i:expr; ) => {};
     (@gen $i:expr; $name:ident { $(# $str:literal)? $($prop:ident: $val:expr),* $(,)? } $($rest:tt)*) => {
