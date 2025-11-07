@@ -452,5 +452,10 @@ impl Gui {
         if ui.button("Set Avail Matter to 0").clicked() {
             self.paperclips.zero_matter();
         }
+
+        // cheats that aren't in the original code
+        if ui.button("Play Threnody").clicked() {
+            self.play_threnody();
+        }
     }
 }

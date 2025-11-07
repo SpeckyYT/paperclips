@@ -1,10 +1,13 @@
 use eframe::{run_native, NativeOptions};
 
-use crate::gui::Gui;
+use crate::{gui::Gui, setup::init_setup};
 
-mod gui;
+pub mod gui;
+pub mod setup;
 
 fn main() {
+    init_setup();
+
     run_native(
         "paperclips",
         NativeOptions {

@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use rand::random_bool;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, project::{Projects, PROJECT_35}, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, project::{PROJECT_35, Projects}, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -20,6 +20,7 @@ pub mod strategy;
 pub mod util;
 pub mod investments;
 pub mod space;
+pub mod threnody;
 pub mod cheat;
 
 #[derive(Debug, Clone)]
@@ -39,6 +40,7 @@ pub struct PaperClips {
     pub investments: Investments,
     pub strategy: Strategy,
     pub space: Space,
+    pub threnody: Threnody,
 }
 
 impl Default for PaperClips {
@@ -58,6 +60,7 @@ impl Default for PaperClips {
             investments: Investments::default(),
             strategy: Strategy::default(),
             space: Space::default(),
+            threnody: Threnody::default(),
         }
     }
 }

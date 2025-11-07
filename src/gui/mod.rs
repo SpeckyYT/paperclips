@@ -3,16 +3,20 @@ use std::time::{Duration, Instant};
 use eframe::{
     egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}, App, Frame
 };
+use kittyaudio::Mixer;
 use paperclips::PaperClips;
 
 const TEN_MS: Duration = Duration::from_millis(10);
 const FRAME_60FPS: Duration = Duration::from_millis(16);
 
-mod groups;
-mod blink;
+pub mod groups;
+pub mod blink;
+pub mod threnody;
 
 pub struct Gui {
     pub paperclips: PaperClips,
+
+    audio_mixer: Mixer,
 
     last_main_update: Instant,
     last_stock_shop_update: Instant,
@@ -24,6 +28,12 @@ impl Default for Gui {
     fn default() -> Self {
         Self {
             paperclips: PaperClips::default(),
+
+            audio_mixer: {
+                let mixer = Mixer::new();
+                mixer.init();
+                mixer
+            },
 
             last_main_update: Instant::now(),
             last_stock_shop_update: Instant::now(),
@@ -55,7 +65,6 @@ impl App for Gui {
                     self.draw_business_group(left);
                     self.draw_manufacturing_group(left);
 
-                    #[cfg(debug_assertions)]
                     {
                         left.add_space(30.0);
                         self.draw_cheat_group(left);
@@ -113,9 +122,15 @@ impl Gui {
             }
             last_wire_price_and_demand_update(Duration::from_millis(100)) {
                 self.paperclips.update_wire_price_and_demand_tick();
+                self.check_threnody();
             }
         }
 
         ctx.request_repaint_after(TEN_MS.saturating_sub(self.last_main_update.elapsed()));
+    }
+    pub fn check_threnody(&mut self) {
+        if self.paperclips.threnody.check() {
+            self.play_threnody();
+        }
     }
 }

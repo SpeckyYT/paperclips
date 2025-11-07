@@ -3,7 +3,7 @@ use std::time::Duration;
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{A100, RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
+use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
 
 pub mod strategies;
 pub mod util;
