@@ -3,7 +3,7 @@ use std::time::Duration;
 use arrayvec::ArrayVec;
 use rand::random_range;
 
-use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
+use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{A100, RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
 
 pub mod strategies;
 pub mod util;
@@ -18,15 +18,18 @@ pub enum TourneyDisplay {
 
 #[derive(Debug, Clone, Copy)]
 pub struct StrategyGrid {
-    aa: u8,
-    ab: u8,
-    ba: u8,
-    bb: u8,
-    previous_horizontal_move: Move,
-    previous_vertical_move: Move,
-    choice_names: (&'static str, &'static str),
+    pub aa: u8,
+    pub ab: u8,
+    pub ba: u8,
+    pub bb: u8,
+    pub h_move: Move,
+    pub v_move: Move,
+    pub h_move_prev: Move,
+    pub v_move_prev: Move,
+    pub choice_names: (&'static str, &'static str),
 }
 
+#[inline]
 fn random_value() -> u8 { random_range(1..=10) }
 impl StrategyGrid {
     pub fn random_self(&mut self) {
@@ -42,8 +45,10 @@ impl StrategyGrid {
             ab: random_value(),
             ba: random_value(),
             bb: random_value(),
-            previous_horizontal_move: Move::A,
-            previous_vertical_move: Move::A,
+            h_move: Move::A,
+            v_move: Move::A,
+            h_move_prev: Move::A,
+            v_move_prev: Move::A,
             choice_names: Self::random_choice_names(),
         }
     }
@@ -129,14 +134,10 @@ pub struct Strategy {
     pub fight: (&'static Strat, &'static Strat),
     // var stratCounter = 0;
     // var roundNum = 0;
-    h_move: Move,
-    v_move: Move,
-    h_move_prev: Move,
-    v_move_prev: Move,
     // var rounds = 0;
     pub current_round: u8,
     /// # rCounter
-    round_counter: u8,
+    pub round_counter: u8,
     pub tourney_in_prog: bool,
     // var winnerPtr = 0;
     // var placeScore = 0;
@@ -181,12 +182,8 @@ impl Default for Strategy {
             tourney_cost: 1000.0,
             tourney_report_display: TourneyDisplay::RunTournament,
             fight: (&RANDOM, &RANDOM),
-            h_move: Move::A,
-            v_move: Move::A,
-            h_move_prev: Move::A,
-            v_move_prev: Move::A,
             current_round: 0,
-            round_counter: 0,
+            round_counter: 10,
             tourney_in_prog: false,
             pick: &RANDOM,
             yomi_boost: 1.0,
@@ -208,8 +205,7 @@ impl Strategy {
         let round_num = self.current_round as usize;
         let h = round_num / self.strats.len();
         let v = round_num % self.strats.len();
-
-        self.fight = (self.strats[v].0, self.strats[h].0);
+        self.fight = (self.strats[h].0, self.strats[v].0);
     }
     #[inline]
     pub fn reset_strats(&mut self) {
@@ -226,7 +222,7 @@ impl Strategy {
     }
     #[inline]
     pub fn pick_winner(&mut self) {
-        self.strats.sort_by(|a, b| a.1.cmp(&b.1));
+        self.strats.sort_by(|a, b| b.1.cmp(&a.1));
     }
     #[inline]
     pub fn picked_strat(&mut self) -> (&'static Strat, u16) {
@@ -239,7 +235,7 @@ impl Strategy {
     /// Requires the strats to be sorted by score
     #[inline]
     pub fn calculate_strats_beat(&self) -> usize {
-        self.strats.len() - self.strats.iter().position(|s| s.0.index == self.pick.index).unwrap_or(0)
+        self.strats.len() - self.strats.iter().position(|s| s.0.index == self.pick.index).unwrap_or(0) + 1
     }
     #[inline]
     pub fn display_tourney_report(&mut self) {
@@ -248,6 +244,10 @@ impl Strategy {
     #[inline]
     pub fn tourney_report(&mut self, display: TourneyDisplay) {
         self.tourney_report_display = display;
+    }
+    #[inline]
+    pub fn is_running_round(&self) -> bool {
+        self.round_counter < 10
     }
 
     pub fn round_setup(&mut self) {
@@ -259,10 +259,14 @@ impl Strategy {
     pub fn run_round(&mut self) {
         self.round_counter += 1;
 
-        (self.h_move_prev, self.h_move) = (self.h_move, (self.fight.0.pick_move)(self.grid, Position::H));
-        (self.v_move_prev, self.v_move) = (self.v_move, (self.fight.1.pick_move)(self.grid, Position::V));
+        let new_h_move = (self.fight.0.pick_move)(self.grid, Position::H);
+        let new_v_move = (self.fight.1.pick_move)(self.grid, Position::V);
 
-        self.calc_payoff(self.h_move, self.v_move);
+        let StrategyGrid { h_move, v_move, h_move_prev, v_move_prev, .. } = &mut self.grid;
+        (*h_move_prev, *h_move) = (*h_move, new_h_move);
+        (*v_move_prev, *v_move) = (*v_move, new_v_move);
+
+        self.calc_payoff(new_h_move, new_v_move);
     }
 
     pub fn calc_payoff(&mut self, hm: Move, vm: Move) {

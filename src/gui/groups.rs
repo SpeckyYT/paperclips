@@ -7,6 +7,8 @@ use strum::IntoEnumIterator;
 
 use crate::gui::Gui;
 
+mod strategy;
+
 impl Gui {
     pub fn draw_business_group(&mut self, ui: &mut Ui) -> InnerResponse<()> {
         let pc = &mut self.paperclips;
@@ -329,16 +331,15 @@ impl Gui {
         ui.group(|ui| {
             ui.heading("Strategic Modeling");
             ui.separator();
-            
-            ComboBox::from_label("Pick a Strat")
+
+            ui.add_enabled_ui(self.paperclips.strategy.tourney_in_prog && !self.paperclips.strategy.disable_run_button, |ui| {
+                ComboBox::from_label("Pick a Strat")
                 .selected_text(self.paperclips.strategy.pick.name)
                 .show_ui(ui, |ui| {
                     for (strat, _) in &self.paperclips.strategy.strats {
                         ui.selectable_value(&mut self.paperclips.strategy.pick, strat, strat.name);
                     }
                 });
-
-            ui.add_enabled_ui(self.paperclips.strategy.tourney_in_prog && !self.paperclips.strategy.disable_run_button, |ui| {
                 if ui.button("Run").clicked() {
                     self.paperclips.run_tourney();
                 }
@@ -353,8 +354,22 @@ impl Gui {
             ui.label(display_text);
 
             // tournamentStuff
-            
-            ui.label(format!("Yomi: {}", self.paperclips.strategy.yomi));
+
+            ui.group(|ui| {
+                let mut frame = Frame::NONE.begin(ui);
+                let f_ui = &mut frame.content_ui;
+
+                static mut HOVERED: bool = false;
+                if self.paperclips.strategy.results_flag && !unsafe { HOVERED } {
+                    self.draw_strats_results(f_ui);
+                } else {
+                    self.draw_payoff_grid(f_ui);
+                }
+                let resp = frame.end(ui);
+                unsafe { HOVERED = resp.hovered(); }
+            });
+
+            ui.label(format!("Yomi: {:.0}", self.paperclips.strategy.yomi));
             
             ui.add_enabled_ui(!self.paperclips.strategy.tourney_in_prog && self.paperclips.computational.operations >= self.paperclips.strategy.tourney_cost, |ui| {
                 if ui.button("New Tournament").clicked() {

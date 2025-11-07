@@ -75,8 +75,8 @@ strats!{
         # "TIT FOR TAT"
         pick_move: |board, position| {
             match position {
-                Position::H => board.previous_vertical_move,
-                Position::V => board.previous_horizontal_move,
+                Position::H => board.v_move_prev,
+                Position::V => board.h_move_prev,
             }
         }
     }

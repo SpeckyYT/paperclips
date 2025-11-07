@@ -35,8 +35,8 @@ pub fn find_biggest_payoff(StrategyGrid { aa, ab, ba, bb, .. }: StrategyGrid) ->
 pub fn what_beats_last(my_position: Position, board: &StrategyGrid) -> Move {
     // Determine the opponent's last move depending on their position.
     let opponent_prev = match my_position.opposite() {
-        Position::H => board.previous_horizontal_move,
-        Position::V => board.previous_vertical_move,
+        Position::H => board.h_move_prev,
+        Position::V => board.v_move_prev,
     };
 
     // If the opponent's previous move was A, compare `aa` vs `ba`.
