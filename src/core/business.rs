@@ -71,6 +71,9 @@ pub struct Business {
     pub clip_rate_temp: Float,
     /// # clipRate
     pub clip_rate: Float,
+
+    /// # unusedClips
+    pub unused_clips: Float,
 }
 
 impl Default for Business {
@@ -107,6 +110,8 @@ impl Default for Business {
             prev_clips: 0.0,
             clip_rate_temp: 0.0,
             clip_rate: 0.0,
+
+            unused_clips: 0.0,
         }
     }
 }
@@ -125,7 +130,7 @@ impl PaperClips {
     pub fn create_clips(&mut self, amount: Float) {
         self.business.clips += amount;
         self.business.unsold_clips += amount;
-        // unused_clips
+        self.business.unused_clips += amount;
     }
     pub fn clip_click(&mut self, amount: Float) {
         // if dismantle >= 4 {

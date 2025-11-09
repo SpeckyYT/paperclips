@@ -1,6 +1,6 @@
 use std::{borrow::Cow, time::Instant};
 
-use crate::{Float, PaperClips, computational::MEM_SIZE, strategy::strategies::*};
+use crate::{Float, PaperClips, computational::MEM_SIZE, strategy::strategies::*, util::powf};
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
@@ -10,11 +10,6 @@ pub struct Projects {
 
     pub buyable_projects: ArrayVec<(Instant, &'static Project), PROJECTS_COUNT>,
     pub statuses: [ProjectStatus; PROJECTS_COUNT],
-
-    pub space_flag: bool,
-    pub harvester_flag: bool,
-    pub wire_drone_flag: bool,
-    pub factory_flag: bool,
 
     pub bribe: Float,
 }
@@ -26,11 +21,6 @@ impl Default for Projects {
 
             buyable_projects: ArrayVec::new(),
             statuses: PROJECTS_STATUSES,
-
-            space_flag: false,
-            harvester_flag: false,
-            wire_drone_flag: false,
-            factory_flag: false,
 
             bribe: 1000000.0,
         }
@@ -617,7 +607,7 @@ projects! {
         cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 25000.0;
-            pc.projects.harvester_flag = true;
+            pc.factory.harvester_flag = true;
             pc.console.push("Harvester Drone facilities online");
         },
     }
@@ -628,7 +618,7 @@ projects! {
         cost: ("(25,000 ops)", |pc| req_operations(25000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 25000.0;
-            pc.projects.wire_drone_flag = true;
+            pc.factory.wire_drone_flag = true;
             pc.console.push("Wire Drone facilities online");
         },
     }
@@ -639,7 +629,7 @@ projects! {
         cost: ("(35,000 ops)", |pc| req_operations(35000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 35000.0;
-            pc.projects.factory_flag = true;
+            pc.factory.factory_flag = true;
             pc.console.push("Clip factory assembly facilities online");
         },
     }
@@ -676,8 +666,27 @@ projects! {
         title: "Space Exploration",
         description: "Dismantle terrestrial facilities, and expand throughout the universe",
         trigger: |pc| !pc.human_flag && pc.space.available_matter <= 0.0,
-        cost: ("(120,000 ops, 10,000,000 MW-seconds, 5 oct clips)", cost_false),
-        effect: effect_noop,
+        cost: (
+            "(120,000 ops, 10,000,000 MW-seconds, 5 oct clips)",
+            |pc| pc.computational.operations >= 120000.0 && pc.factory.stored_power >= 10000000.0 && pc.business.unused_clips >= powf(10.0, 27) * 5.0,
+        ),
+        effect: |pc| {
+            pc.computational.standard_ops -= 120000.0;
+            pc.factory.stored_power -= 10000000.0;
+            pc.business.unused_clips -= powf(10.0, 27) * 5.0;
+
+            pc.space.boredom_level = 0.0;
+            pc.space.space_flag = true;
+            pc.factory_reboot();
+            pc.harvester_reboot();
+            pc.wire_drone_reboot();
+            pc.farm_reboot();
+            pc.battery_reboot();
+            pc.factory.farm_level = 1;
+            pc.factory.pow_mod = 1.0;
+
+            pc.console.push("Von Neumann Probes online");
+        },
     }
     PROJECT_50 {
         title: "Quantum Computing",

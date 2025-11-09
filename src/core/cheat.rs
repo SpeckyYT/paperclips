@@ -4,7 +4,7 @@ impl PaperClips {
     pub fn cheat_clips(&mut self) {
         const ADDED_CLIPS: Float = 100000000.0;
         self.business.clips += ADDED_CLIPS;
-        // self.business.unused_clips += ADDED_CLIPS;
+        self.business.unused_clips += ADDED_CLIPS;
         self.console.push("you just cheated");
     }
     pub fn cheat_money(&mut self) {

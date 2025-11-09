@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use rand::random_bool;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, project::{PROJECT_35, Projects}, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -19,6 +19,7 @@ pub mod project;
 pub mod strategy;
 pub mod util;
 pub mod investments;
+pub mod factory;
 pub mod space;
 pub mod threnody;
 pub mod cheat;
@@ -39,6 +40,7 @@ pub struct PaperClips {
     pub qchips: QChips,
     pub investments: Investments,
     pub strategy: Strategy,
+    pub factory: Factory,
     pub space: Space,
     pub threnody: Threnody,
 }
@@ -59,6 +61,7 @@ impl Default for PaperClips {
             console: Console::default(),
             investments: Investments::default(),
             strategy: Strategy::default(),
+            factory: Factory::default(),
             space: Space::default(),
             threnody: Threnody::default(),
         }
@@ -271,7 +274,7 @@ impl PaperClips {
             [10] (clips(1000000000000000000000.0)) => time "One Sextillion Clips Created";
             [11] (clips(1000000000000000000000000.0)) => time "One Septillion Clips Created";
             [12] (clips(1000000000000000000000000000.0)) => time "One Octillion Clips Created";
-            [13] (self.projects.space_flag) => time "Terrestrial resources fully utilized";
+            [13] (self.space.space_flag) => time "Terrestrial resources fully utilized";
             [14] (
                 (self.business.clips >= TOTAL_MATTER)
                 || (self.space.found_matter >= TOTAL_MATTER && self.space.available_matter < 1.0 && self.wire.count < 1.0)
