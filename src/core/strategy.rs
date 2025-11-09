@@ -126,6 +126,7 @@ pub struct Strategy {
     pub strats: ArrayVec<(&'static Strat, u16), STRAT_COUNT>,
 
     pub yomi: Float,
+    pub yomi_boost: Float,
 
     pub tourney_cost: Float,
     pub tourney_report_display: TourneyDisplay,
@@ -143,8 +144,6 @@ pub struct Strategy {
     // var placeScore = 0;
     // var showScore = 0;
     pub pick: &'static Strat,
-    // var yomi = 0;
-    yomi_boost: Float,
 
     pub auto_tourney_flag: bool,
     pub auto_tourney_status: bool,

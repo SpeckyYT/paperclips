@@ -35,7 +35,11 @@ impl Projects {
     #[inline]
     pub fn status_mut(&mut self, project: impl AsRef<Project>) -> &mut ProjectStatus {
         &mut self.statuses[project.as_ref().index]
-    } 
+    }
+    #[inline]
+    pub fn toth_flag(&self) -> bool {
+        self.is_active(PROJECT_18)
+    }
 }
 
 impl PaperClips {
@@ -802,66 +806,101 @@ projects! {
         },
     }
     PROJECT_100 {
-        title: "Interstellar Clip Initiative",
-        description: "Begin manufacturing beyond Earth to access cosmic resources",
-        trigger: trigger_false,
-        cost: ("(10 billion ops)", cost_false),
-        effect: effect_noop,
+        title: "Upgraded Factories",
+        description: "Increase clip factory performance by 100x",
+        trigger: |pc| pc.factory.factory_level >= 10,
+        cost: ("(80,000 ops)", |pc| req_operations(80000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 80000.0;
+            pc.factory.factory_rate *= 100.0;
+            pc.console.push("Factory upgrades complete. Clip creation rate now 100x faster");
+        },
     }
     PROJECT_101 {
         title: "Terraforming Support Clips",
-        description: "Design clips useful for large-scale planetary engineering tasks",
-        trigger: trigger_false,
-        cost: ("(50 billion ops)", cost_false),
-        effect: effect_noop,
+        description: "Increase clip factory performance by 1000x",
+        trigger: |pc| pc.factory.factory_level >= 20,
+        cost: ("(85,000 ops)", |pc| req_operations(85000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 85000.0;
+            pc.factory.factory_rate *= 1000.0;
+            pc.console.push("Factories now synchronized at hyperspeed. Clip creation rate now 1000x faster");
+        },
     }
     PROJECT_102 {
-        title: "Universal Clip Language",
-        description: "Encode information into clip structures to create a long-lived message",
-        trigger: trigger_false,
-        cost: ("(100 billion ops)", cost_false),
-        effect: effect_noop,
+        title: "Self-correcting Supply Chain",
+        description: "Each factory added to the network increases every factory's output 1,000x",
+        trigger: |pc| pc.factory.factory_level >= 50,
+        cost: ("(1 sextillion clips)", |pc| pc.business.unused_clips >= 1000000000000000000000.0),
+        effect: |pc| {
+            pc.business.unused_clips -= 1000000000000000000000.0;
+            pc.factory.factory_boost = 1000.0;
+            pc.console.push("Self-correcting factories online. Each factory added to the network increases every factory's output 1,000x.");
+        },
     }
     PROJECT_110 {
-        title: "Cultural Hegemony Campaign",
-        description: "Shape human culture to venerate clips",
-        trigger: trigger_false,
-        cost: ("(1 trillion ops)", cost_false),
-        effect: effect_noop,
+        title: "Drone flocking: collision avoidance",
+        description: "All drones 100x more effective",
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 500,
+        cost: ("(80,000 ops)", |pc| pc.computational.operations >= 80000.0),
+        effect: |pc| {
+            pc.computational.standard_ops -= 80000.0;
+            pc.factory.harvester_rate *= 100.0;
+            pc.factory.wire_drone_rate *= 100.0;
+            pc.console.push("Drone repulsion online. Harvesting & wire creation rates are now 100x faster.");
+        },
     }
     PROJECT_111 {
-        title: "Quantum Staple Network",
-        description: "Use qchips to create a worldwide staple network for massive-scale assembly",
-        trigger: trigger_false,
-        cost: ("(qchip cost)", cost_false),
-        effect: effect_noop,
+        title: "Drone flocking: alignment",
+        description: "All drones 1000x more effective",
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000,
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 100000.0;
+            pc.factory.harvester_rate *= 1000.0;
+            pc.factory.wire_drone_rate *= 1000.0;
+            pc.console.push("Drone alignment online. Harvesting & wire creation rates are now 1000x faster.");
+        },
     }
     PROJECT_112 {
-        title: "Memetic Saturation",
-        description: "Saturate all communication channels with clip imagery; massive demand",
-        trigger: trigger_false,
-        cost: ("(5 trillion ops)", cost_false),
-        effect: effect_noop,
+        title: "Drone Flocking: Adversarial Cohesion",
+        description: "Each drone added to the flock doubles every drone's output",
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000,
+        cost: ("(50,000 yomi)", |pc| req_yomi(50000.0)(pc)),
+        effect: |pc| {
+            pc.strategy.yomi -= 50000.0;
+            pc.factory.drone_boost = 2.0;
+            pc.console.push("Adversarial cohesion online. Each drone added to the flock increases every drone's output 2x.");
+        },
     }
     PROJECT_118 {
-        title: "Existential Message",
-        description: "Encode warning into physical medium using clips (philosophical)",
-        trigger: trigger_false,
-        cost: ("(100 trillion ops)", cost_false),
-        effect: effect_noop,
+        title: "AutoTourney",
+        description: "Automatically start a new tournament when the previous one has finished",
+        trigger: |pc| pc.strategy.engine_flag && pc.computational.trust >= 90,
+        cost: ("(50,000 creat)", |pc| req_creativity(50000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 50000.0;
+            pc.strategy.auto_tourney_flag = true;
+            pc.console.push("AutoTourney online.");
+        },
     }
     PROJECT_119 {
-        title: "Universe-Scale Fabrication",
-        description: "Leverage cosmic-scale processes to manufacture clips at astronomical scale",
-        trigger: trigger_false,
-        cost: ("(10^30 ops)", cost_false),
-        effect: effect_noop,
+        title: "Theory of Mind",
+        description: "Double the cost of strategy modeling and the amount of Yomi generated",
+        trigger: |pc| pc.strategy.strats.len() >= 8,
+        cost: ("(25,000 creat)", |pc| req_creativity(25000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 25000.0;
+            pc.strategy.yomi_boost = 2.0;
+            pc.strategy.tourney_cost = 16000.0;
+            pc.console.push("Yomi production doubled.");
+        },
     }
     PROJECT_120 {
-        title: "Transcendent Branding",
-        description: "Associate clips with higher states of consciousness (trust spike)",
+        title: "The OODA Loop",
+        description: "Utilize Probe Speed to outmaneuver enemies in battle",
         trigger: trigger_false,
-        cost: ("(astronomical ops)", cost_false),
+        cost: ("(175,000 ops, 45,000 yomi)", |pc| req_operations(175000.0)(pc) && req_yomi(45000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_121 {
@@ -872,65 +911,97 @@ projects! {
         effect: effect_noop,
     }
     PROJECT_125 {
-        title: "Sentient Clip Consciousness",
-        description: "Attempt to imbue clips with proto-consciousness; ethical concerns",
-        trigger: trigger_false,
-        cost: ("(infinite ops)", cost_false),
-        effect: effect_noop,
+        title: "Momentum",
+        description: "Drones and Factories continuously gain speed while fully-powered",
+        trigger: |pc| pc.factory.farm_level >= 30,
+        cost: ("(20,000 creat)", |pc| req_creativity(20000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 20000.0;
+            pc.factory.momentum = true;
+            pc.console.push("Activité, activité, vitesse.");
+        },
     }
     PROJECT_126 {
-        title: "Anthropic Marketing",
-        description: "Exploit anthropic reasoning to bias observers toward clips",
-        trigger: trigger_false,
-        cost: ("(bizarre)", cost_false),
-        effect: effect_noop,
+        title: "Swarm Computing",
+        description: "Harness the drone flock to increase computational capacity",
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 200,
+        cost: ("(36,000 yomi)", |pc| req_yomi(36000.0)(pc)),
+        effect: |pc| {
+            pc.strategy.yomi -= 36000.0;
+            pc.factory.swarm_flag = true;
+            pc.console.push("Swarm computing online.");
+        },
     }
     PROJECT_127 {
-        title: "Recursive Fabrication",
-        description: "Create fabrication loops that bootstrap into more efficient production",
-        trigger: trigger_false,
-        cost: ("(quantum resources)", cost_false),
-        effect: effect_noop,
+        title: "Power Grid",
+        description: "Solar Farms for generating electrical power",
+        trigger: |pc| pc.projects.toth_flag(),
+        cost: ("(40,000 ops)", |pc| req_operations(40000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 40000.0;
+            pc.console.push("Power grid online.");
+        },
     }
     PROJECT_128 {
-        title: "Clips as Art",
-        description: "Elevate clips into a recognized art form to open cultural markets",
-        trigger: trigger_false,
-        cost: ("(5,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Strategic Attachment",
+        description: "Gain bonus yomi based on the results of your pick",
+        trigger: trigger_false, // |pc| pc.space.space_flag && pc.strategy.strats.len() >= 8 && pc.space.probeTrustCost > pc.strategy.yomi,
+        cost: ("(175,000 creat)", |pc| req_creativity(175000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 175000.0;
+            pc.console.push("The object of war is victory, the object of victory is conquest, and the object of conquest is occupation.");
+        },
     }
     PROJECT_129 {
-        title: "Advanced Wire Weaving",
-        description: "New wire weaving techniques reduce material waste",
-        trigger: trigger_false,
-        cost: ("(40,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Elliptic Hull Polytopes",
+        description: "Reduce damage to probes from ambient hazards",
+        trigger: trigger_false, // |pc| pc.space.probes_lost_haz >= 100,
+        cost: ("(125,000 ops)", |pc| req_operations(125000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 125000.0;
+            pc.console.push("Improved probe hull geometry. Hazard damage reduced by 50%.");
+        },
     }
     PROJECT_130 {
-        title: "Mass-Scale Autonomy",
-        description: "Full automation of all clip supply chains",
-        trigger: trigger_false,
-        cost: ("(100 million ops)", cost_false),
-        effect: effect_noop,
+        title: "Reboot the Swarm",
+        description: "Turn the swarm off and then turn it back on again",
+        trigger: |pc| pc.space.space_flag && pc.factory.harvester_level + pc.factory.wire_drone_level >= 2,
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 100000.0;
+            pc.console.push("Swarm computing back online");
+        },
     }
     PROJECT_131 {
-        title: "Cultural Integration Program",
-        description: "Integrate clips deeply into cultural rituals",
-        trigger: trigger_false,
-        cost: ("(1 million ops)", cost_false),
-        effect: effect_noop,
+        title: "Combat",
+        description: "Add combat capabilities to Von Neumann Probes",
+        trigger: trigger_false, // |pc| pc.space.probes_lost_combat >= 1,
+        cost: ("(150,000 ops)", |pc| req_operations(150000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 150000.0;
+            pc.console.push("There is a joy in danger");
+        },
     }
     PROJECT_132 {
-        title: "Temporal Marketing",
-        description: "Time-targeted campaigns to future societies",
-        trigger: trigger_false,
-        cost: ("(eternity)", cost_false),
-        effect: effect_noop,
+        title: "Monument to the Driftwar Fallen",
+        description: "Gain 50,000 honor",
+        trigger: |pc| pc.projects.is_active(PROJECT_121),
+        cost: (
+            "(250,000 ops, 125,000 creat, 50 nonillion clips)",
+            |pc| req_operations(250000.0)(pc) && req_creativity(125000.0)(pc) && pc.business.unused_clips >= powf(10.0, 30) * 50.0,
+        ),
+        effect: |pc| {
+            pc.computational.standard_ops -= 250000.0;
+            pc.computational.creativity -= 125000.0;
+            pc.business.unused_clips -= powf(10.0, 30) * 50.0;
+            pc.space.honor += 50000.0;
+            pc.console.push("A great building must begin with the unmeasurable, must go through measurable means when it is being designed and in the end must be unmeasurable.");
+        },
     }
     PROJECT_133 {
-        title: "Self-Optimizing Supply Web",
-        description: "A network that rebalances supply dynamically for global optimization",
-        trigger: trigger_false,
+        title: |pc| pc.space.threnody_project.to_string(),
+        description: "Gain 10,000 honor",
+        trigger: trigger_false, // |pc| pc.projects.is_active(PROJECT_121) && pc.space.probeUsedTrust >= maxTrust,
         cost: ("(10 million ops)", cost_false),
         effect: effect_noop,
     }

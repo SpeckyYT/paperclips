@@ -5,21 +5,35 @@ use crate::{Float, PaperClips};
 #[derive(Debug, Clone, Copy)]
 pub struct Factory {
     /// # storedPower
-    pub stored_power: f64,
+    pub stored_power: Float,
 
     pub harvester_flag: bool,
     pub wire_drone_flag: bool,
     pub factory_flag: bool,
 
+    /// # momentum
+    pub momentum: bool,
+    /// # swarmFlag
+    pub swarm_flag: bool,
+
     /// # factoryLevel
     pub factory_level: u32,
+    /// # factoryRate
+    pub factory_rate: Float,
+    /// # factoryBoost
+    pub factory_boost: Float,
     /// # factoryBill
     pub factory_bill: Float,
     /// # factoryCost
     pub factory_cost: Float,
 
+    /// # droneBoost
+    pub drone_boost: Float,
+
     /// # harvesterLevel
     pub harvester_level: u32,
+    /// # harvesterRate
+    pub harvester_rate: Float,
     /// # harvesterBill
     pub harvester_bill: Float,
     /// # harvesterCost
@@ -27,6 +41,8 @@ pub struct Factory {
 
     /// # wireDroneLevel
     pub wire_drone_level: u32,
+    /// # wireDroneRate
+    pub wire_drone_rate: Float,
     /// # wireDroneBill
     pub wire_drone_bill: Float,
     /// # wireDroneCost
@@ -71,15 +87,24 @@ impl Default for Factory {
             wire_drone_flag: false,
             factory_flag: false,
 
+            momentum: false,
+            swarm_flag: false,
+
             factory_level: 0,
+            factory_rate: 1000000000.0,
+            factory_boost: 1.0,
             factory_bill: 0.0,
             factory_cost: 100000000.0,
 
+            drone_boost: 1.0,
+
             harvester_level: 0,
+            harvester_rate: 26180337.0, // what the fuck
             harvester_bill: 0.0,
             harvester_cost: 1000000.0,
 
             wire_drone_level: 0,
+            wire_drone_rate: 16180339.0, // what the fuck part 2
             wire_drone_bill: 0.0,
             wire_drone_cost: 1000000.0,
 
