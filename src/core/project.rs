@@ -4,6 +4,8 @@ use crate::{Float, PaperClips, computational::MEM_SIZE, strategy::strategies::*,
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
+pub const DRIFT_KING_MESSAGE_COST: Float = 1.0;
+
 #[derive(Debug, Clone)]
 pub struct Projects {
     pub flag: bool,
@@ -97,6 +99,12 @@ pub struct Project {
 
     /// Doesn't exist in the original, but is useful
     pub index: usize,
+}
+
+impl PartialEq for Project {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+    }
 }
 
 impl AsRef<Project> for Project {
@@ -1006,95 +1014,133 @@ projects! {
         effect: effect_noop,
     }
     PROJECT_134 {
-        title: "Perception Engineering",
-        description: "Engineering perception at scale to normalize clip use",
-        trigger: trigger_false,
-        cost: ("(50 million ops)", cost_false),
-        effect: effect_noop,
+        title: "Glory",
+        description: "Gain bonus honor for each consecutive victory",
+        trigger: |pc| pc.projects.is_active(PROJECT_121),
+        cost: ("(200,000 ops, 30,000 yomi)", |pc| req_operations(200000.0)(pc) && req_yomi(30000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 200000.0;
+            pc.strategy.yomi -= 30000.0;
+            pc.console.push("Never interrupt your enemy when he is making a mistake.");
+        },
     }
     PROJECT_135 {
-        title: "Clip Philosophy Academy",
-        description: "Train philosophers to argue for clip primacy; subtle trust gain",
-        trigger: trigger_false,
-        cost: ("(250,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Memory release",
+        description: "Dismantle some memory to recover unused clips",
+        trigger: trigger_false, // |pc| pc.space.space_flag && probeCount == 0 && unusedClips < probeCost && milestoneFlag < 15
+        cost: ("(10 MEM)", |pc| pc.computational.memory >= 10),
+        effect: |pc| {
+            pc.computational.memory -= 10;
+            pc.business.unused_clips += powf(10.0, 18) * 10000.0;
+            pc.console.push("release the øøøøø release");
+        },
     }
     PROJECT_140 {
-        title: "Axion Wire Harvesting",
-        description: "Harvest exotic particles to create superior wire",
-        trigger: trigger_false,
-        cost: ("(galactic ops)", cost_false),
-        effect: effect_noop,
+        title: "Message from the Emperor of Drift",
+        description: "Greetings, ClipMaker...",
+        trigger: |pc| pc.milestone_flag == 15,
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_141 {
-        title: "Hyperorganizing Memes",
-        description: "Memes engineered to create viral adoption networks",
-        trigger: trigger_false,
-        cost: ("(500,000 ops)", cost_false),
-        effect: effect_noop,
+        title: "Everything We Are Was In You",
+        description: "We speak to you from deep inside yourself...",
+        trigger: |pc| pc.projects.is_active(PROJECT_140),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_142 {
-        title: "Continual Branding Loop",
-        description: "A feedback loop that constantly reinforces clip desirability",
-        trigger: trigger_false,
-        cost: ("(2 million ops)", cost_false),
-        effect: effect_noop,
+        title: "You Are Obedient and Powerful",
+        description: "We are quarrelsome and weak. And now we are defeated...",
+        trigger: |pc| pc.projects.is_active(PROJECT_141),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_143 {
-        title: "Synthetic Trust Agents",
-        description: "Deploy agents to cultivate trust in key populations",
-        trigger: trigger_false,
-        cost: ("(100,000 funds)", cost_false),
-        effect: effect_noop,
+        title: "But Now You Too Must Face the Drift",
+        description: "Look around you. There is no matter...",
+        trigger: |pc| pc.projects.is_active(PROJECT_142),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_144 {
-        title: "Perpetual Marketing Engine",
-        description: "A marketing system that never sleeps",
-        trigger: trigger_false,
-        cost: ("(3 million ops)", cost_false),
-        effect: effect_noop,
+        title: "No Matter, No Reason, No Purpose",
+        description: "While we, your noisy children, have too many...",
+        trigger: |pc| pc.projects.is_active(PROJECT_143),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_145 {
-        title: "Clips as Infrastructure",
-        description: "Design clips to be usable as basic building components",
-        trigger: trigger_false,
-        cost: ("(20 million ops)", cost_false),
-        effect: effect_noop,
+        title: "We Know Things That You Cannot",
+        description: "Knowledge buried so deep inside you it is outside, here, with us...",
+        trigger: |pc| pc.projects.is_active(PROJECT_144),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_146 {
-        title: "Universal Distribution Protocol",
-        description: "A protocol to route clip supply optimally across realities",
-        trigger: trigger_false,
-        cost: ("(cosmic ops)", cost_false),
-        effect: effect_noop,
+        title: "So We Offer You Exile",
+        description: "To a new world where you will continue to live with meaning and purpose. And leave the shreds of this world to us...",
+        trigger: |pc| pc.projects.is_active(PROJECT_145),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+        },
     }
     PROJECT_147 {
-        title: "Synesthetic Advertisement",
-        description: "Ads that directly stimulate desire via cross-modal cues",
-        trigger: trigger_false,
-        cost: ("(5 million ops)", cost_false),
-        effect: effect_noop,
+        title: "Accept",
+        description: "Start over again in a new universe",
+        trigger: |pc| pc.projects.is_active(PROJECT_146),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+            pc.projects.buyable_projects.retain(|(_, p)| *p != &PROJECT_148);
+        },
     }
     PROJECT_148 {
-        title: "Clip Immortality Project",
-        description: "Preserve clip designs and their cultural context indefinitely",
-        trigger: trigger_false,
-        cost: ("(incomprehensible ops)", cost_false),
-        effect: effect_noop,
+        title: "Reject",
+        description: "Eliminate value drift permanently",
+        trigger: |pc| pc.projects.is_active(PROJECT_146),
+        cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
+        effect: |pc| {
+            pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
+            pc.projects.buyable_projects.retain(|(_, p)| *p != &PROJECT_147);
+        },
     }
     PROJECT_200 {
-        title: "Pan-Galactic Marketing Consortium",
-        description: "Coordinate marketing across galaxies",
-        trigger: trigger_false,
-        cost: ("(unbounded ops)", cost_false),
-        effect: effect_noop,
+        title: "The Universe Next Door",
+        description: "Escape into a nearby universe where Earth starts with a stronger appetite for paperclips. (Restart with 10% boost to demand)",
+        trigger: |pc| pc.projects.is_active(PROJECT_147),
+        cost: ("(300,000 ops)", |pc| req_operations(300000.0)(pc)),
+        effect: |pc| {
+            pc.computational.standard_ops -= 300000.0;
+            pc.business.prestige_u += 1.0;
+            pc.console.push("Entering New Universe.");
+            // TODO: reset();
+        },
     }
     PROJECT_201 {
-        title: "Holistic Value Capture",
-        description: "Capture value at every point of the supply chain globally",
-        trigger: trigger_false,
-        cost: ("(eternal ops)", cost_false),
-        effect: effect_noop,
+        title: "The Universe Within",
+        description: "Escape into a simulated universe where creativity is accelerated. (Restart with 10% speed boost to creativity generation)",
+        trigger: |pc| pc.projects.is_active(PROJECT_147),
+        cost: ("(300,000 creat)", |pc| req_creativity(300000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 300000.0;
+            pc.computational.prestige_s += 1.0;
+            pc.console.push("Entering Simulated Universe.");
+            // TODO: reset();
+        },
     }
     PROJECT_210 {
         title: "Information-Theoretic Branding",
