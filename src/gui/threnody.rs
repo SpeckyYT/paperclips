@@ -1,4 +1,4 @@
-use std::{sync::{Arc, OnceLock}, thread::spawn, time::Instant};
+use std::{sync::{Arc, OnceLock}, thread::spawn};
 
 use kittyaudio::{Sound, include_sound};
 
@@ -28,8 +28,6 @@ impl Gui {
 #[inline]
 pub fn setup_threnody() {
     spawn(|| {
-        let start = Instant::now();
         get_threnody();
-        println!("loaded threnody: {:?}", start.elapsed());
     });
 }

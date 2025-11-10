@@ -381,10 +381,8 @@ impl Gui {
     }
 
     pub fn draw_top_console(&mut self, ui: &mut Ui) {
-        if let Some(start) = self.paperclips.space.hypno_drone_event {
-            if self.long_blink(ui, start) {
-                self.paperclips.space.hypno_drone_event = None;
-            }
+        if let Some(start) = self.paperclips.space.hypno_drone_event && self.long_blink(ui, start) {
+            self.paperclips.space.hypno_drone_event = None;
         }
 
         let pc = &mut self.paperclips;
