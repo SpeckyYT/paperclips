@@ -70,7 +70,7 @@ impl Default for PaperClips {
 
 impl PaperClips {
     /// Should run once every 10ms
-    pub fn main_loop_tick(&mut self) {
+    pub fn main_tick(&mut self) {
         self.ticks += 1;
         
         self.milestone_check();
@@ -174,6 +174,23 @@ impl PaperClips {
         // Ending
 
         // lots of code
+
+
+        // Other updating ticks
+        if self.ticks.is_multiple_of(ticks_10ms(Duration::from_millis(1000))) {
+            self.update_stock_shop_tick();
+        }
+        if self.ticks.is_multiple_of(ticks_10ms(Duration::from_millis(2500))) {
+            self.update_stocks_tick();
+        }
+        if self.ticks.is_multiple_of(ticks_10ms(Duration::from_millis(100))) {
+            self.update_wire_price_and_demand_tick();
+        }
+
+        // Small fixes that aren't in the original code
+        if self.console.messages.is_empty() {
+            self.console.push("Welcome to Universal Paperclips");
+        }
     }
 
     /// Should run once every 1000ms
@@ -280,5 +297,20 @@ impl PaperClips {
                 || (self.space.found_matter >= TOTAL_MATTER && self.space.available_matter < 1.0 && self.wire.count < 1.0)
             ) => time "Universal Paperclips achieved";
         }
+    }
+
+    pub fn reset(&mut self) {
+        let prestige_u = self.business.prestige_u;
+        let prestige_s = self.computational.prestige_s;
+
+        *self = Default::default();
+
+        self.business.prestige_u = prestige_u;
+        self.computational.prestige_s = prestige_s;
+    }
+
+    pub fn reset_prestige(&mut self) {
+        self.business.prestige_u = 0.0;
+        self.computational.prestige_s = 0.0;
     }
 }

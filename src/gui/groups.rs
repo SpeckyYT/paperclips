@@ -439,8 +439,7 @@ impl Gui {
             self.paperclips.space.hypno_drone_event = Some(Instant::now());
         }
         if ui.button("Free Prestige U").clicked() {
-            // TODO:
-            // self.paperclips.cheat_prestige_u();
+            self.paperclips.cheat_prestige_u();
         }
         if ui.button("Free Prestige S").clicked() {
             self.paperclips.cheat_prestige_s();
@@ -456,6 +455,9 @@ impl Gui {
         // cheats that aren't in the original code
         if ui.button("Play Threnody").clicked() {
             self.play_threnody();
+        }
+        if ui.button("Reset").clicked() {
+            self.paperclips.reset();
         }
     }
 }

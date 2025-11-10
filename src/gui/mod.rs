@@ -19,9 +19,6 @@ pub struct Gui {
     audio_mixer: Mixer,
 
     last_main_update: Instant,
-    last_stock_shop_update: Instant,
-    last_stocks_update: Instant,
-    last_wire_price_and_demand_update: Instant,
 }
 
 impl Default for Gui {
@@ -36,9 +33,6 @@ impl Default for Gui {
             },
 
             last_main_update: Instant::now(),
-            last_stock_shop_update: Instant::now(),
-            last_stocks_update: Instant::now(),
-            last_wire_price_and_demand_update: Instant::now(),
         }
     }
 }
@@ -112,16 +106,7 @@ impl Gui {
         }
         update_time!{
             last_main_update(TEN_MS) {
-                self.paperclips.main_loop_tick();
-            }
-            last_stock_shop_update(Duration::from_millis(1000)) {
-                self.paperclips.update_stock_shop_tick();
-            }
-            last_stocks_update(Duration::from_millis(2500)) {
-                self.paperclips.update_stocks_tick();
-            }
-            last_wire_price_and_demand_update(Duration::from_millis(100)) {
-                self.paperclips.update_wire_price_and_demand_tick();
+                self.paperclips.main_tick();
                 self.check_threnody();
             }
         }

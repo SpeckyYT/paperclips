@@ -14,8 +14,7 @@ fn main() {
             ..Default::default()
         },
         Box::new(|_cc| {
-            let mut gui = Gui::default();
-            gui.paperclips.console.push("Welcome to Universal Paperclips");
+            let gui = Gui::default();
             Ok(Box::new(gui))
         })
     ).unwrap();

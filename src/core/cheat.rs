@@ -28,17 +28,13 @@ impl PaperClips {
         self.strategy.yomi += 1000000.0;
         self.console.push("you just cheated");
     }
-    pub fn reset_prestige(&mut self) {
-        self.computational.prestige_s = 0.0;
-    }
 
     // // This is GUI-only. It has no effect on the core state
     // pub fn cheat_hypno(&mut self) {}
     
-    // // Needs `prestige_u`
-    // pub fn cheat_prestige_u(&mut self) {
-    //     self.computational.prestige_u
-    // }
+    pub fn cheat_prestige_u(&mut self) {
+        self.business.prestige_u += 1.0;
+    }
     pub fn cheat_prestige_s(&mut self) {
         self.computational.prestige_s += 1.0;
     }

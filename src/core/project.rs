@@ -1105,7 +1105,7 @@ projects! {
         cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
         effect: |pc| {
             pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
-            pc.projects.buyable_projects.retain(|(_, p)| *p != &PROJECT_148);
+            pc.projects.buyable_projects.retain(|(_, p)| **p != PROJECT_148);
         },
     }
     PROJECT_148 {
@@ -1115,7 +1115,7 @@ projects! {
         cost: ("", |pc| pc.computational.operations >= DRIFT_KING_MESSAGE_COST),
         effect: |pc| {
             pc.computational.standard_ops -= DRIFT_KING_MESSAGE_COST;
-            pc.projects.buyable_projects.retain(|(_, p)| *p != &PROJECT_147);
+            pc.projects.buyable_projects.retain(|(_, p)| **p != PROJECT_147);
         },
     }
     PROJECT_200 {
@@ -1127,7 +1127,7 @@ projects! {
             pc.computational.standard_ops -= 300000.0;
             pc.business.prestige_u += 1.0;
             pc.console.push("Entering New Universe.");
-            // TODO: reset();
+            pc.reset();
         },
     }
     PROJECT_201 {
@@ -1139,7 +1139,7 @@ projects! {
             pc.computational.creativity -= 300000.0;
             pc.computational.prestige_s += 1.0;
             pc.console.push("Entering Simulated Universe.");
-            // TODO: reset();
+            pc.reset();
         },
     }
     PROJECT_210 {
