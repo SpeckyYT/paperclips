@@ -4,7 +4,7 @@ use eframe::{
     egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}, App, Frame
 };
 use kittyaudio::Mixer;
-use paperclips::PaperClips;
+use paperclips::{PaperClips, util::number_cruncher};
 
 const TEN_MS: Duration = Duration::from_millis(10);
 const FRAME_60FPS: Duration = Duration::from_millis(16);
@@ -42,11 +42,18 @@ impl App for Gui {
         self.update_paperclips(ctx);
 
         TopBottomPanel::top("console").show(ctx, |ui| {
+            // #consoleDiv
             self.draw_top_console(ui);
+            // #topDiv / #prestigeDiv
+            self.draw_prestige(ui);
         });
 
+        // #topDiv
         CentralPanel::default().show(ctx, |ui| {
-            ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()));
+            let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()));
+            resp.on_hover_ui(|ui| {
+                ui.label(number_cruncher(self.paperclips.business.clips, Some(1)));
+            });
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, right]| {

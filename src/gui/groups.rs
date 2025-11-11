@@ -410,6 +410,14 @@ impl Gui {
         }
     }
 
+    pub fn draw_prestige(&mut self, ui: &mut Ui) {
+        let prestige_u = self.paperclips.business.prestige_u;
+        let prestige_s = self.paperclips.computational.prestige_s;
+        if prestige_u > 0.0 || prestige_s > 0.0 {
+            ui.label(format!("Universe: {prestige_u} / Sim level: {prestige_s}"));
+        }
+    }
+
     pub fn draw_cheat_group(&mut self, ui: &mut Ui) {
         if ui.button("Free Clips").clicked() {
             self.paperclips.cheat_clips();
