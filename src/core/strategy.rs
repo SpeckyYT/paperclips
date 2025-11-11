@@ -1,9 +1,8 @@
 use std::time::Duration;
 
 use arrayvec::ArrayVec;
-use rand::random_range;
 
-use crate::{Float, PaperClips, Ticks, project::PROJECT_128, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
+use crate::{Float, PaperClips, Ticks, project::PROJECT_128, rng::PCRng, strategy::strategies::{RANDOM, STRAT_COUNT, Strat}, util::ticks_10ms};
 
 pub mod strategies;
 pub mod util;
@@ -30,33 +29,48 @@ pub struct StrategyGrid {
 }
 
 #[inline]
-fn random_value() -> u8 { random_range(1..=10) }
+fn random_value(rng: &mut PCRng) -> u8 {
+    (rng.random_float(true) * 9.0 + 1.0).floor() as u8
+}
 impl StrategyGrid {
-    pub fn random_self(&mut self) {
-        self.aa = random_value();
-        self.ab = random_value();
-        self.ba = random_value();
-        self.bb = random_value();
-        self.update_choice_names();
+    pub fn random_self(&mut self, rng: &mut PCRng) {
+        self.aa = random_value(rng);
+        self.ab = random_value(rng);
+        self.ba = random_value(rng);
+        self.bb = random_value(rng);
+        self.update_choice_names(rng);
     }
-    pub fn random() -> StrategyGrid {
+    pub fn new() -> StrategyGrid {
         Self {
-            aa: random_value(),
-            ab: random_value(),
-            ba: random_value(),
-            bb: random_value(),
+            aa: 1,
+            ab: 1,
+            ba: 1,
+            bb: 1,
             h_move: Move::A,
             v_move: Move::A,
             h_move_prev: Move::A,
             v_move_prev: Move::A,
-            choice_names: Self::random_choice_names(),
+            choice_names: CHOICE_NAMES[0],
         }
     }
-    pub fn update_choice_names(&mut self) {
-        self.choice_names = Self::random_choice_names();
+    pub fn random(rng: &mut PCRng) -> StrategyGrid {
+        Self {
+            aa: random_value(rng),
+            ab: random_value(rng),
+            ba: random_value(rng),
+            bb: random_value(rng),
+            h_move: Move::A,
+            v_move: Move::A,
+            h_move_prev: Move::A,
+            v_move_prev: Move::A,
+            choice_names: Self::random_choice_names(rng),
+        }
     }
-    fn random_choice_names() -> (&'static str, &'static str) {
-        CHOICE_NAMES[random_range(0..CHOICE_NAMES.len())]
+    pub fn update_choice_names(&mut self, rng: &mut PCRng) {
+        self.choice_names = Self::random_choice_names(rng);
+    }
+    fn random_choice_names(rng: &mut PCRng) -> (&'static str, &'static str) {
+        CHOICE_NAMES[(rng.random_float_no_best() * CHOICE_NAMES.len() as Float) as usize]
     }
     pub fn get_values(&self, h: Move, v: Move) -> (u8, u8) {
         use Move::*;
@@ -174,7 +188,7 @@ impl Default for Strategy {
     fn default() -> Self {
         Self {
             engine_flag: false,
-            grid: StrategyGrid::random(),
+            grid: StrategyGrid::new(),
             strats: ArrayVec::from_iter([(&RANDOM, 0)]),
             yomi: 0.0,
 
@@ -216,8 +230,8 @@ impl Strategy {
         self.strats.len() as u8 * self.strats.len() as u8
     }
     #[inline]
-    pub fn generate_grid(&mut self) {
-        self.grid.random_self();
+    pub fn generate_grid(&mut self, rng: &mut PCRng) {
+        self.grid.random_self(rng);
     }
     #[inline]
     pub fn pick_winner(&mut self) {
@@ -255,11 +269,11 @@ impl Strategy {
         self.tourney_report_display = TourneyDisplay::Round;
     }
 
-    pub fn run_round(&mut self) {
+    pub fn run_round(&mut self, rng: &mut PCRng) {
         self.round_counter += 1;
 
-        let new_h_move = (self.fight.0.pick_move)(self.grid, Position::H);
-        let new_v_move = (self.fight.1.pick_move)(self.grid, Position::V);
+        let new_h_move = (self.fight.0.pick_move)(self.grid, Position::H, rng);
+        let new_v_move = (self.fight.1.pick_move)(self.grid, Position::V, rng);
 
         let StrategyGrid { h_move, v_move, h_move_prev, v_move_prev, .. } = &mut self.grid;
         (*h_move_prev, *h_move) = (*h_move, new_h_move);
@@ -287,7 +301,7 @@ impl PaperClips {
         self.strategy.current_round = 0;
         self.strategy.reset_strats();
         self.computational.standard_ops -= self.strategy.tourney_cost;
-        self.strategy.grid.random_self();
+        self.strategy.grid.random_self(&mut self.rng);
         self.strategy.disable_run_button = false;
         self.strategy.tourney_report_display = TourneyDisplay::RunTournament;
     }
@@ -311,7 +325,7 @@ impl PaperClips {
     }
     pub fn round_loop(&mut self) {
         if self.strategy.round_counter < 10 {
-            self.strategy.run_round();
+            self.strategy.run_round(&mut self.rng);
             self.strategy.round_timer = self.ticks;
         } else {
             self.strategy.current_round += 1;

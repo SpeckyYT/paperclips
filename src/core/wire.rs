@@ -1,6 +1,4 @@
-use rand::random_bool;
-
-use crate::{Ticks, core::{Float, PaperClips}};
+use crate::{Ticks, core::{Float, PaperClips}, rng::PCRng};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Wire {
@@ -46,13 +44,13 @@ impl Default for Wire {
 }
 
 impl Wire {
-    pub fn adjust_wire_price(&mut self) {
+    pub fn adjust_wire_price(&mut self, rng: &mut PCRng) {
         if self.price_timer >= 250 && self.base_price > 15.0 {
             self.base_price *= 0.999; 
             self.price_timer = 0;
         }
 
-        if random_bool(0.015) {
+        if rng.random_bool(0.015, false) {
             self.price_counter += 1;
             let wire_adjust = 6.0 * (self.price_counter as Float).sin();
             self.cost = self.base_price + wire_adjust;

@@ -2,9 +2,7 @@
 
 use std::time::Duration;
 
-use rand::random_bool;
-
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -23,6 +21,7 @@ pub mod factory;
 pub mod space;
 pub mod threnody;
 pub mod cheat;
+pub mod rng;
 
 #[derive(Debug, Clone)]
 pub struct PaperClips {
@@ -43,6 +42,7 @@ pub struct PaperClips {
     pub factory: Factory,
     pub space: Space,
     pub threnody: Threnody,
+    pub rng: PCRng,
 }
 
 impl Default for PaperClips {
@@ -64,6 +64,7 @@ impl Default for PaperClips {
             factory: Factory::default(),
             space: Space::default(),
             threnody: Threnody::default(),
+            rng: PCRng::default(),
         }
     }
 }
@@ -205,7 +206,7 @@ impl PaperClips {
     pub fn update_stocks_tick(&mut self) {
         self.investments.sell_delay += 1;
         if self.human_flag && !self.investments.stocks.is_empty() {
-            if self.investments.sell_delay >= 5 && random_bool(0.3) {
+            if self.investments.sell_delay >= 5 && self.rng.random_bool_no_best(0.3) {
                 self.sell_stock();
                 self.investments.sell_delay = 0;
             }
@@ -216,11 +217,11 @@ impl PaperClips {
     /// Should run once every 100ms
     pub fn update_wire_price_and_demand_tick(&mut self) {
         // Wire Price Fluctuation
-        self.wire.adjust_wire_price();
+        self.wire.adjust_wire_price(&mut self.rng);
 
         if self.human_flag {
             // Sales Calculator
-            if random_bool((self.business.demand as f64 / 100.0).clamp(0.0, 1.0)) {
+            if self.rng.random_bool((self.business.demand as f64 / 100.0).clamp(0.0, 1.0), true) {
                 self.sell_clips(self.business.scaled_demand().floor());
             }
 

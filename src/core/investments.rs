@@ -4,10 +4,9 @@ use core::f64;
 use std::{collections::VecDeque, time::Duration};
 
 use arrayvec::ArrayString;
-use rand::{random, random_bool, random_range};
 use strum::EnumIter;
 
-use crate::core::{Float, PaperClips};
+use crate::{core::{Float, PaperClips}, rng::PCRng};
 
 pub const MAX_STOCKS: usize = 5;
 pub const UPDATE_STOCK_SHOP: Duration = Duration::from_millis(1000);
@@ -183,7 +182,7 @@ impl PaperClips {
             (false, _, _) => budget,
         };
 
-        if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves && random_bool(0.25) {
+        if stocks.len() < *max_port && *bankroll >= 5.0 && budget >= 1.0 && *bankroll - budget >= reserves && self.rng.random_bool_no_best(0.25) {
             self.create_stock(budget);
         }
     }
@@ -191,7 +190,7 @@ impl PaperClips {
         let Investments { stocks, stock_index, bankroll, .. } = &mut self.investments;
         *stock_index += 1;
 
-        let roll = random::<Float>();
+        let roll = self.rng.random_float(true);
         let max_price: Float = match roll {
             r if r > 0.99 => 3000.0,
             r if r > 0.85 => 500.0,
@@ -199,14 +198,14 @@ impl PaperClips {
             r if r > 0.20 => 50.0,
             _ => 15.0,
         };
-        let price = random_range(0.0..=max_price).ceil();
+        let price = (self.rng.random_float(true) * max_price).ceil();
         let price = if price > money { money * roll } else { price };
 
         let amount = (money / price).floor().min(1000000.0);
         let total = price * amount;
 
         stocks.push_back(Stock {
-            symbol: generate_symbol(),
+            symbol: generate_symbol(&mut self.rng),
             price,
             amount: amount as u32,
             profit: 0.0,
@@ -225,13 +224,13 @@ impl PaperClips {
         let Investments { stocks, stock_gain_threshold, riskiness, .. } = &mut self.investments;
 
         for stock in stocks {
-            if random_bool(0.6) {
-                let gain = random_bool((*stock_gain_threshold).clamp(0.0, 1.0).into());
+            if self.rng.random_bool(0.6, true) {
+                let gain = self.rng.random_bool((*stock_gain_threshold).clamp(0.0, 1.0).into(), true);
                 
-                let delta = (random::<Float>() * stock.price / (4 * riskiness.value()) as Float).ceil();
+                let delta = (self.rng.random_float(true) * stock.price / (4 * riskiness.value()) as Float).ceil();
                 stock.price += if gain { delta } else { -delta };
 
-                if stock.price == 0.0 && random_bool(0.76) {
+                if stock.price == 0.0 && self.rng.random_bool(0.76, true) {
                     stock.price = 1.0;
                 }
 
@@ -242,14 +241,14 @@ impl PaperClips {
     }
 }
 
-pub fn generate_symbol() -> Symbol {
-    let letters = match random::<Float>() {
+pub fn generate_symbol(rng: &mut PCRng) -> Symbol {
+    let letters = match rng.random_float(false) {
         0.0..=0.01 => 1,
         0.01..=0.1 => 2,
         0.1..=0.4 => 3,
         _ => 4,
     };
     let mut symbol = Symbol::new_const();
-    (0..letters).for_each(|_| symbol.push(ALPHABET[random_range(0..ALPHABET.len())]));
+    (0..letters).for_each(|_| symbol.push(ALPHABET[(rng.random_float_no_best() * ALPHABET.len() as Float) as usize]));
     symbol
 }

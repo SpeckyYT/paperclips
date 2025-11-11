@@ -1,12 +1,10 @@
-use rand::random_bool;
-
-use crate::core::strategy::{util::{find_biggest_payoff, what_beats_last}, Move::{self, *}, Position, Side::*, StrategyGrid};
+use crate::{core::strategy::{Move::{self, *}, Position, Side::*, StrategyGrid, util::{find_biggest_payoff, what_beats_last}}, rng::PCRng};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Strat {
     pub name: &'static str,
     pub index: usize,
-    pub pick_move: fn(board: StrategyGrid, position: Position) -> Move,
+    pub pick_move: fn(board: StrategyGrid, position: Position, rng: &mut PCRng) -> Move,
 }
 
 impl PartialEq for Strat {
@@ -34,21 +32,21 @@ macro_rules! strats {
 
 strats!{
     RANDOM {
-        pick_move: |_, _| {
-            match random_bool(0.5) {
+        pick_move: |_, _, rng| {
+            match rng.random_bool_no_best(0.5) {
                 true => A,
                 false => B,
             }
         },
     }
     A100 {
-        pick_move: |_, _| A,
+        pick_move: |_, _, _| A,
     }
     B100 {
-        pick_move: |_, _| B,
+        pick_move: |_, _, _| B,
     }
     GREEDY {
-        pick_move: |board, _| {
+        pick_move: |board, _, _| {
             match find_biggest_payoff(board) {
                 AA|AB => A,
                 BA|BB => B,
@@ -56,7 +54,7 @@ strats!{
         }
     }
     GENEROUS {
-        pick_move: |board, _| {
+        pick_move: |board, _, _| {
             match find_biggest_payoff(board) {
                 AA|BA => A,
                 AB|BB => B,
@@ -64,7 +62,7 @@ strats!{
         }
     }
     MINIMAX {
-        pick_move: |board, _| {
+        pick_move: |board, _, _| {
             match find_biggest_payoff(board) {
                 AA|BA => B,
                 AB|BB => A,
@@ -73,7 +71,7 @@ strats!{
     }
     TIT_FOR_TAT {
         # "TIT FOR TAT"
-        pick_move: |board, position| {
+        pick_move: |board, position, _| {
             match position {
                 Position::H => board.v_move_prev,
                 Position::V => board.h_move_prev,
@@ -82,7 +80,7 @@ strats!{
     }
     BEAT_LAST {
         # "BEAT LAST"
-        pick_move: |board, position| {
+        pick_move: |board, position, _| {
             what_beats_last(position, &board)
         }
     }
