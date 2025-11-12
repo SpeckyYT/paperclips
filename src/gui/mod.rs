@@ -61,6 +61,7 @@ impl App for Gui {
                     match self.paperclips.human_flag {
                         false => {
                             self.draw_creation_group(left);
+                            self.draw_wire_production_group(left);
                         },
                         true => {
                             self.draw_business_group(left);

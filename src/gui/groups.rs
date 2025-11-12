@@ -2,7 +2,7 @@ use std::{borrow::Cow, time::Instant};
 
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{Float, investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
+use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
 use strum::IntoEnumIterator;
 
 use crate::gui::Gui;
@@ -411,7 +411,7 @@ impl Gui {
                 if resp.clicked() {
                     self.paperclips.factory_reboot();
                 }
-                resp.on_hover_text(number_cruncher(self.paperclips.factory.factory_level as Float, Some(1)));
+                resp.on_hover_text(number_cruncher(self.paperclips.factory.factory_level.into(), Some(1)));
             }
             ui.add_space(10.0);
             ui.label(format!("Cost: {} clips", 0)); // TODO
@@ -419,6 +419,90 @@ impl Gui {
             ui.label(format!("Wire: {} inches", self.paperclips.wire.count));
             ui.label(format!("Factories: {}", self.paperclips.factory.factory_level));
         });
+    }
+
+    pub fn draw_wire_production_group(&mut self, ui: &mut Ui) {
+        ui.group(|ui| {
+            ui.heading("Wire Production");
+            ui.separator();
+
+            ui.small(format!("Next Upgrade at: {} Drones", 0)); // TODO
+
+            ui.label(format!("Available Matter: {} g", self.paperclips.space.available_matter));
+            ui.label(format!("({} g per sec)", 0)); // TODO
+            ui.label(format!("Acquired Matter: {} g", self.paperclips.space.acquired_matter));
+            ui.label(format!("({} g per sec)", 0)); // TODO
+            ui.label(format!("Wire: {} inches", self.paperclips.wire.count));
+            ui.label(format!("({} inches per sec)", 0)); // TODO
+
+            self.draw_harvester_div(ui);
+            ui.add_space(10.0);
+            self.draw_wire_drone_div(ui);
+
+            // #droneDivSpace
+            if self.paperclips.space.space_flag {
+                ui.label(format!("Harvester Drones: {}", self.paperclips.factory.harvester_level));
+                ui.label(format!("Wire Drones: {}", self.paperclips.factory.wire_drone_level));
+            }
+        });
+    }
+
+    /// # #harvesterDiv
+    pub fn draw_harvester_div(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            if ui.button("Harvester Drone").clicked() {
+                // TODO: makeHarvester(1)
+            }
+        });
+        // TODO: disable
+        ui.horizontal(|ui| {
+            for (title, amount) in [("+10", 10), ("+100", 100), ("+1k", 1000)] {
+                if ui.button(title).clicked() {
+                    // TODO: makeHarvester(amount)
+                }
+            }
+        });
+
+        {
+            let resp = ui.button("Disassemble All");
+            if resp.clicked() {
+                self.paperclips.harvester_reboot();
+            }
+            resp.on_hover_text(number_cruncher(self.paperclips.factory.harvester_level.into(), None));
+        }
+
+        ui.add_space(10.0);
+
+        ui.label(format!("Cost: {} clips", 0)); // TODO
+    }
+
+    /// # #wireDroneDiv
+    pub fn draw_wire_drone_div(&mut self, ui: &mut Ui) {
+        ui.horizontal(|ui| {
+            if ui.button("Wire Drone").clicked() {
+                // TODO: makeWireDrone(1)
+            }
+        });
+        // TODO: disable
+        ui.horizontal(|ui| {
+            for (title, amount) in [("+10", 10), ("+100", 100), ("+1k", 1000)] {
+                if ui.button(title).clicked() {
+                    // TODO: makeWireDrone(amount)
+                }
+            }
+        });
+
+        {
+            let resp = ui.button("Disassemble All");
+            if resp.clicked() {
+                self.paperclips.wire_drone_reboot();
+            }
+            resp.on_hover_text(number_cruncher(self.paperclips.factory.wire_drone_level.into(), None));
+        }
+
+        ui.add_space(10.0);
+
+        ui.label(format!("Cost: {} clips", 0)); // TODO
     }
 
     pub fn draw_top_console(&mut self, ui: &mut Ui) {
