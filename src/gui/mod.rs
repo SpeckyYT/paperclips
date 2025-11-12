@@ -62,6 +62,9 @@ impl App for Gui {
                         false => {
                             self.draw_creation_group(left);
                             self.draw_wire_production_group(left);
+                            if self.paperclips.space.space_flag {
+                                self.draw_space_group(left);
+                            }
                         },
                         true => {
                             self.draw_business_group(left);

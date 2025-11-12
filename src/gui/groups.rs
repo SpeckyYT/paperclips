@@ -505,6 +505,38 @@ impl Gui {
         ui.label(format!("Cost: {} clips", 0)); // TODO
     }
 
+    pub fn draw_space_group(&mut self, ui: &mut Ui) {
+        ui.group(|ui| {
+            ui.heading("Space Exploration");
+            ui.separator();
+    
+            ui.label(format!("{:.12}% of universe explored", 0)); // TODO
+    
+            if ui.button("Launch Probe").clicked() {
+                // TODO: makeProbe()
+            }
+            ui.label(format!("Cost: {} clips", 0)); // TODO
+            
+            ui.add_space(10.0);
+    
+            ui.label(format!("Launched: {}", 0)); // TODO
+            ui.label(format!("Descendents: {}", 0)); // TODO
+    
+            ui.add_space(10.0);
+    
+            ui.label(format!("Lost to hazards: ({})", 0)); // TODO
+            ui.label(format!("Lost to value drift: ({})", 0)); // TODO
+            ui.label(format!("Lost in combat: ({})", 0)); // TODO
+            ui.separator();
+            ui.label(format!("Total: {}", 0)); // TODO
+    
+            ui.add_space(10.0);
+    
+            ui.label(format!("Drifters Killed: {}", 0)); // TODO
+            ui.label(format!("Drifters: {}", 0)); // TODO
+        });
+    }
+
     pub fn draw_top_console(&mut self, ui: &mut Ui) {
         if let Some(start) = self.paperclips.space.hypno_drone_event && self.long_blink(ui, start) {
             self.paperclips.space.hypno_drone_event = None;
