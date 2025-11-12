@@ -2,7 +2,7 @@ use std::{borrow::Cow, time::Instant};
 
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::blink};
+use paperclips::{Float, investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
 use strum::IntoEnumIterator;
 
 use crate::gui::Gui;
@@ -10,6 +10,14 @@ use crate::gui::Gui;
 mod strategy;
 
 impl Gui {
+    pub fn draw_make_paperclip(&mut self, ui: &mut Ui) {
+        ui.add_enabled_ui(self.paperclips.wire.count >= 1.0, |ui| {
+            if ui.button("Make Paperclip").clicked() {
+                self.paperclips.clip_click(1.0);
+            }
+        });
+    }
+
     pub fn draw_business_group(&mut self, ui: &mut Ui) -> InnerResponse<()> {
         let pc = &mut self.paperclips;
         
@@ -377,6 +385,39 @@ impl Gui {
                 }
             });
             ui.label(format!("Cost: {:.0} ops", self.paperclips.strategy.tourney_cost));
+        });
+    }
+
+    pub fn draw_creation_group(&mut self, ui: &mut Ui) {
+        ui.group(|ui| {
+            ui.heading("Manufacturing");
+            ui.separator();
+    
+            ui.small(format!("Next Upgrade at: {} Factories", 0)); // TODO
+            ui.label(format!("Clips per Second: {}", 0)); // TODO
+            ui.label(format!("Unused Clips: {}", self.paperclips.business.unused_clips));
+    
+            ui.add_space(10.0);
+    
+            // #factoryDiv
+            ui.horizontal(|ui| {
+                if ui.button("Clip Factory").clicked() {
+                    // TODO: makeFactory();
+                }
+                ui.label(self.paperclips.factory.factory_level.to_string());
+            });
+            {
+                let resp = ui.button("Disassemble All");
+                if resp.clicked() {
+                    self.paperclips.factory_reboot();
+                }
+                resp.on_hover_text(number_cruncher(self.paperclips.factory.factory_level as Float, Some(1)));
+            }
+            ui.add_space(10.0);
+            ui.label(format!("Cost: {} clips", 0)); // TODO
+            ui.add_space(10.0);
+            ui.label(format!("Wire: {} inches", self.paperclips.wire.count));
+            ui.label(format!("Factories: {}", self.paperclips.factory.factory_level));
         });
     }
 

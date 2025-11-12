@@ -51,21 +51,24 @@ impl App for Gui {
         // #topDiv
         CentralPanel::default().show(ctx, |ui| {
             let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()));
-            resp.on_hover_ui(|ui| {
-                ui.label(number_cruncher(self.paperclips.business.clips, Some(1)));
-            });
+            resp.on_hover_text(number_cruncher(self.paperclips.business.clips, Some(1)));
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, right]| {
                     // LEFT COLUMN
-                    left.add_enabled_ui(self.paperclips.wire.count >= 1.0, |ui| {
-                        if ui.button("Make Paperclip").clicked() {
-                            self.paperclips.clip_click(1.0);
-                        }
-                    });
-                    self.draw_business_group(left);
-                    self.draw_manufacturing_group(left);
+                    self.draw_make_paperclip(left);
 
+                    match self.paperclips.human_flag {
+                        false => {
+                            self.draw_creation_group(left);
+                        },
+                        true => {
+                            self.draw_business_group(left);
+                            self.draw_manufacturing_group(left);
+                        }
+                    }
+
+                    #[cfg(debug_assertions)]
                     {
                         left.add_space(30.0);
                         self.draw_cheat_group(left);
