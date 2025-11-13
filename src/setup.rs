@@ -1,5 +1,5 @@
-use crate::gui::threnody::setup_threnody;
+use crate::gui::threnody::load_sounds;
 
 pub fn init_setup() {
-    setup_threnody();
+    load_sounds();
 }

@@ -4,30 +4,40 @@ use kittyaudio::{Sound, include_sound};
 
 use crate::gui::Gui;
 
-static SOUND: OnceLock<Arc<Sound>> = OnceLock::new();
-#[inline]
-pub fn get_threnody() -> Arc<Sound> {
-    SOUND.get_or_init(|| {
-        Arc::new({
-            if cfg!(target_os = "android") || cfg!(target_os = "ios") {
-                include_sound!("../../assets/test_mobile.mp3").unwrap()
-            } else {
-                include_sound!("../../assets/test_web.mp3").unwrap()
+macro_rules! sounds {
+    ($($static:ident = $func:ident $code:expr)*) => {
+        $(
+            static $static: OnceLock<Arc<Sound>> = OnceLock::new();
+            #[inline]
+            fn $func() -> Arc<Sound> {
+                $static.get_or_init(|| {
+                    Arc::new($code)
+                }).clone()
             }
-        })
-    }).clone()
+        )*
+
+        impl Gui {
+            $(
+                #[inline]
+                pub fn $func(&mut self) {
+                    self.audio_mixer.play((*$func()).clone());
+                }
+            )*
+        }
+
+        pub fn load_sounds() {
+            $( spawn(|| { $func(); }); )*
+        }
+    };
 }
 
-impl Gui {
-    #[inline]
-    pub fn play_threnody(&mut self) {
-        self.audio_mixer.play((*get_threnody()).clone());
+sounds!{
+    THRENODY_SOUND = play_threnody {
+        if cfg!(target_os = "android") || cfg!(target_os = "ios") {
+            include_sound!("../../assets/test_mobile.mp3").unwrap()
+        } else {
+            include_sound!("../../assets/test_web.mp3").unwrap()
+        }
     }
-}
-
-#[inline]
-pub fn setup_threnody() {
-    spawn(|| {
-        get_threnody();
-    });
+    VIDEO_SERIO_SOUND = play_video_serio include_sound!("../../assets/video_serio.mp3").unwrap()
 }

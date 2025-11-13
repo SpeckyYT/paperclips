@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use eframe::{
-    egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}, App, Frame
+    App, Frame, egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}
 };
 use kittyaudio::Mixer;
 use paperclips::{PaperClips, util::number_cruncher};
@@ -12,6 +12,7 @@ const FRAME_60FPS: Duration = Duration::from_millis(16);
 pub mod groups;
 pub mod blink;
 pub mod threnody;
+pub mod secrets;
 
 pub struct Gui {
     pub paperclips: PaperClips,
@@ -50,8 +51,10 @@ impl App for Gui {
 
         // #topDiv
         CentralPanel::default().show(ctx, |ui| {
-            let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()));
-            resp.on_hover_text(number_cruncher(self.paperclips.business.clips, Some(1)));
+            let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()))
+                .on_hover_text(number_cruncher(self.paperclips.business.clips, Some(1)));
+
+            self.video_serio_button(resp);
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, right]| {
