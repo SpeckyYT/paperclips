@@ -149,23 +149,34 @@ impl Gui {
     
                 ui.heading("Computational Resources");
                 ui.separator();
+
+                // #trustDiv
+                if pc.human_flag {
+                    ui.label(format!("Trust: {}", c.trust));
+                    ui.label(format!("+1 Trust at: {} clips", c.next_trust));
+                    ui.add_space(10.0);
+                }
+
+                // #swarmGiftDiv
+                if pc.factory.swarm_flag /* && !(dismantle >= 2 && endTimer2 >= 50) */ { // TODO
+                    ui.label(format!("Swarm Gifts: {}", 0)); // TODO
+                }
     
-                ui.label(format!("Trust: {}", c.trust));
-                ui.label(format!("+1 Trust at: {} clips", c.next_trust));
-    
-                ui.add_space(10.0);
-    
-                let enable_buttons = c.trust > c.processors as i32 + c.memory as i32 /* && swarmGifts > 0 */;
-                ui.horizontal(|ui| {
-                    ui.add_enabled_ui(enable_buttons, |ui| {
-                        if ui.button("Processors").clicked() {
-                            pc.add_processors();
-                        }
+                let enable_compute_trust_buttons = c.trust > c.processors as i32 + c.memory as i32 /* && swarmGifts > 0 */;
+
+                // #processorDisplay
+                if true /* dismantle >= 6 */ {
+                    ui.horizontal(|ui| {
+                        ui.add_enabled_ui(enable_compute_trust_buttons, |ui| {
+                            if ui.button("Processors").clicked() {
+                                pc.add_processors();
+                            }
+                        });
+                        ui.label(pc.computational.processors.to_string());
                     });
-                    ui.label(pc.computational.processors.to_string());
-                });
+                }
                 ui.horizontal(|ui| {
-                    ui.add_enabled_ui(enable_buttons, |ui| {
+                    ui.add_enabled_ui(enable_compute_trust_buttons, |ui| {
                         if ui.button("Memory").clicked() {
                             pc.add_memory();
                         }
@@ -505,6 +516,7 @@ impl Gui {
         ui.label(format!("Cost: {} clips", 0)); // TODO
     }
 
+    /// # #spaceDiv
     pub fn draw_space_group(&mut self, ui: &mut Ui) {
         ui.group(|ui| {
             ui.heading("Space Exploration");
@@ -568,9 +580,9 @@ impl Gui {
     }
 
     pub fn draw_prestige(&mut self, ui: &mut Ui) {
-        let prestige_u = self.paperclips.business.prestige_u;
-        let prestige_s = self.paperclips.computational.prestige_s;
-        if prestige_u > 0.0 || prestige_s > 0.0 {
+        let prestige_u = self.paperclips.business.prestige_u + 1.0;
+        let prestige_s = self.paperclips.computational.prestige_s + 1.0;
+        if prestige_u > 1.0 || prestige_s > 1.0 {
             ui.label(format!("Universe: {prestige_u} / Sim level: {prestige_s}"));
         }
     }
