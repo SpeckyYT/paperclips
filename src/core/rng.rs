@@ -64,7 +64,7 @@ pub fn sm64_rng(input: &mut u16) -> u16 {
         *input = 0; // prevent a two-number loop
     }
 
-    let mut s0 = (*input << 8) & 0xffff;
+    let mut s0 = *input << 8;
     s0 ^= *input;
 
     *input = ((s0 & 0x00ff) << 8) | ((s0 & 0xff00) >> 8);

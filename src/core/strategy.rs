@@ -83,6 +83,12 @@ impl StrategyGrid {
     }
 }
 
+impl Default for StrategyGrid {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub const CHOICE_NAMES: &[(&str, &str)] = &[
     ("cooperate", "defect"),
     ("swerve", "straight"),
