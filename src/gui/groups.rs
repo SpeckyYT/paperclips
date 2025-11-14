@@ -2,7 +2,7 @@ use std::{borrow::Cow, time::Instant};
 
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{investments::Riskiness, messages::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
+use paperclips::{investments::Riskiness, console::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
 use strum::IntoEnumIterator;
 
 use crate::gui::Gui;

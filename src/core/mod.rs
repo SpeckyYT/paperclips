@@ -2,14 +2,14 @@
 
 use std::time::Duration;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, messages::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, space::{Space, TOTAL_MATTER}, strategy::Strategy, threnody::Threnody, util::ticks_10ms};
+use crate::{business::Business, core::{computational::Computational, investments::Investments, console::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, space::{Space, TOTAL_MATTER}, strategy::Strategy, sounds::Threnody, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
 pub type Ticks = u128;
 
 pub mod business;
-pub mod messages;
+pub mod console;
 pub mod wire;
 pub mod computational;
 pub mod qchips;
@@ -19,7 +19,7 @@ pub mod util;
 pub mod investments;
 pub mod factory;
 pub mod space;
-pub mod threnody;
+pub mod sounds;
 pub mod cheat;
 pub mod rng;
 
