@@ -23,7 +23,7 @@ pub mod sounds;
 pub mod cheat;
 pub mod rng;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone)] // TODO: , Serialize, Deserialize
 pub struct PaperClips {
     pub ticks: u128,
 

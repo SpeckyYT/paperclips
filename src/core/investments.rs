@@ -4,6 +4,7 @@ use core::f64;
 use std::{collections::VecDeque, time::Duration};
 
 use arrayvec::ArrayString;
+use serde::{Deserialize, Serialize};
 use strum::EnumIter;
 
 use crate::{core::{Float, PaperClips}, rng::PCRng};
@@ -17,7 +18,7 @@ pub const ALPHABET: [char; 26] = [
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter, Serialize, Deserialize)]
 pub enum Riskiness {
     Low = 7,
     Medium = 5,

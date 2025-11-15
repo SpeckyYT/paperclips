@@ -1,8 +1,10 @@
 use std::{borrow::Cow, collections::VecDeque};
 
+use serde::{Deserialize, Serialize};
+
 const DEFAULT_MESSAGES_SIZE: usize = 5;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Console {
     pub max_messages: usize,
     pub messages: VecDeque<Cow<'static, str>>,

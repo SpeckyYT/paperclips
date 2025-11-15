@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{Ticks, core::{Float, PaperClips}, rng::PCRng};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Wire {
     /// # wirePriceTimer
     pub price_timer: Ticks,

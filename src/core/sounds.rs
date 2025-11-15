@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy, Default)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct Threnody {
     pub should_play: bool,
 }

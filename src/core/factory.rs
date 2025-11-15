@@ -1,8 +1,10 @@
 use std::mem::take;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{Float, PaperClips};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Factory {
     /// # storedPower
     pub stored_power: Float,

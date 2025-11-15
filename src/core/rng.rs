@@ -1,9 +1,9 @@
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct PCRng {
     pub rng_kind: RngKind,
 }
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub enum RngKind {
     #[default]
     ThreadRng,
@@ -12,6 +12,7 @@ pub enum RngKind {
     Worst,
 }
 use RngKind::*;
+use serde::{Deserialize, Serialize};
 
 use crate::Float;
 

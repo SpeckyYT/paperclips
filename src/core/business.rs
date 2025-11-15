@@ -1,8 +1,10 @@
 use std::collections::VecDeque;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{util::{floor_to, round_to}, Float, PaperClips};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Business {
     /// # funds
     pub funds: Float,

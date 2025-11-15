@@ -1,11 +1,13 @@
 use std::cmp::Ordering;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{core::Float, PaperClips};
 
 pub const CREATIVITY_THRESHOLD: Float = 400.0;
 pub const MEM_SIZE: u32 = 1000;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Computational {
     pub comp_flag: bool,
 
