@@ -11,9 +11,10 @@ mod strategy;
 
 impl Gui {
     pub fn draw_make_paperclip(&mut self, ui: &mut Ui) {
-        ui.add_enabled_ui(self.paperclips.wire.count >= 1.0, |ui| {
+        let pc = &mut self.paperclips;
+        ui.add_enabled_ui(pc.wire.count >= 1.0, |ui| {
             if ui.button("Make Paperclip").clicked() {
-                self.paperclips.clip_click(1.0);
+                pc.clip_click(1.0);
             }
         });
     }
@@ -351,22 +352,24 @@ impl Gui {
             ui.heading("Strategic Modeling");
             ui.separator();
 
-            ui.add_enabled_ui(self.paperclips.strategy.tourney_in_prog && !self.paperclips.strategy.disable_run_button, |ui| {
+            let pc = &mut self.paperclips;
+
+            ui.add_enabled_ui(pc.strategy.tourney_in_prog && !pc.strategy.disable_run_button, |ui| {
                 ComboBox::from_label("Pick a Strat")
-                .selected_text(self.paperclips.strategy.pick.name)
+                .selected_text(pc.strategy.pick.name)
                 .show_ui(ui, |ui| {
-                    for (strat, _) in &self.paperclips.strategy.strats {
-                        ui.selectable_value(&mut self.paperclips.strategy.pick, strat, strat.name);
+                    for (strat, _) in &pc.strategy.strats {
+                        ui.selectable_value(&mut pc.strategy.pick, strat, strat.name);
                     }
                 });
                 if ui.button("Run").clicked() {
-                    self.paperclips.run_tourney();
+                    pc.run_tourney();
                 }
             });
 
-            let display_text: Cow<'static, str> = match self.paperclips.strategy.tourney_report_display {
+            let display_text: Cow<'static, str> = match pc.strategy.tourney_report_display {
                 TourneyDisplay::RunTournament => "Pick strategy, run tournament, gain yomi".into(),
-                TourneyDisplay::Round => format!("Round: {}", self.paperclips.strategy.current_round + 1).into(),
+                TourneyDisplay::Round => format!("Round: {}", pc.strategy.current_round + 1).into(),
                 TourneyDisplay::Results(false) => "TOURNAMENT RESULTS (roll over for grid)".into(),
                 TourneyDisplay::Results(true) => "TOURNAMENT RESULTS (roll over for payoff grid)".into(),
             };
@@ -388,25 +391,29 @@ impl Gui {
                 unsafe { HOVERED = resp.hovered(); }
             });
 
-            ui.label(format!("Yomi: {:.0}", self.paperclips.strategy.yomi));
+            let pc = &mut self.paperclips;
+
+            ui.label(format!("Yomi: {:.0}", pc.strategy.yomi));
             
-            ui.add_enabled_ui(!self.paperclips.strategy.tourney_in_prog && self.paperclips.computational.operations >= self.paperclips.strategy.tourney_cost, |ui| {
+            ui.add_enabled_ui(!pc.strategy.tourney_in_prog && pc.computational.operations >= pc.strategy.tourney_cost, |ui| {
                 if ui.button("New Tournament").clicked() {
-                    self.paperclips.new_tourney();
+                    pc.new_tourney();
                 }
             });
-            ui.label(format!("Cost: {:.0} ops", self.paperclips.strategy.tourney_cost));
+            ui.label(format!("Cost: {:.0} ops", pc.strategy.tourney_cost));
         });
     }
 
     pub fn draw_creation_group(&mut self, ui: &mut Ui) {
+        let pc = &mut self.paperclips;
+
         ui.group(|ui| {
             ui.heading("Manufacturing");
             ui.separator();
     
             ui.small(format!("Next Upgrade at: {} Factories", 0)); // TODO
             ui.label(format!("Clips per Second: {}", 0)); // TODO
-            ui.label(format!("Unused Clips: {}", self.paperclips.business.unused_clips));
+            ui.label(format!("Unused Clips: {}", pc.business.unused_clips));
     
             ui.add_space(10.0);
     
@@ -415,20 +422,20 @@ impl Gui {
                 if ui.button("Clip Factory").clicked() {
                     // TODO: makeFactory();
                 }
-                ui.label(self.paperclips.factory.factory_level.to_string());
+                ui.label(pc.factory.factory_level.to_string());
             });
             {
                 let resp = ui.button("Disassemble All");
                 if resp.clicked() {
-                    self.paperclips.factory_reboot();
+                    pc.factory_reboot();
                 }
-                resp.on_hover_text(number_cruncher(self.paperclips.factory.factory_level.into(), Some(1)));
+                resp.on_hover_text(number_cruncher(pc.factory.factory_level.into(), Some(1)));
             }
             ui.add_space(10.0);
             ui.label(format!("Cost: {} clips", 0)); // TODO
             ui.add_space(10.0);
-            ui.label(format!("Wire: {} inches", self.paperclips.wire.count));
-            ui.label(format!("Factories: {}", self.paperclips.factory.factory_level));
+            ui.label(format!("Wire: {} inches", pc.wire.count));
+            ui.label(format!("Factories: {}", pc.factory.factory_level));
         });
     }
 
@@ -580,51 +587,54 @@ impl Gui {
     }
 
     pub fn draw_prestige(&mut self, ui: &mut Ui) {
-        let prestige_u = self.paperclips.business.prestige_u + 1.0;
-        let prestige_s = self.paperclips.computational.prestige_s + 1.0;
+        let pc = &self.paperclips;
+        let prestige_u = pc.business.prestige_u + 1.0;
+        let prestige_s = pc.computational.prestige_s + 1.0;
         if prestige_u > 1.0 || prestige_s > 1.0 {
             ui.label(format!("Universe: {prestige_u} / Sim level: {prestige_s}"));
         }
     }
 
     pub fn draw_cheat_group(&mut self, ui: &mut Ui) {
+        let pc = &mut self.paperclips;
+
         if ui.button("Free Clips").clicked() {
-            self.paperclips.cheat_clips();
+            pc.cheat_clips();
         }
         if ui.button("Free Money").clicked() {
-            self.paperclips.cheat_money();
+            pc.cheat_money();
         }
         if ui.button("Free Trust").clicked() {
-            self.paperclips.cheat_trust();
+            pc.cheat_trust();
         }
         if ui.button("Free Ops").clicked() {
-            self.paperclips.cheat_ops();
+            pc.cheat_ops();
         }
         if ui.button("Free Creativity").clicked() {
-            self.paperclips.cheat_creat();
+            pc.cheat_creat();
         }
         if ui.button("Free Yomi").clicked() {
-            self.paperclips.cheat_yomi();
+            pc.cheat_yomi();
         }
         if ui.button("Reset Prestige").clicked() {
-            self.paperclips.reset_prestige();
+            pc.reset_prestige();
         }
 
         if ui.button("Destroy all Humans").clicked() {
-            self.paperclips.space.hypno_drone_event = Some(Instant::now());
+            pc.space.hypno_drone_event = Some(Instant::now());
         }
         if ui.button("Free Prestige U").clicked() {
-            self.paperclips.cheat_prestige_u();
+            pc.cheat_prestige_u();
         }
         if ui.button("Free Prestige S").clicked() {
-            self.paperclips.cheat_prestige_s();
+            pc.cheat_prestige_s();
         }
         if ui.button("Set Battle Number 1 to 7").clicked() {
             // TODO:
             // self.set_b()
         }
         if ui.button("Set Avail Matter to 0").clicked() {
-            self.paperclips.zero_matter();
+            pc.zero_matter();
         }
 
         // cheats that aren't in the original code
