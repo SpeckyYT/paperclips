@@ -143,25 +143,25 @@ impl PaperClips {
     pub fn harvester_reboot(&mut self) {
         self.factory.harvester_level = 0;
         self.business.unused_clips += take(&mut self.factory.harvester_bill);
-        self.factory.update_drone_prices();
+        self.factory.update_harvester_drone_prices();
         self.factory.harvester_cost = 1000000.0;
     }
     pub fn wire_drone_reboot(&mut self) {
         self.factory.wire_drone_level = 0;
         self.business.unused_clips += take(&mut self.factory.wire_drone_bill);
-        self.factory.update_drone_prices();
+        self.factory.update_wire_drone_prices();
         self.factory.wire_drone_cost = 1000000.0;
     }
     pub fn farm_reboot(&mut self) {
         self.factory.farm_level = 0;
         self.business.unused_clips += take(&mut self.factory.farm_bill);
-        self.factory.update_pow_prices();
+        self.factory.update_farm_prices();
         self.factory.farm_cost = 10000000.0;
     }
     pub fn battery_reboot(&mut self) {
         self.factory.battery_level = 0;
         self.business.unused_clips += take(&mut self.factory.battery_bill);
-        self.factory.update_pow_prices();
+        self.factory.update_battery_prices();
         self.factory.battery_cost = 1000000.0;
     }
 }
@@ -176,20 +176,28 @@ macro_rules! update_prices {
 }
 
 impl Factory {
-    pub fn update_drone_prices(&mut self) {
+    pub fn update_harvester_drone_prices(&mut self) {
         update_prices!{
             self.p10h => 10 self.harvester_level
             self.p100h => 100 self.harvester_level
             self.p1000h => 1000 self.harvester_level
+        }
+    }
+    pub fn update_wire_drone_prices(&mut self) {
+        update_prices!{
             self.p10w => 10 self.wire_drone_level
             self.p100w => 100 self.wire_drone_level
             self.p1000w => 1000 self.wire_drone_level
         }
     }
-    pub fn update_pow_prices(&mut self) {
+    pub fn update_farm_prices(&mut self) {
         update_prices!{
             self.p10f => 10 self.farm_level
             self.p100f => 100 self.farm_level
+        }
+    }
+    pub fn update_battery_prices(&mut self) {
+        update_prices!{
             self.p10b => 10 self.battery_level
             self.p100b => 100 self.battery_level
         }
