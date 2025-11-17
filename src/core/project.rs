@@ -1,6 +1,6 @@
 use std::{borrow::Cow, time::Instant};
 
-use crate::{Float, PaperClips, computational::MEM_SIZE, strategy::strategies::*, util::powf};
+use crate::{Float, PaperClips, computational::MEM_SIZE, space::THRENODY_START, strategy::strategies::*, util::powf};
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
@@ -1007,7 +1007,7 @@ projects! {
         },
     }
     PROJECT_133 {
-        title: |pc| pc.space.threnody_project.to_string(),
+        title: |pc| format!("{THRENODY_START} {}", pc.space.threnody_project),
         description: "Gain 10,000 honor",
         trigger: trigger_false, // |pc| pc.projects.is_active(PROJECT_121) && pc.space.probeUsedTrust >= maxTrust,
         cost: ("(10 million ops)", cost_false),

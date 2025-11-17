@@ -12,6 +12,9 @@ pub const THRENODY_START: &str = "Threnody for the Heroes of ";
 pub const MAX_BATTLENAME_LEN: usize = 24+1 + 20;
 pub const MAX_THRENODY_LEN: usize = THRENODY_START.len() + MAX_BATTLENAME_LEN;
 
+/// # probeXBaseRate
+pub const PROBE_X_BASE_RATE: Float = 1750000000000000000.0;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Space {
     /// # spaceFlag
@@ -24,7 +27,7 @@ pub struct Space {
 
     /// # threnodyTitle
     pub threnody_title: ArrayString<MAX_BATTLENAME_LEN>,
-    pub threnody_project: ArrayString<MAX_THRENODY_LEN>,
+    pub threnody_project: ArrayString<MAX_BATTLENAME_LEN>,
 
     /// # boredomLevel
     pub boredom_level: Float,
@@ -37,6 +40,14 @@ pub struct Space {
     pub acquired_matter: Float,
     /// # processedMatter
     pub processed_matter: Float,
+
+    /// # probeCount
+    pub probe_count: Float,
+
+    /// # probeSpeed
+    pub probe_speed: Float,
+    /// # probeNav
+    pub probe_nav: Float,
 }
 
 impl Default for Space {
@@ -49,11 +60,7 @@ impl Default for Space {
             honor: 0.0,
 
             threnody_title: ArrayString::from(DEFAULT_BATTLENAME).expect("Always valid"),
-            threnody_project: {
-                let mut string = ArrayString::from(THRENODY_START).expect("Always valid");
-                string.push_str(DEFAULT_BATTLENAME);
-                string
-            },
+            threnody_project: ArrayString::from(DEFAULT_BATTLENAME).expect("Always valid"),
 
             boredom_level: 0.0,
 
@@ -61,6 +68,20 @@ impl Default for Space {
             found_matter: STARTING_AVAILABLE_MATTER,
             acquired_matter: 0.0,
             processed_matter: 0.0,
+
+            probe_count: 0.0,
+
+            probe_speed: 0.0,
+            probe_nav: 0.0,
         }
+    }
+}
+
+impl Space {
+    pub fn explore_universe(&mut self) {
+        let x_rate = self.probe_count.floor() * PROBE_X_BASE_RATE * self.probe_speed * self.probe_nav;
+        let x_rate = x_rate.min(TOTAL_MATTER - self.found_matter);
+        self.found_matter += x_rate;
+        self.available_matter += x_rate;
     }
 }

@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{Float, PaperClips};
 
+pub const BATTERY_SIZE: u32 = 10000;
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Factory {
     /// # storedPower
@@ -31,6 +33,8 @@ pub struct Factory {
 
     /// # droneBoost
     pub drone_boost: Float,
+    /// # dronePowerRate
+    pub drone_power_rate: Float,
 
     /// # harvesterLevel
     pub harvester_level: u32,
@@ -56,6 +60,10 @@ pub struct Factory {
     pub farm_bill: Float,
     /// # farmCost
     pub farm_cost: Float,
+    /// # farmRate
+    pub farm_rate: Float,
+    /// # factoryPowerRate
+    pub factory_power_rate: Float,
 
     /// # batteryLevel
     pub battery_level: u32,
@@ -99,6 +107,7 @@ impl Default for Factory {
             factory_cost: 100000000.0,
 
             drone_boost: 1.0,
+            drone_power_rate: 1.0,
 
             harvester_level: 0,
             harvester_rate: 26180337.0, // what the fuck
@@ -113,6 +122,8 @@ impl Default for Factory {
             farm_level: 0,
             farm_bill: 0.0,
             farm_cost: 10000000.0,
+            farm_rate: 50.0,
+            factory_power_rate: 200.0,
 
             battery_level: 0,
             battery_bill: 0.0,
@@ -164,6 +175,41 @@ impl PaperClips {
         self.factory.update_battery_prices();
         self.factory.battery_cost = 1000000.0;
     }
+
+    pub fn update_power(&mut self) {
+        if !self.human_flag && !self.space.space_flag {
+            let supply = self.factory.power_supply();
+            let d_demand = self.factory.power_drone_demand();
+            let f_demand = self.factory.power_factory_demand();
+            let demand = d_demand + f_demand;
+            let cap = self.factory.battery_cap();
+
+            if supply >= demand {
+                if self.factory.stored_power < cap.into() {
+                    self.factory.stored_power += (supply - demand).min(cap as Float - self.factory.stored_power);
+                }
+                self.factory.pow_mod = self.factory.pow_mod.max(1.0);
+                if self.factory.momentum {
+                    self.factory.pow_mod += 0.0005;
+                }
+            } else if supply < demand {
+                let mut xs_demand = demand - supply;
+                if self.factory.stored_power > 0.0 {
+                    if self.factory.stored_power >= xs_demand {
+                        if self.factory.momentum {
+                            self.factory.pow_mod += 0.0005;
+                        }
+                        self.factory.stored_power -= xs_demand;
+                    } else if self.factory.stored_power < xs_demand {
+                        xs_demand -= take(&mut self.factory.stored_power);
+                        self.factory.pow_mod = (supply - xs_demand) / demand;
+                    }
+                } else if self.factory.stored_power <= 0.0 {
+                    self.factory.pow_mod = supply / demand;
+                }
+            }
+        }
+    }
 }
 
 macro_rules! update_prices {
@@ -176,6 +222,23 @@ macro_rules! update_prices {
 }
 
 impl Factory {
+    #[inline]
+    pub const fn power_supply(&self) -> Float {
+        self.farm_level as Float * self.farm_rate / 100.0
+    }
+    #[inline]
+    pub const fn power_drone_demand(&self) -> Float {
+        self.harvester_level as Float * self.drone_power_rate / 100.0 +
+        self.wire_drone_level as Float * self.drone_power_rate / 100.0
+    }
+    #[inline]
+    pub const fn power_factory_demand(&self) -> Float {
+        self.factory_level as Float * self.factory_power_rate
+    }
+    #[inline]
+    pub const fn battery_cap(&self) -> u32 {
+        self.battery_level * BATTERY_SIZE
+    }
     pub fn update_harvester_drone_prices(&mut self) {
         update_prices!{
             self.p10h => 10 self.harvester_level

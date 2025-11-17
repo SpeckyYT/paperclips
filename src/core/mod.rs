@@ -116,12 +116,13 @@ impl PaperClips {
             self.buy_wire();
         }
 
-        // // First, Explore
-        // explore_universe();
-        // // Then, Drones
-        // if (humanFlag == 0 && spaceFlag == 0) {
-        //     update_drone_buttons();
-        // }
+        // First, Explore
+        self.space.explore_universe();
+        // Then, Drones
+        if !self.human_flag && !self.space.space_flag {
+            // update_drone_buttons(); // This is managed by the GUI
+        }
+
         // update_power();
         // update_swarm();
         // acquire_matter();
