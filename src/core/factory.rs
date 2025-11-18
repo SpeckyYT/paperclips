@@ -118,7 +118,9 @@ pub struct Factory {
     pub pow_mod: Float,
 
     /// # mtr
-    pub matter: Float,
+    pub acquired_matter_per_tick: Float,
+    /// # a
+    pub created_wire_per_tick: Float,
 }
 
 impl Default for Factory {
@@ -190,7 +192,8 @@ impl Default for Factory {
 
             pow_mod: 0.0,
 
-            matter: 0.0,
+            acquired_matter_per_tick: 0.0,
+            created_wire_per_tick: 0.0,
         }
     }
 }
@@ -333,7 +336,7 @@ impl PaperClips {
     }
 
     pub fn acquire_matter(&mut self) {
-        self.factory.matter = if self.space.available_matter > 0.0 {
+        self.factory.acquired_matter_per_tick = if self.space.available_matter > 0.0 {
             let h = self.factory.harvester_level.floor();
 
             let dbsth = if self.factory.drone_boost > 1.0 {
@@ -350,6 +353,29 @@ impl PaperClips {
             self.space.acquired_matter += mtr;
 
             mtr
+        } else {
+            0.0
+        }
+    }
+
+    pub fn process_matter(&mut self) {
+        self.factory.created_wire_per_tick = if self.space.acquired_matter > 0.0 {
+            let w = self.factory.wire_drone_level.floor();
+
+            let dbstw = if self.factory.drone_boost > 1.0 {
+                self.factory.drone_boost * w
+            } else {
+                1.0
+            };
+
+            let mut wire = self.factory.pow_mod * dbstw * w * self.factory.wire_drone_rate;
+            wire *= (200.0 - self.factory.swarm_slider) / 100.0;
+            wire = wire.min(self.space.acquired_matter);
+
+            self.space.acquired_matter -= wire;
+            self.wire.count += wire;
+
+            wire
         } else {
             0.0
         }

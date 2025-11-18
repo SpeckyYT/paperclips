@@ -126,7 +126,7 @@ impl PaperClips {
         self.update_power();
         self.update_swarm();
         self.acquire_matter();
-        // process_matter();
+        self.process_matter();
 
         // // Then Factories    
         // let fbst = if factory_boost > 1 {
