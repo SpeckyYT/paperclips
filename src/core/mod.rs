@@ -125,7 +125,7 @@ impl PaperClips {
 
         self.update_power();
         self.update_swarm();
-        // acquire_matter();
+        self.acquire_matter();
         // process_matter();
 
         // // Then Factories    

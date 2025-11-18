@@ -116,6 +116,9 @@ pub struct Factory {
 
     /// # powMod
     pub pow_mod: Float,
+
+    /// # mtr
+    pub matter: Float,
 }
 
 impl Default for Factory {
@@ -186,6 +189,8 @@ impl Default for Factory {
             p100b: 0.0,
 
             pow_mod: 0.0,
+
+            matter: 0.0,
         }
     }
 }
@@ -325,6 +330,29 @@ impl PaperClips {
                 self.factory.gift_countdown = (GIFT_PERIOD - self.factory.gift_bits) / self.factory.gift_bit_generation_rate;
                 SwarmStatus::Active
             };
+    }
+
+    pub fn acquire_matter(&mut self) {
+        self.factory.matter = if self.space.available_matter > 0.0 {
+            let h = self.factory.harvester_level.floor();
+
+            let dbsth = if self.factory.drone_boost > 1.0 {
+                self.factory.drone_boost * h
+            } else {
+                1.0
+            };
+
+            let mut mtr = self.factory.pow_mod * dbsth * h * self.factory.harvester_rate;
+            mtr *= (200.0 - self.factory.swarm_slider) / 100.0;
+            mtr = mtr.min(self.space.available_matter);
+
+            self.space.available_matter -= mtr;
+            self.space.acquired_matter += mtr;
+
+            mtr
+        } else {
+            0.0
+        }
     }
 }
 
