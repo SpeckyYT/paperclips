@@ -123,8 +123,8 @@ impl PaperClips {
             // update_drone_buttons(); // This is managed by the GUI
         }
 
-        // update_power();
-        // update_swarm();
+        self.update_power();
+        self.update_swarm();
         // acquire_matter();
         // process_matter();
 

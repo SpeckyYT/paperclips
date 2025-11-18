@@ -1,10 +1,12 @@
-use std::mem::take;
+use std::{f64::consts::E, mem::take};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Float, PaperClips};
+use crate::{Float, PaperClips, project::PROJECT_130};
 
 pub const BATTERY_SIZE: u32 = 10000;
+pub const SYNCH_COST: Float = 5000.0;
+pub const GIFT_PERIOD: Float = 125000.0;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Factory {
@@ -20,8 +22,36 @@ pub struct Factory {
     /// # swarmFlag
     pub swarm_flag: bool,
 
+    /// # swarmGifts
+    pub swarm_gifts: Float,
+    /// # sliderPos
+    /// `0.0..=200.0`
+    pub swarm_slider: Float,
+    /// # swarmStatus
+    pub swarm_status: SwarmStatus,
+    /// # giftCountdown
+    pub gift_countdown: Float,
+    /// # giftBits
+    pub gift_bits: Float,
+    /// # giftBitGenerationRate
+    pub gift_bit_generation_rate: Float,
+
+    /// # boredomFlag
+    pub boredom_flag: bool,
+    /// # boredomLevel
+    pub boredom_level: u16,
+    /// # boredomMsg
+    pub boredom_msg: bool,
+
+    /// # disorgFlag
+    pub disorg_flag: bool,
+    /// # disorgCounter
+    pub disorg_counter: Float,
+    /// # disorgMsg
+    pub disorg_msg: bool,
+
     /// # factoryLevel
-    pub factory_level: u32,
+    pub factory_level: Float,
     /// # factoryRate
     pub factory_rate: Float,
     /// # factoryBoost
@@ -37,7 +67,7 @@ pub struct Factory {
     pub drone_power_rate: Float,
 
     /// # harvesterLevel
-    pub harvester_level: u32,
+    pub harvester_level: Float,
     /// # harvesterRate
     pub harvester_rate: Float,
     /// # harvesterBill
@@ -46,7 +76,7 @@ pub struct Factory {
     pub harvester_cost: Float,
 
     /// # wireDroneLevel
-    pub wire_drone_level: u32,
+    pub wire_drone_level: Float,
     /// # wireDroneRate
     pub wire_drone_rate: Float,
     /// # wireDroneBill
@@ -100,7 +130,22 @@ impl Default for Factory {
             momentum: false,
             swarm_flag: false,
 
-            factory_level: 0,
+            swarm_gifts: 0.0,
+            swarm_slider: 0.0,
+            swarm_status: SwarmStatus::default(),
+            gift_countdown: GIFT_PERIOD,
+            gift_bits: 0.0,
+            gift_bit_generation_rate: 0.0,
+
+            boredom_flag: false,
+            boredom_level: 0,
+            boredom_msg: false,
+
+            disorg_flag: false,
+            disorg_counter: 0.0,
+            disorg_msg: false,
+
+            factory_level: 0.0,
             factory_rate: 1000000000.0,
             factory_boost: 1.0,
             factory_bill: 0.0,
@@ -109,12 +154,12 @@ impl Default for Factory {
             drone_boost: 1.0,
             drone_power_rate: 1.0,
 
-            harvester_level: 0,
+            harvester_level: 0.0,
             harvester_rate: 26180337.0, // what the fuck
             harvester_bill: 0.0,
             harvester_cost: 1000000.0,
 
-            wire_drone_level: 0,
+            wire_drone_level: 0.0,
             wire_drone_rate: 16180339.0, // what the fuck part 2
             wire_drone_bill: 0.0,
             wire_drone_cost: 1000000.0,
@@ -147,18 +192,18 @@ impl Default for Factory {
 
 impl PaperClips {
     pub fn factory_reboot(&mut self) {
-        self.factory.factory_level = 0;
+        self.factory.factory_level = 0.0;
         self.business.unused_clips += take(&mut self.factory.factory_bill);
         self.factory.factory_cost = 100000000.0;
     }
     pub fn harvester_reboot(&mut self) {
-        self.factory.harvester_level = 0;
+        self.factory.harvester_level = 0.0;
         self.business.unused_clips += take(&mut self.factory.harvester_bill);
         self.factory.update_harvester_drone_prices();
         self.factory.harvester_cost = 1000000.0;
     }
     pub fn wire_drone_reboot(&mut self) {
-        self.factory.wire_drone_level = 0;
+        self.factory.wire_drone_level = 0.0;
         self.business.unused_clips += take(&mut self.factory.wire_drone_bill);
         self.factory.update_wire_drone_prices();
         self.factory.wire_drone_cost = 1000000.0;
@@ -210,13 +255,98 @@ impl PaperClips {
             }
         }
     }
+
+    pub fn update_swarm(&mut self) {
+        self.factory.swarm_gifts = self.factory.swarm_gifts.max(0.0);
+
+        if self.space.available_matter == 0.0 && self.factory.harvester_level + self.factory.wire_drone_level >= 1.0 {
+            self.factory.boredom_level += 1;
+        } else if self.space.available_matter > 0.0 && self.factory.boredom_level > 0 {
+            self.factory.boredom_level -= 1;
+        }
+
+        if self.factory.boredom_level >= 30000 {
+            self.factory.boredom_flag = true;
+            self.factory.boredom_level = 0;
+            if !self.factory.boredom_msg {
+                self.console.push("No matter to harvest. Inactivity has caused the Swarm to become bored");
+                self.factory.boredom_msg = true;
+            }
+        }
+
+        let h = self.factory.harvester_level;
+        let w = self.factory.wire_drone_level;
+        let drone_ratio = h.max(w + 1.0) / h.min(w + 1.0);
+
+        if drone_ratio < 1.5 && self.factory.disorg_counter > 1.0 {
+            self.factory.disorg_counter -= 0.01;
+        } else if drone_ratio > 1.5 {
+            self.factory.disorg_counter += (drone_ratio / 10000.0).min(0.01);
+        }
+
+        if self.factory.disorg_counter >= 100.0 {
+            self.factory.disorg_flag = true;
+            if !self.factory.disorg_msg {
+                self.console.push("Imbalance between Harvester and Wire Drone levels has disorganized the Swarm");
+                self.factory.disorg_msg = true;
+            }
+        }
+
+        let d = (h + w).floor();
+
+        if self.factory.gift_countdown <= 0.0 {
+            let next_gift = (d.log10().round() * self.factory.swarm_slider / 100.0).max(1.0);
+            self.factory.swarm_gifts += next_gift;
+            if self.milestone_flag < 15 {
+                self.console.push(format!("The swarm has generated a gift of {next_gift:.0} additional computational capacity"));
+            }
+            self.factory.gift_bits = 0.0;
+        }
+
+        // Written from the bottom to the top
+        self.factory.swarm_status =
+            if self.factory.disorg_flag {
+                SwarmStatus::Disorganized
+            } else if self.factory.boredom_flag {
+                SwarmStatus::Bored
+            } else if !self.factory.swarm_flag {
+                SwarmStatus::Sleeping
+            } else if d == 0.0 {
+                SwarmStatus::None
+            } else if d == 1.0 {
+                SwarmStatus::Lonely
+            } else if self.space.space_flag && self.projects.is_active(PROJECT_130) {
+                SwarmStatus::NoResponse
+            } else if self.factory.pow_mod == 0.0 {
+                SwarmStatus::Sleeping
+            } else {
+                self.factory.gift_bit_generation_rate = d.log(E as Float) * (self.factory.swarm_slider / 100.0);
+                self.factory.gift_bits += self.factory.gift_bit_generation_rate;
+                self.factory.gift_countdown = (GIFT_PERIOD - self.factory.gift_bits) / self.factory.gift_bit_generation_rate;
+                SwarmStatus::Active
+            };
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+pub enum SwarmStatus {
+    Active = 0,
+    Hungry = 1,
+    Confused = 2,
+    Bored = 3,
+    Cold = 4,
+    Disorganized = 5,
+    Sleeping = 6,
+    #[default]
+    None = 7,
+    Lonely = 8,
+    NoResponse = 9,
 }
 
 macro_rules! update_prices {
     ($($store:expr => $amt:literal $lvl:expr)*) => {
         $({
-            let start_lvl = $lvl + 1;
-            $store = (start_lvl..start_lvl + $amt).map(|i| (i as Float).powf(2.25)).sum::<Float>() * 1000000.0;
+            $store = (1..=$amt).map(|i| ($lvl as Float + i as Float).powf(2.25)).sum::<Float>() * 1000000.0
         })*
     };
 }

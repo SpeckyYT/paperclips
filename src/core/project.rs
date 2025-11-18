@@ -816,7 +816,7 @@ projects! {
     PROJECT_100 {
         title: "Upgraded Factories",
         description: "Increase clip factory performance by 100x",
-        trigger: |pc| pc.factory.factory_level >= 10,
+        trigger: |pc| pc.factory.factory_level >= 10.0,
         cost: ("(80,000 ops)", |pc| req_operations(80000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 80000.0;
@@ -827,7 +827,7 @@ projects! {
     PROJECT_101 {
         title: "Terraforming Support Clips",
         description: "Increase clip factory performance by 1000x",
-        trigger: |pc| pc.factory.factory_level >= 20,
+        trigger: |pc| pc.factory.factory_level >= 20.0,
         cost: ("(85,000 ops)", |pc| req_operations(85000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 85000.0;
@@ -838,7 +838,7 @@ projects! {
     PROJECT_102 {
         title: "Self-correcting Supply Chain",
         description: "Each factory added to the network increases every factory's output 1,000x",
-        trigger: |pc| pc.factory.factory_level >= 50,
+        trigger: |pc| pc.factory.factory_level >= 50.0,
         cost: ("(1 sextillion clips)", |pc| pc.business.unused_clips >= 1000000000000000000000.0),
         effect: |pc| {
             pc.business.unused_clips -= 1000000000000000000000.0;
@@ -849,7 +849,7 @@ projects! {
     PROJECT_110 {
         title: "Drone flocking: collision avoidance",
         description: "All drones 100x more effective",
-        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 500,
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 500.0,
         cost: ("(80,000 ops)", |pc| pc.computational.operations >= 80000.0),
         effect: |pc| {
             pc.computational.standard_ops -= 80000.0;
@@ -861,7 +861,7 @@ projects! {
     PROJECT_111 {
         title: "Drone flocking: alignment",
         description: "All drones 1000x more effective",
-        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000,
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000.0,
         cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 100000.0;
@@ -873,7 +873,7 @@ projects! {
     PROJECT_112 {
         title: "Drone Flocking: Adversarial Cohesion",
         description: "Each drone added to the flock doubles every drone's output",
-        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000,
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 5000.0,
         cost: ("(50,000 yomi)", |pc| req_yomi(50000.0)(pc)),
         effect: |pc| {
             pc.strategy.yomi -= 50000.0;
@@ -932,7 +932,7 @@ projects! {
     PROJECT_126 {
         title: "Swarm Computing",
         description: "Harness the drone flock to increase computational capacity",
-        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 200,
+        trigger: |pc| pc.factory.harvester_level + pc.factory.wire_drone_level >= 200.0,
         cost: ("(36,000 yomi)", |pc| req_yomi(36000.0)(pc)),
         effect: |pc| {
             pc.strategy.yomi -= 36000.0;
@@ -973,7 +973,7 @@ projects! {
     PROJECT_130 {
         title: "Reboot the Swarm",
         description: "Turn the swarm off and then turn it back on again",
-        trigger: |pc| pc.space.space_flag && pc.factory.harvester_level + pc.factory.wire_drone_level >= 2,
+        trigger: |pc| pc.space.space_flag && pc.factory.harvester_level + pc.factory.wire_drone_level >= 2.0,
         cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 100000.0;
