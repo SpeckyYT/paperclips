@@ -27,11 +27,11 @@ pub mod rng;
 pub struct PaperClips {
     pub ticks: u128,
 
-    pub milestone_flag: u8,
+    pub milestone_flag: u8, // TODO: enum maybe?
     pub human_flag: bool,
+    pub dismantle: u8, // TODO: enum maybe? part 2
 
     pub console: Console,
-
     pub business: Business,
     pub wire: Wire,
     pub computational: Computational, 
@@ -52,13 +52,14 @@ impl Default for PaperClips {
 
             milestone_flag: 0,
             human_flag: true,
+            dismantle: 0,
 
+            console: Console::default(),
             business: Business::default(),
             wire: Wire::default(),
-            qchips: QChips::default(),
             computational: Computational::default(),
             projects: Projects::default(),
-            console: Console::default(),
+            qchips: QChips::default(),
             investments: Investments::default(),
             strategy: Strategy::default(),
             factory: Factory::default(),
@@ -128,27 +129,27 @@ impl PaperClips {
         self.acquire_matter();
         self.process_matter();
 
-        // // Then Factories    
-        // let fbst = if factory_boost > 1 {
-        //     fbst = factory_boost * factory_level;
-        // } else { 1 };
-        // if (dismantle < 4) {
-        //     clipClick(powMod * fbst * (Math.floor(factoryLevel) * factoryRate));
-        // }
+        // Then Factories    
+        let fbst = if self.factory.factory_boost > 1.0 {
+            self.factory.factory_boost * self.factory.factory_level
+        } else {
+            1.0
+        };
+        if self.dismantle < 4 {
+            self.clip_click(self.factory.pow_mod * fbst * self.factory.factory_level.floor() * self.factory.factory_rate);
+        }
 
         // // Then Other Probe Functions
-        // if spaceFlag {
-        //     if probe_count < 0 {
-        //         probe_count = 0;
-        //     }
-        //     encounter_hazards();
-        //     spawn_factories();
-        //     spawn_harvesters();
-        //     spawn_wire_drones();
-        //     spawn_probes();
-        //     drift();
-        //     war();
-        // }
+        if self.space.space_flag {
+            self.space.probe_count = self.space.probe_count.min(0.0);
+            //     encounter_hazards();
+            //     spawn_factories();
+            //     spawn_harvesters();
+            //     spawn_wire_drones();
+            //     spawn_probes();
+            //     drift();
+            //     war();
+        }
 
         // // Auto-Clipper
         // if (dismantle < 4) {
