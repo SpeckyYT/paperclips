@@ -139,23 +139,23 @@ impl PaperClips {
             self.clip_click(self.factory.pow_mod * fbst * self.factory.factory_level.floor() * self.factory.factory_rate);
         }
 
-        // // Then Other Probe Functions
+        // Then Other Probe Functions
         if self.space.space_flag {
             self.space.probe_count = self.space.probe_count.min(0.0);
-            //     encounter_hazards();
-            //     spawn_factories();
-            //     spawn_harvesters();
-            //     spawn_wire_drones();
-            //     spawn_probes();
-            //     drift();
+            self.encounter_hazards();
+            self.spawn_factories();
+            self.spawn_harvesters();
+            self.spawn_wire_drones();
+            self.spawn_probes();
+            self.drift();
             //     war();
         }
 
-        // // Auto-Clipper
-        // if (dismantle < 4) {
+        // Auto-Clipper
+        if self.dismantle < 4 {
             self.clip_click(self.business.clipper_boost * (self.business.clipper_level / 100.0));
             self.clip_click(self.business.mega_clipper_boost * (self.business.mega_clipper_level * 5.0));
-        // }
+        }
 
         // Demand Curve 
         if self.human_flag {
