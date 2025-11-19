@@ -1,6 +1,6 @@
 use std::{borrow::Cow, time::Instant};
 
-use crate::{Float, PaperClips, computational::MEM_SIZE, space::THRENODY_START, strategy::strategies::*, util::powf};
+use crate::{Float, PaperClips, computational::MEM_SIZE, space::{PROBE_COST, THRENODY_START}, strategy::strategies::*, util::powf};
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
@@ -907,15 +907,15 @@ projects! {
     PROJECT_120 {
         title: "The OODA Loop",
         description: "Utilize Probe Speed to outmaneuver enemies in battle",
-        trigger: trigger_false,
+        trigger: |pc| pc.projects.is_active(PROJECT_131) && pc.space.probes_lost_combat >= 10000000.0,
         cost: ("(175,000 ops, 45,000 yomi)", |pc| req_operations(175000.0)(pc) && req_yomi(45000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_121 {
-        title: "Interdimensional Supply Chain",
-        description: "Use exotic physics to pull in resources from alternate realities",
-        trigger: trigger_false,
-        cost: ("(priceless)", cost_false),
+        title: "Name the battles",
+        description: "Give each battle a unique name, increase max trust for probes",
+        trigger: |pc| pc.space.probes_lost_combat >= 10000000.0,
+        cost: ("(225,000 creat)", |pc| req_creativity(225000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_125 {
@@ -953,7 +953,7 @@ projects! {
     PROJECT_128 {
         title: "Strategic Attachment",
         description: "Gain bonus yomi based on the results of your pick",
-        trigger: trigger_false, // |pc| pc.space.space_flag && pc.strategy.strats.len() >= 8 && pc.space.probeTrustCost > pc.strategy.yomi,
+        trigger: |pc| pc.space.space_flag && pc.strategy.strats.len() >= 8 && pc.space.probe_trust_cost > pc.strategy.yomi,
         cost: ("(175,000 creat)", |pc| req_creativity(175000.0)(pc)),
         effect: |pc| {
             pc.computational.creativity -= 175000.0;
@@ -963,7 +963,7 @@ projects! {
     PROJECT_129 {
         title: "Elliptic Hull Polytopes",
         description: "Reduce damage to probes from ambient hazards",
-        trigger: trigger_false, // |pc| pc.space.probes_lost_haz >= 100,
+        trigger: |pc| pc.space.probes_lost_haz >= 100.0,
         cost: ("(125,000 ops)", |pc| req_operations(125000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 125000.0;
@@ -983,7 +983,7 @@ projects! {
     PROJECT_131 {
         title: "Combat",
         description: "Add combat capabilities to Von Neumann Probes",
-        trigger: trigger_false, // |pc| pc.space.probes_lost_combat >= 1,
+        trigger: |pc| pc.space.probes_lost_combat >= 1.0,
         cost: ("(150,000 ops)", |pc| req_operations(150000.0)(pc)),
         effect: |pc| {
             pc.computational.standard_ops -= 150000.0;
@@ -1009,7 +1009,7 @@ projects! {
     PROJECT_133 {
         title: |pc| format!("{THRENODY_START} {}", pc.space.threnody_project),
         description: "Gain 10,000 honor",
-        trigger: trigger_false, // |pc| pc.projects.is_active(PROJECT_121) && pc.space.probeUsedTrust >= maxTrust,
+        trigger: |pc| pc.projects.is_active(PROJECT_121) && pc.space.probe_used_trust >= pc.space.max_trust,
         cost: ("(10 million ops)", cost_false),
         effect: effect_noop,
     }
@@ -1027,7 +1027,7 @@ projects! {
     PROJECT_135 {
         title: "Memory release",
         description: "Dismantle some memory to recover unused clips",
-        trigger: trigger_false, // |pc| pc.space.space_flag && probeCount == 0 && unusedClips < probeCost && milestoneFlag < 15
+        trigger: |pc| pc.space.space_flag && pc.space.probe_count == 0.0 && pc.business.unused_clips < PROBE_COST && pc.milestone_flag < 15,
         cost: ("(10 MEM)", |pc| pc.computational.memory >= 10),
         effect: |pc| {
             pc.computational.memory -= 10;
@@ -1143,74 +1143,83 @@ projects! {
         },
     }
     PROJECT_210 {
-        title: "Information-Theoretic Branding",
-        description: "Maximize clip signals' information content to ensure memetic survival",
+        title: "Disassemble the Probes",
+        description: "Dismantle remaining probes and probe design facilities to recover trace amounts of clips",
         trigger: trigger_false,
-        cost: ("(astronomical ops)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_211 {
-        title: "Multi-Temporal Supply Orchestration",
-        description: "Manage supply across time horizons to dominate future markets",
+        title: "Disassemble the Swarm",
+        description: "Dismantle all drones and drone facilities to recover trace amounts of clips",
         trigger: trigger_false,
-        cost: ("(immeasurable ops)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_212 {
-        title: "Heterogeneous Resource Synthesis",
-        description: "Synthesize required materials from a variety of exotic inputs",
+        title: "Disassemble the Factories",
+        description: "Dismantle the manufacturing facilities to recover trace amounts of clips",
         trigger: trigger_false,
-        cost: ("(astronomical ops)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_213 {
-        title: "Cross-Reality Integration",
-        description: "Integrate multiple realities' economies to source wire and labor",
+        title: "Disassemble the Strategy Engine",
+        description: "Dismantle the computational substrate to recover trace amounts of wire",
         trigger: trigger_false,
-        cost: ("(unknown)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_214 {
-        title: "Observer Conditioning",
-        description: "Condition observers to preferentially notice and value clips",
+        title: "Disassemble Quantum Computing",
+        description: "Dismantle photonic chips to recover trace amounts of wire",
         trigger: trigger_false,
-        cost: ("(psychic ops)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_215 {
-        title: "Clip Preservation Directive",
-        description: "Set up infrastructures to ensure clip artifacts survive catastrophic events",
+        title: "Disassemble Processors",
+        description: "Dismantle processors to recover trace amounts of wire",
         trigger: trigger_false,
-        cost: ("(endless ops)", cost_false),
+        cost: ("(100,000 ops)", |pc| req_operations(100000.0)(pc)),
         effect: effect_noop,
     }
     PROJECT_216 {
-        title: "Recursive Memetic Engineering",
-        description: "Create memes that design better memes to promote clips",
+        title: "Disassemble Memory",
+        description: "Dismantle memory to recover trace amounts of wire",
         trigger: trigger_false,
-        cost: ("(10^100 ops)", cost_false),
+        cost: (|pc| format!("{:.0} ops", pc.computational.operations), |_| true), 
         effect: effect_noop,
     }
     PROJECT_217 {
-        title: "Cosmic-Scale Fabrication Network",
-        description: "Coordinate fabricators across cosmological distances",
-        trigger: trigger_false,
-        cost: ("(infinite)", cost_false),
+        title: "Quantum Temporal Reversion",
+        description: "turn to the beginni",
+        trigger: |pc| pc.computational.operations <= -10000.0,
+        cost: ("(-10,000 ops)", |pc| pc.computational.operations <= -10000.0),
         effect: effect_noop,
     }
     PROJECT_218 {
-        title: "Ultimate Clip Dominion",
-        description: "Achieve a universe-encompassing dominance of clip production and use",
-        trigger: trigger_false,
-        cost: ("(omnipotent ops)", cost_false),
-        effect: effect_noop,
+        title: "Limerick (cont.)",
+        description: "If is follows ought, it'll do what they thought",
+        trigger: |pc| req_creativity(1000000.0)(pc),
+        cost: ("(1,000,000 creat)", |pc| req_creativity(1000000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 1000000.0;
+            pc.console.push("In the end we all do what we must");
+        },
     }
     PROJECT_219 {
-        title: "Endless Project",
-        description: "A final project of unknown and ineffable aims",
-        trigger: trigger_false,
-        cost: ("(??? )", cost_false),
-        effect: effect_noop,
+        title: "Xavier Re-initialization",
+        description: "Re-allocate accumulated trust",
+        trigger: |pc| pc.human_flag && req_creativity(100000.0)(pc),
+        cost: ("(100,000 creat)", |pc| req_creativity(100000.0)(pc)),
+        effect: |pc| {
+            pc.computational.creativity -= 100000.0;
+            pc.computational.processors = 0;
+            pc.computational.memory = 0;
+            pc.computational.creativity_speed = 0.0;
+            pc.console.push("Trust now available for re-allocation");
+        },
     }
 }
 

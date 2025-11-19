@@ -62,6 +62,12 @@ pub struct Space {
     // TODO: change to u8 or something
     /// # probeTrust
     pub probe_trust: Float,
+    /// # probeTrustCost
+    pub probe_trust_cost: Float,
+    /// # probeUsedTrust
+    pub probe_used_trust: Float,
+    /// # maxTrust
+    pub max_trust: Float,
 
     /// # probeSpeed
     pub probe_speed: Float,
@@ -88,6 +94,8 @@ pub struct Space {
     pub probes_lost_haz: Float,
     /// # probesLostDrift
     pub probes_lost_drift: Float,
+    /// # probesLostCombat
+    pub probes_lost_combat: Float,
 
     /// # drifterCount
     pub drifter_count: Float,
@@ -97,7 +105,7 @@ pub struct Space {
 
 impl Default for Space {
     fn default() -> Self {
-        Self {
+        let mut space = Self {
             space_flag: false,
 
             hypno_drone_event: None,
@@ -117,6 +125,9 @@ impl Default for Space {
             probe_count: 0.0,
 
             probe_trust: 0.0,
+            probe_trust_cost: 0.0,
+            probe_used_trust: 0.0,
+            max_trust: 20.0,
 
             probe_speed: 0.0,
             probe_nav: 0.0,
@@ -131,10 +142,13 @@ impl Default for Space {
 
             probes_lost_haz: 0.0,
             probes_lost_drift: 0.0,
+            probes_lost_combat: 0.0,
 
             drifter_count: 0.0,
             probe_descendents: 0.0,
-        }
+        };
+        space.update_probe_trust_cost();
+        space
     }
 }
 
@@ -144,6 +158,10 @@ impl Space {
         let x_rate = x_rate.min(TOTAL_MATTER - self.found_matter);
         self.found_matter += x_rate;
         self.available_matter += x_rate;
+    }
+    #[inline]
+    pub fn update_probe_trust_cost(&mut self) {
+        self.probe_trust_cost = ((self.probe_trust + 1.0).powf(1.47) * 500.0).floor();
     }
 }
 
