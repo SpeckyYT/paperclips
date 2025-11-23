@@ -20,6 +20,7 @@ pub struct Gui {
     audio_mixer: Mixer,
 
     last_main_update: Instant,
+    last_combat_update: Instant,
 }
 
 impl Default for Gui {
@@ -34,6 +35,7 @@ impl Default for Gui {
             },
 
             last_main_update: Instant::now(),
+            last_combat_update: Instant::now(),
         }
     }
 }
@@ -125,6 +127,9 @@ impl Gui {
             last_main_update(TEN_MS) {
                 self.paperclips.main_tick();
                 self.check_threnody();
+            }
+            last_combat_update(FRAME_60FPS) {
+                self.paperclips.update_combat();
             }
         }
 

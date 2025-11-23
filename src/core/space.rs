@@ -1,16 +1,9 @@
 use std::time::Instant;
 
-use arrayvec::ArrayString;
-
 use crate::{Float, PaperClips, factory::{FACTORY_COST, HARVESTER_COST, WIRE_DRONE_COST}, project::{PROJECT_129, PROJECT_148}, util::powf};
 
 pub const TOTAL_MATTER: Float = powf(10.0, 54);
 pub const STARTING_AVAILABLE_MATTER: Float = powf(10.0, 24) * 6000.0;
-
-pub const DEFAULT_BATTLENAME: &str = "Durenstein 1";
-pub const THRENODY_START: &str = "Threnody for the Heroes of ";
-pub const MAX_BATTLENAME_LEN: usize = 24+1 + 20;
-pub const MAX_THRENODY_LEN: usize = THRENODY_START.len() + MAX_BATTLENAME_LEN;
 
 pub const PROBE_COST: Float = powf(10.0, 17);
 
@@ -36,13 +29,6 @@ pub struct Space {
     pub space_flag: bool,
 
     pub hypno_drone_event: Option<Instant>,
-
-    /// # honor
-    pub honor: Float,
-
-    /// # threnodyTitle
-    pub threnody_title: ArrayString<MAX_BATTLENAME_LEN>,
-    pub threnody_project: ArrayString<MAX_BATTLENAME_LEN>,
 
     /// # boredomLevel
     pub boredom_level: Float,
@@ -96,6 +82,8 @@ pub struct Space {
     pub probes_lost_drift: Float,
     /// # probesLostCombat
     pub probes_lost_combat: Float,
+    /// # driftersKilled
+    pub drifters_killed: Float,
 
     /// # drifterCount
     pub drifter_count: Float,
@@ -109,11 +97,6 @@ impl Default for Space {
             space_flag: false,
 
             hypno_drone_event: None,
-
-            honor: 0.0,
-
-            threnody_title: ArrayString::from(DEFAULT_BATTLENAME).expect("Always valid"),
-            threnody_project: ArrayString::from(DEFAULT_BATTLENAME).expect("Always valid"),
 
             boredom_level: 0.0,
 
@@ -143,6 +126,7 @@ impl Default for Space {
             probes_lost_haz: 0.0,
             probes_lost_drift: 0.0,
             probes_lost_combat: 0.0,
+            drifters_killed: 0.0,
 
             drifter_count: 0.0,
             probe_descendents: 0.0,

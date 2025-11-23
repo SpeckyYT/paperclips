@@ -1,6 +1,6 @@
 use std::{borrow::Cow, time::Instant};
 
-use crate::{Float, PaperClips, computational::MEM_SIZE, space::{PROBE_COST, THRENODY_START}, strategy::strategies::*, util::powf};
+use crate::{Float, PaperClips, combat::THRENODY_START, computational::MEM_SIZE, space::PROBE_COST, strategy::strategies::*, util::powf};
 use ProjectStatus::*;
 use arrayvec::ArrayVec;
 
@@ -1002,12 +1002,12 @@ projects! {
             pc.computational.standard_ops -= 250000.0;
             pc.computational.creativity -= 125000.0;
             pc.business.unused_clips -= powf(10.0, 30) * 50.0;
-            pc.space.honor += 50000.0;
+            pc.combat.honor += 50000;
             pc.console.push("A great building must begin with the unmeasurable, must go through measurable means when it is being designed and in the end must be unmeasurable.");
         },
     }
     PROJECT_133 {
-        title: |pc| format!("{THRENODY_START} {}", pc.space.threnody_project),
+        title: |pc| format!("{THRENODY_START} {}", pc.combat.threnody_project),
         description: "Gain 10,000 honor",
         trigger: |pc| pc.projects.is_active(PROJECT_121) && pc.space.probe_used_trust >= pc.space.max_trust,
         cost: ("(10 million ops)", cost_false),

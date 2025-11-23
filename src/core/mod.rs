@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use crate::{business::Business, core::{computational::Computational, investments::Investments, console::Console, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, space::{Space, TOTAL_MATTER}, strategy::Strategy, sounds::Threnody, util::ticks_10ms};
+use crate::{business::Business, combat::Combat, core::{computational::Computational, console::Console, investments::Investments, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, sounds::Threnody, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -20,6 +20,8 @@ pub mod investments;
 pub mod factory;
 pub mod space;
 pub mod sounds;
+pub mod combat;
+pub mod ending;
 pub mod cheat;
 pub mod rng;
 
@@ -41,6 +43,7 @@ pub struct PaperClips {
     pub strategy: Strategy,
     pub factory: Factory,
     pub space: Space,
+    pub combat: Combat,
     pub threnody: Threnody,
     pub rng: PCRng,
 }
@@ -64,6 +67,7 @@ impl Default for PaperClips {
             strategy: Strategy::default(),
             factory: Factory::default(),
             space: Space::default(),
+            combat: Combat::default(),
             threnody: Threnody::default(),
             rng: PCRng::default(),
         }
@@ -148,7 +152,8 @@ impl PaperClips {
             self.spawn_wire_drones();
             self.spawn_probes();
             self.drift();
-            //     war();
+            self.war();
+            self.ending();
         }
 
         // Auto-Clipper
