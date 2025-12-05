@@ -4,6 +4,8 @@ use kittyaudio::{Sound, include_sound};
 
 use crate::gui::Gui;
 
+pub const IS_MOBILE: bool = cfg!(target_os = "android") || cfg!(target_os = "ios");
+
 macro_rules! sounds {
     ($($static:ident = $func:ident $code:expr)*) => {
         $(
@@ -33,7 +35,7 @@ macro_rules! sounds {
 
 sounds!{
     THRENODY_SOUND = play_threnody {
-        if cfg!(target_os = "android") || cfg!(target_os = "ios") {
+        if IS_MOBILE {
             include_sound!("../../assets/test_mobile.mp3").unwrap()
         } else {
             include_sound!("../../assets/test_web.mp3").unwrap()

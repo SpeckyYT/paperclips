@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use crate::{business::Business, combat::Combat, core::{computational::Computational, console::Console, investments::Investments, qchips::QChips, wire::Wire}, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, sounds::Threnody, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
+use crate::{business::Business, combat::Combat, core::{computational::Computational, console::Console, investments::Investments, qchips::QChips, wire::Wire}, end::End, factory::Factory, project::{PROJECT_35, Projects}, rng::PCRng, sounds::Threnody, space::{Space, TOTAL_MATTER}, strategy::Strategy, util::ticks_10ms};
 
 // Can easily get changed with f128 in the future
 pub type Float = f64;
@@ -21,7 +21,7 @@ pub mod factory;
 pub mod space;
 pub mod sounds;
 pub mod combat;
-pub mod ending;
+pub mod end;
 pub mod cheat;
 pub mod rng;
 
@@ -45,6 +45,7 @@ pub struct PaperClips {
     pub space: Space,
     pub combat: Combat,
     pub threnody: Threnody,
+    pub end: End,
     pub rng: PCRng,
 }
 
@@ -69,6 +70,7 @@ impl Default for PaperClips {
             space: Space::default(),
             combat: Combat::default(),
             threnody: Threnody::default(),
+            end: End::default(),
             rng: PCRng::default(),
         }
     }

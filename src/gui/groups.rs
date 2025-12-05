@@ -2,12 +2,13 @@ use std::{borrow::Cow, time::Instant};
 
 use eframe::egui::{Color32, ComboBox, CornerRadius, CursorIcon, Frame, InnerResponse, Rect, RichText, Sense, Ui, Vec2};
 use egui_extras::{Column, TableBuilder};
-use paperclips::{investments::Riskiness, console::Console, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
+use paperclips::{console::Console, end::Dismantle, investments::Riskiness, qchips::QOPS_FADE_TIME, strategy::TourneyDisplay, util::{blink, number_cruncher}};
 use strum::IntoEnumIterator;
 
 use crate::gui::Gui;
 
-mod strategy;
+pub mod strategy;
+pub mod combat;
 
 impl Gui {
     pub fn draw_make_paperclip(&mut self, ui: &mut Ui) {
@@ -159,8 +160,8 @@ impl Gui {
                 }
 
                 // #swarmGiftDiv
-                if pc.factory.swarm_flag /* && !(dismantle >= 2 && endTimer2 >= 50) */ { // TODO
-                    ui.label(format!("Swarm Gifts: {}", 0)); // TODO
+                if pc.factory.swarm_flag && !(pc.end.dismantle >= Dismantle::Swarm && pc.end.timer2 >= 50) {
+                    ui.label(format!("Swarm Gifts: {:.0}", pc.factory.swarm_gifts));
                 }
     
                 let enable_compute_trust_buttons = c.trust > c.processors as i32 + c.memory as i32 /* && swarmGifts > 0 */;

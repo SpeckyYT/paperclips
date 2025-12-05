@@ -99,6 +99,7 @@ impl App for Gui {
                     if self.paperclips.strategy.engine_flag {
                         self.draw_strategy_group(right);
                     }
+                    self.draw_combat_group(right); // TODO
                 });
             });
         });

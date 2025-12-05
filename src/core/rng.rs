@@ -3,6 +3,8 @@ pub struct PCRng {
     pub rng_kind: RngKind,
 }
 
+const PREV_BELOW_ONE: Float = Float::from_bits((1.0 as Float).to_bits() - 1);
+
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub enum RngKind {
     #[default]
@@ -39,11 +41,10 @@ impl PCRng {
     // 0.0..1.0
     #[inline]
     pub fn random_float(&mut self, one_is_best: bool) -> Float {
-        let mut best_worst = [ 1.0, 0.0 ];
-        if !one_is_best {
-            best_worst.reverse();
-        }
-        let [ best, worst ] = best_worst;
+        let [ best, worst ] = match one_is_best {
+            true => [ PREV_BELOW_ONE, 0.0 ],
+            false => [ 0.0, PREV_BELOW_ONE ],
+        };
         match self.rng_kind {
             ThreadRng => rand::random::<Float>(),
             SM64Rng(ref mut number) => sm64_rng(number) as Float / (u16::MAX as f64 + 1.0),
