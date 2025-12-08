@@ -56,7 +56,7 @@ impl App for Gui {
             let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()))
                 .on_hover_text(number_cruncher(self.paperclips.business.clips, Some(1)));
 
-            self.video_serio_button(resp);
+            self.paperclips_button_secret(resp);
 
             ScrollArea::vertical().show(ui, |ui| {
                 ui.columns_const(|[left, middle, right]| {

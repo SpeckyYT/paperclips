@@ -42,4 +42,5 @@ sounds!{
         }
     }
     VIDEO_SERIO_SOUND = play_video_serio include_sound!("../../assets/video_serio.mp3").unwrap()
+    LA_ZUCCA_SOUND = play_la_zucca include_sound!("../../assets/la_zucca.mp3").unwrap()
 }
