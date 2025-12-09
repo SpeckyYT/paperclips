@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Ticks, core::{Float, PaperClips}, rng::PCRng};
+use crate::{core::{Float, PaperClips}, rng::PCRng};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Wire {
     /// # wirePriceTimer
-    pub price_timer: Ticks,
+    pub price_timer: u8,
     /// # wireBasePrice
     pub base_price: Float,
     /// # wirePriceCounter
@@ -47,15 +47,22 @@ impl Default for Wire {
 
 impl Wire {
     pub fn adjust_wire_price(&mut self, rng: &mut PCRng) {
+        self.price_timer = self.price_timer.saturating_add(1);
+
         if self.price_timer >= 250 && self.base_price > 15.0 {
             self.base_price *= 0.999; 
             self.price_timer = 0;
         }
 
-        if rng.random_bool(0.015, false) {
+        let wire_adjust = 6.0 * (self.price_counter as Float).sin();
+        let new_cost = self.base_price + wire_adjust;
+
+        let best_rng = rng.is_best() && new_cost < self.cost;
+        let worst_rng = rng.is_worst() && new_cost > self.cost;
+        
+        if best_rng || worst_rng || rng.random_bool(0.015, false) {
             self.price_counter += 1;
-            let wire_adjust = 6.0 * (self.price_counter as Float).sin();
-            self.cost = self.base_price + wire_adjust;
+            self.cost = new_cost;
         }
     }
 

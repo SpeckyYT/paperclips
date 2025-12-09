@@ -59,6 +59,14 @@ impl PCRng {
             _ => self.random_float(true),
         }
     }
+    #[inline]
+    pub fn is_best(&mut self) -> bool {
+        matches!(self.rng_kind, RngKind::Best)
+    }
+    #[inline]
+    pub fn is_worst(&mut self) -> bool {
+        matches!(self.rng_kind, RngKind::Worst)
+    }
 }
 
 pub fn sm64_rng(input: &mut u16) -> u16 {
