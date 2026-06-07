@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use eframe::{
-    App, Frame, egui::{CentralPanel, Context, ScrollArea, TopBottomPanel}
+    App, Frame, egui::{CentralPanel, Panel, ScrollArea, Ui}
 };
 use kittyaudio::Mixer;
 use paperclips::{PaperClips, util::number_cruncher};
@@ -41,10 +41,10 @@ impl Default for Gui {
 }
 
 impl App for Gui {
-    fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
-        self.update_paperclips(ctx);
+    fn ui(&mut self, ui: &mut Ui, _frame: &mut Frame) {
+        self.update_paperclips(ui);
 
-        TopBottomPanel::top("console").show(ctx, |ui| {
+        Panel::top("console").show_inside(ui, |ui| {
             // #consoleDiv
             self.draw_top_console(ui);
             // #topDiv / #prestigeDiv
@@ -52,7 +52,7 @@ impl App for Gui {
         });
 
         // #topDiv
-        CentralPanel::default().show(ctx, |ui| {
+        CentralPanel::default().show_inside(ui, |ui| {
             let resp = ui.heading(format!("Paperclips: {}", self.paperclips.business.clips.round()))
                 .on_hover_text(number_cruncher(self.paperclips.business.clips, Some(1)));
 
@@ -107,7 +107,7 @@ impl App for Gui {
 }
 
 impl Gui {
-    pub fn update_paperclips(&mut self, ctx: &Context) {
+    pub fn update_paperclips(&mut self, ui: &mut Ui) {
         macro_rules! update_time {
             ($($prop:ident($time:expr) $code:block)*) => {
                 const TOTAL_LOOPS: usize = [$(stringify!($prop)),*].len();
@@ -134,7 +134,7 @@ impl Gui {
             }
         }
 
-        ctx.request_repaint_after(TEN_MS.saturating_sub(self.last_main_update.elapsed()));
+        ui.request_repaint_after(TEN_MS.saturating_sub(self.last_main_update.elapsed()));
     }
     pub fn check_threnody(&mut self) {
         if self.paperclips.threnody.check() {
